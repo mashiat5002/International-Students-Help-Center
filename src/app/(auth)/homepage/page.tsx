@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StudyProgrammes from '@/app/components/StudyProgrammes';
+import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
+import JourneyProgress from '@/app/components/JourneyProgress';
+import Documents from '@/app/components/Documents';
 
 export default function HomePage() {
   const router = useRouter();
@@ -229,10 +232,13 @@ export default function HomePage() {
         </aside>
 
         {/* Main Content */}
-        <main className={`flex-1 p-8 transition-all duration-300
+        <main className={`flex-1 transition-all duration-300 
           ${isSidebarOpen ? 'ml-64' : 'ml-0'} 
           ${isDesktopSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
           {activeItem === 'Find Study Programmes' && <StudyProgrammes />}
+          {activeItem === 'Favorite Programmes' && <FavoriteProgrammes  />}
+          {activeItem === 'Journey Progress' && <JourneyProgress  />}
+          {activeItem === 'Documents' && <Documents  />}
           {/* Add other component conditions here as we create them */}
         </main>
       </div>

@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 interface ProgramProps {
   title: string;
   university: string;
@@ -10,9 +12,10 @@ interface ProgramProps {
   isFavorite: boolean;
   onFavoriteClick: () => void;
   onLearnMore: () => void;
+  onStartJourney?: () => void;
 }
 
-const RecommendedProgramCard = ({
+const RecommendedProgramCard = React.memo(({
   title,
   university,
   country,
@@ -21,8 +24,14 @@ const RecommendedProgramCard = ({
   description,
   isFavorite,
   onFavoriteClick,
-  onLearnMore
+  onLearnMore,
+  onStartJourney = () => console.log('Start Journey clicked')
 }: ProgramProps) => {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onFavoriteClick();
+  };
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white via-white to-blue-50 
       rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 
@@ -33,7 +42,7 @@ const RecommendedProgramCard = ({
 
       {/* Favorite Button with new styling */}
       <button
-        onClick={onFavoriteClick}
+        onClick={handleFavoriteClick}
         className="absolute top-4 right-4 z-10 pointer-events-auto bg-white/80 p-2 rounded-full
           shadow-lg backdrop-blur-sm hover:bg-white transition-all duration-300
           group-hover:scale-110"
@@ -89,18 +98,30 @@ const RecommendedProgramCard = ({
         {/* Description and Button */}
         <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <p className="text-sm text-gray-600 md:max-w-[60%]">{description}</p>
-          <button 
-            onClick={onLearnMore}
-            className="px-6 py-2.5 bg-blue-900 text-white rounded-xl font-medium
-              hover:bg-blue-800 transform hover:-translate-y-0.5
-              transition-all duration-300 shadow-md hover:shadow-xl
-              text-sm md:text-base whitespace-nowrap">
-            Learn More
-          </button>
+          <div className="mt-4 flex gap-4 ">
+            <button
+              onClick={() => onLearnMore()}
+              className="flex-1 bg-blue-900 text-white px-4 py-2 rounded-lg
+                hover:bg-blue-800 transition-colors duration-300
+                font-medium text-xs md:text-xs"
+            >
+              Learn More
+            </button>
+            <button
+              onClick={() => onStartJourney()}
+              className="flex-1 bg-gradient-to-r from-blue-800 to-blue-900 text-white px-4 py-2 rounded-lg
+                hover:from-blue-800 hover:to-blue-950 transition-all duration-300
+                font-medium text-xs md:text-xs"
+            >
+              Start Journey
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return prevProps.isFavorite === nextProps.isFavorite;
+});
 
 export default RecommendedProgramCard; 
