@@ -11,6 +11,8 @@ interface Program {
   duration: string;
   tuition: string;
   description: string;
+  deadline: string;
+  isFavorite: boolean;
 }
 
 // Move ResultsSection outside the main component
@@ -21,7 +23,7 @@ const FavoriteResultsSection = React.memo(({
   favorites: Program[], 
   onToggleFavorite: (program: Program) => void 
 }) => (
-  <div className="w-[95%] md:w-[80%] h-[70vh] animate-fadeIn relative mx-auto mt-16">
+  <div className="w-[95%] md:w-[80%] h-[80vh] animate-fadeIn relative mx-auto mt-16">
     <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
     <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
@@ -39,6 +41,7 @@ const FavoriteResultsSection = React.memo(({
               <RecommendedProgramCard
                 key={program.title}
                 {...program}
+                deadline={program.deadline}
                 isFavorite={true}
                 onFavoriteClick={() => onToggleFavorite(program)}
                 onLearnMore={() => console.log(`Learn more about ${program.title}`)}
@@ -64,10 +67,20 @@ const FavoriteProgrammes = () => {
 
   // Load favorites from localStorage on component mount
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('studyProgramFavorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
+    const loadFavorites = () => {
+      const savedFavorites = localStorage.getItem('studyProgramFavorites');
+      if (savedFavorites) {
+        const parsedFavorites = JSON.parse(savedFavorites);
+        // Ensure all favorites have a deadline
+        const favoritesWithDeadlines = parsedFavorites.map((fav: Program) => ({
+          ...fav,
+          deadline: fav.deadline || '2024-12-31' // Provide a default deadline if none exists
+        }));
+        setFavorites(favoritesWithDeadlines);
+      }
+    };
+
+    loadFavorites();
   }, []);
 
   const toggleFavorite = useCallback((program: Program) => {
@@ -76,9 +89,9 @@ const FavoriteProgrammes = () => {
       
       setToastMessage(`${program.title} removed from favorites`);
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => setShowToast(false), 10000);
       
-      // Update localStorage
+      // Update localStorage with deadline included
       localStorage.setItem('studyProgramFavorites', JSON.stringify(newFavorites));
       return newFavorites;
     });

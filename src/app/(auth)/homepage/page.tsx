@@ -6,6 +6,9 @@ import StudyProgrammes from '@/app/components/StudyProgrammes';
 import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
 import JourneyProgress from '@/app/components/JourneyProgress';
 import Documents from '@/app/components/Documents';
+import ApplicationLinks from '@/app/components/ApplicationLinks';
+import OnlineSeminars from '@/app/components/OnlineSeminars';
+import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 
 export default function HomePage() {
   const router = useRouter();
@@ -42,7 +45,7 @@ export default function HomePage() {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     )},
-    { name: 'Applications', icon: (
+    { name: 'Application Links', icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
@@ -162,11 +165,14 @@ export default function HomePage() {
           />
         )}
 
-        {/* Sidebar */}
-        <aside className={`fixed z-40 flex flex-col h-full bg-gradient-to-b from-[#000033] to-[#001a4d] shadow-xl text-white
+        {/* Sidebar - Fixed height and width for desktop */}
+        <aside className={`fixed lg:fixed flex flex-col bg-gradient-to-b from-[#000033] to-[#001a4d] shadow-xl text-white
           transition-all duration-300 transform
+          h-[calc(100vh-4rem)] top-16
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-          lg:translate-x-0 ${isDesktopSidebarCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
+          lg:translate-x-0
+          ${isDesktopSidebarCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64
+          z-40`}
         >
           {/* Logo */}
           <div className="h-[100px] p-6 border-b border-white/10 shrink-0">
@@ -233,12 +239,17 @@ export default function HomePage() {
 
         {/* Main Content */}
         <main className={`flex-1 transition-all duration-300 
-          ${isSidebarOpen ? 'ml-64' : 'ml-0'} 
-          ${isDesktopSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}`}>
+          ${isDesktopSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}
+          ml-0
+          w-full`}
+        >
           {activeItem === 'Find Study Programmes' && <StudyProgrammes />}
           {activeItem === 'Favorite Programmes' && <FavoriteProgrammes  />}
           {activeItem === 'Journey Progress' && <JourneyProgress  />}
           {activeItem === 'Documents' && <Documents  />}
+          {activeItem === 'Application Links' && <ApplicationLinks  />}
+          {activeItem === 'Online Seminars' && <OnlineSeminars  />}
+          {activeItem === 'Scheduled Meetings' && <ScheduledMeetings  />}
           {/* Add other component conditions here as we create them */}
         </main>
       </div>

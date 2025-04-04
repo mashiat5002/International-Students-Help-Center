@@ -15,14 +15,27 @@ const questions = [
 ];
 
 // Add this demo data for study programmes
-const demoPrograms = Array(10).fill({}).map((_, index) => ({
-  title: `Program ${index + 1}`,
-  university: `University of Technology ${index + 1}`,
-  country: ["USA", "UK", "Canada", "Germany", "Australia"][index % 5],
-  duration: ["4 Years", "3 Years", "2 Years"][index % 3],
-  tuition: `$${(20 + index) * 1000}/year`,
-  description: "Bachelor's degree program focusing on software development, algorithms, and computer systems with practical industry experience."
-}));
+const demoPrograms = [
+  {
+    title: "Computer Science",
+    university: "Massachusetts Institute of Technology",
+    country: "United States",
+    duration: "2 years",
+    tuition: "$53,450 per year",
+    description: "A comprehensive program covering advanced computing concepts, algorithms, and software development.",
+    deadline: "2024-12-15"
+  },
+  {
+    title: "Data Science",
+    university: "Stanford University",
+    country: "United States",
+    duration: "18 months",
+    tuition: "$52,479 per year",
+    description: "An intensive program focusing on big data analytics, machine learning, and statistical analysis.",
+    deadline: "2024-04-30"
+  },
+  // ... add deadlines for other programs
+];
 
 // Add new interface for program type
 interface Program {

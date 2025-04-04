@@ -12,6 +12,7 @@ interface Journey {
   lastUpdated: string;
   institution: string;
   program: string;
+  deadline: string;
   steps: {
     title: string;
     description: string;
@@ -296,6 +297,7 @@ const JourneyProgress = () => {
         lastUpdated: '2024-03-15',
         institution: 'Massachusetts Institute of Technology',
         program: 'Master of Science in Computer Science',
+        deadline: '2024-04-15',
         steps: [
           {
             title: 'Document Preparation',
@@ -333,6 +335,7 @@ const JourneyProgress = () => {
         lastUpdated: '2024-03-14',
         institution: 'Stanford University',
         program: 'Master of Science in Data Science',
+        deadline: '2024-04-15',
         steps: [
           {
             title: 'Prerequisites Check',
@@ -365,6 +368,7 @@ const JourneyProgress = () => {
         lastUpdated: '2024-03-13',
         institution: 'Harvard University',
         program: 'Master of Business Administration',
+        deadline: '2024-04-15',
         steps: [
           {
             title: 'GMAT Exam',
@@ -407,6 +411,7 @@ const JourneyProgress = () => {
         lastUpdated: '2024-03-12',
         institution: 'University of California, Berkeley',
         program: 'Master of Engineering in Artificial Intelligence',
+        deadline: '2024-04-15',
         steps: [
           {
             title: 'Technical Portfolio',
@@ -504,19 +509,135 @@ const JourneyProgress = () => {
             <div className="h-full flex flex-col">
               {/* Progress Tracker Header */}
               <div className="px-8 py-4 border-b bg-white/50 backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-blue-900">
-                  Progress Tracker
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-blue-900">
+                    Progress Tracker
+                  </h3>
+                  <div className={`px-3 py-1.5 rounded-lg text-sm
+                    ${new Date(selectedJourney.deadline) < new Date() 
+                      ? 'bg-red-100 text-red-800' 
+                      : new Date(selectedJourney.deadline).getTime() - new Date().getTime() <= 30 * 24 * 60 * 60 * 1000
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-green-100 text-green-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <div>
+                        <span className="text-xs font-medium block">Deadline</span>
+                        <span className="block">{selectedJourney.deadline}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Scrollable Progress Content */}
+              {/* Steps Content */}
               <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
                 <div className="space-y-8">
-                  <ProgressTracker 
-                    journey={selectedJourney} 
-                    onUpdateStatus={handleUpdateStatus}
-                    onUpdateDocument={handleUpdateDocument}
-                  />
+                  {selectedJourney.steps.map((step, index) => (
+                    <div key={index} className="relative">
+                      {/* Connector line */}
+                      {index < selectedJourney.steps.length - 1 && (
+                        <div className="absolute left-[23px] top-[40px] w-[2px] h-[calc(100%+32px)] 
+                          bg-gradient-to-b from-blue-200 to-gray-200" />
+                      )}
+                      
+                      {/* Step */}
+                      <div className="flex items-start gap-6">
+                        {/* Status indicator button */}
+                        <button
+                          onClick={() => handleUpdateStatus(index, 
+                            step.status === 'not-started' ? 'in-progress' :
+                            step.status === 'in-progress' ? 'completed' : 
+                            'not-started'
+                          )}
+                          className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0
+                            transition-all duration-300 cursor-pointer hover:scale-110
+                            ${step.status === 'completed' 
+                              ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg shadow-green-200' 
+                              : step.status === 'in-progress'
+                              ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-200'
+                              : 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-600 hover:from-blue-50 hover:to-blue-200'}`}
+                        >
+                          {step.status === 'completed' ? '✓' : index + 1}
+                        </button>
+                        
+                        {/* Step content and document upload */}
+                        <div className="flex-1 space-y-4">
+                          <div className="pt-2">
+                            <h4 className="text-lg font-semibold text-blue-900 mb-2">{step.title}</h4>
+                            <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                          </div>
+
+                          {/* Document upload section */}
+                          <div className="flex items-center gap-4">
+                            <div className="relative group">
+                              <label className="relative">
+                                <input
+                                  type="file"
+                                  accept="application/pdf"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const base64 = await convertToBase64(file);
+                                      handleUpdateDocument(index, base64, file.name);
+                                    }
+                                  }}
+                                />
+                                <div className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg border border-blue-200
+                                  hover:bg-blue-100 transition-colors duration-300 cursor-pointer text-sm">
+                                  {step.document ? 'Replace PDF' : 'Upload PDF'}
+                                </div>
+                              </label>
+                              
+                              {/* Tooltip */}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 
+                                opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50">
+                                <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm shadow-lg">
+                                  <p className="mb-1">Note:</p>
+                                  <p className="text-gray-300 text-xs leading-relaxed">
+                                    Documents are stored locally and not submitted to the Institution. 
+                                    Experts can review these documents to provide verification and improvement tips.
+                                  </p>
+                                  {/* Tooltip arrow */}
+                                  <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 
+                                    border-solid border-t-gray-900 border-t-4 border-x-transparent border-x-4 border-b-0">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {step.document && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                                </svg>
+                                <span>{step.documentName}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Status badge */}
+                        <div className={`px-4 py-2 rounded-full text-sm font-medium mt-2
+                          transition-all duration-300
+                          ${step.status === 'completed' 
+                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                            : step.status === 'in-progress'
+                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                            : 'bg-gray-100 text-gray-800 border border-gray-200'}`}
+                        >
+                          {step.status.charAt(0).toUpperCase() + step.status.slice(1).replace('-', ' ')}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

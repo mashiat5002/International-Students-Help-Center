@@ -12,20 +12,20 @@ interface Document {
   content: string; // base64 string
 }
 
-const DocumentCard = React.memo(({ document }: { document: Document }) => (
+const DocumentCard = React.memo(({ document: doc }: { document: Document }) => (
   <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100 hover:border-blue-300 transition-all duration-300">
     <div className="p-6">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-blue-900 mb-1">{document.journeyTitle}</h3>
-          <p className="text-sm text-gray-600">{document.stepTitle}</p>
+          <h3 className="text-lg font-bold text-blue-900 mb-1">{doc.journeyTitle}</h3>
+          <p className="text-sm text-gray-600">{doc.stepTitle}</p>
           <div className="mt-2 space-y-1">
-            <p className="text-xs text-gray-500">Institution: {document.institution}</p>
-            <p className="text-xs text-gray-500">Program: {document.program}</p>
+            <p className="text-xs text-gray-500">Institution: {doc.institution}</p>
+            <p className="text-xs text-gray-500">Program: {doc.program}</p>
           </div>
         </div>
         <span className="text-xs text-gray-500">
-          Uploaded: {document.uploadDate}
+          Uploaded: {doc.uploadDate}
         </span>
       </div>
 
@@ -35,17 +35,16 @@ const DocumentCard = React.memo(({ document }: { document: Document }) => (
             <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
             <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
           </svg>
-          <span className="text-sm font-medium text-gray-700">{document.fileName}</span>
+          <span className="text-sm font-medium text-gray-700">{doc.fileName}</span>
         </div>
 
         <div className="flex gap-2">
           <button 
             onClick={() => {
-              // Convert base64 to PDF and open in new tab
               const pdfWindow = window.open("");
               if (pdfWindow) {
                 pdfWindow.document.write(
-                  "<iframe width='100%' height='100%' src='" + document.content + "'></iframe>"
+                  "<iframe width='100%' height='100%' src='" + doc.content + "'></iframe>"
                 );
               }
             }}
@@ -56,10 +55,10 @@ const DocumentCard = React.memo(({ document }: { document: Document }) => (
           </button>
           <button 
             onClick={() => {
-              const link = document.createElement('a');
-              link.href = document.content;
-              link.download = document.fileName;
-              link.click();
+              const downloadLink = window.document.createElement('a');
+              downloadLink.href = doc.content;
+              downloadLink.download = doc.fileName;
+              downloadLink.click();
             }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg
               hover:bg-blue-700 transition-colors duration-300 text-sm font-medium"
