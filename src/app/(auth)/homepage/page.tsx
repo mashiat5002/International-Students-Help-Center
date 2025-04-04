@@ -9,12 +9,15 @@ import Documents from '@/app/components/Documents';
 import ApplicationLinks from '@/app/components/ApplicationLinks';
 import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
+import PastInquiries from '@/app/components/PastInquiries';
+import Profile from '@/app/components/Profile';
 
 export default function HomePage() {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState('Dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Remove or modify the authentication check for now
   // useEffect(() => {
@@ -135,7 +138,13 @@ export default function HomePage() {
 
             {/* Right Section */}
             <div className="flex items-center space-x-6">
-              <button className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300">
+              <button 
+                onClick={() => {
+                  setShowProfile(true);
+                  setActiveItem('');  // Clear active menu item when showing profile
+                }} 
+                className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -200,7 +209,10 @@ export default function HomePage() {
             {menuItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => setActiveItem(item.name)}
+                onClick={() => {
+                  setActiveItem(item.name);
+                  setShowProfile(false);
+                }}
                 className={`flex items-center w-full p-2.5 rounded-xl transition-all duration-300
                   ${activeItem === item.name
                     ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm translate-x-2'
@@ -223,7 +235,13 @@ export default function HomePage() {
 
           {/* Bottom Section */}
           <div className="p-6 border-t border-white/10 shrink-0">
-            <div className="flex items-center space-x-3">
+            <div 
+              onClick={() => {
+                setShowProfile(true);
+                setActiveItem('');  // Clear active menu item when showing profile
+              }}
+              className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -243,14 +261,20 @@ export default function HomePage() {
           ml-0
           w-full`}
         >
-          {activeItem === 'Find Study Programmes' && <StudyProgrammes />}
-          {activeItem === 'Favorite Programmes' && <FavoriteProgrammes  />}
-          {activeItem === 'Journey Progress' && <JourneyProgress  />}
-          {activeItem === 'Documents' && <Documents  />}
-          {activeItem === 'Application Links' && <ApplicationLinks  />}
-          {activeItem === 'Online Seminars' && <OnlineSeminars  />}
-          {activeItem === 'Scheduled Meetings' && <ScheduledMeetings  />}
-          {/* Add other component conditions here as we create them */}
+          {showProfile ? (
+            <Profile />
+          ) : (
+            <>
+              {activeItem === 'Find Study Programmes' && <StudyProgrammes />}
+              {activeItem === 'Favorite Programmes' && <FavoriteProgrammes />}
+              {activeItem === 'Journey Progress' && <JourneyProgress />}
+              {activeItem === 'Documents' && <Documents />}
+              {activeItem === 'Application Links' && <ApplicationLinks />}
+              {activeItem === 'Online Seminars' && <OnlineSeminars />}
+              {activeItem === 'Scheduled Meetings' && <ScheduledMeetings />}
+              {activeItem === 'Past Inquiries' && <PastInquiries />}
+            </>
+          )}
         </main>
       </div>
     </div>
