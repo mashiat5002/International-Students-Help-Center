@@ -116,7 +116,18 @@ const Documents = () => {
         institution: "UC Berkeley",
         program: "Master of Engineering in AI",
         content: samplePdfBase64
+      },
+      {
+        journeyTitle: "AI Engineering Application",
+        stepTitle: "Technical Portfolio",
+        fileName: "Portfolio_Berkeley_AI.pdf",
+        uploadDate: "2024-03-12",
+        institution: "UC Berkeley",
+        program: "Master of Engineering in AI",
+        content: samplePdfBase64
       }
+      
+      
     ];
 
     // Store sample documents in localStorage
@@ -133,7 +144,7 @@ const Documents = () => {
 
   return (
     <div className="h-full w-full overflow-hidden">
-      <div className="w-[95%] md:w-[80%] h-[85vh] animate-fadeIn relative mx-auto mt-5">
+      <div className="w-[95%] md:w-[90%] h-[85vh] animate-fadeIn relative mx-auto mt-10">
         <div className="bg-white/20 backdrop-blur-md rounded-xl shadow-lg h-full flex flex-col overflow-hidden">
           {/* Fixed Header */}
           <div className="px-6 py-4 border-b bg-white/50 backdrop-blur-sm">

@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
+import RegisterCard from '@/components/auth/RegisterCard';
+import LoginCard from '@/components/auth/LoginCard';
 
 const backgroundImages = [
   '/students.jpg',  // You'll need to add these images to your public folder
@@ -10,6 +12,9 @@ const backgroundImages = [
 
 export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showRegisterCard, setShowRegisterCard] = useState(false);
+  const [showLoginCard, setShowLoginCard] = useState(false);
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,8 +26,46 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleRegisterClick = () => {
+    setIsButtonClicked(true);
+    setShowRegisterCard(true);
+  };
+
+  const handleLoginClick = () => {
+    setIsButtonClicked(true);
+    setShowLoginCard(true);
+  };
+
+  const handleClose = () => {
+    setShowRegisterCard(false);
+    setShowLoginCard(false);
+    setIsButtonClicked(false);
+  };
+
+  const handleShowLogin = () => {
+    setShowRegisterCard(false);
+    setShowLoginCard(true);
+  };
+
   return (
     <div className="relative h-screen overflow-hidden">
+      {/* Register Card Modal */}
+      <RegisterCard 
+        isOpen={showRegisterCard} 
+        onClose={handleClose}
+        onShowLogin={handleShowLogin}
+      />
+
+      {/* Login Card Modal */}
+      <LoginCard 
+        isOpen={showLoginCard} 
+        onClose={handleClose}
+        onShowRegister={() => {
+          setShowLoginCard(false);
+          setShowRegisterCard(true);
+        }}
+      />
+
       {/* Background Images */}
       {backgroundImages.map((image, index) => (
         <div
@@ -51,11 +94,21 @@ export default function Hero() {
             and get AI-powered guidance for studying abroad.
           </p>
           <div className="mt-10 flex justify-center space-x-4">
-            <button className="bg-white text-[#000033] px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors">
+            <button 
+              onClick={handleRegisterClick}
+              className={`bg-white text-[#000033] px-8 py-3 rounded-md font-semibold transition-all duration-300 ${
+                isButtonClicked && showRegisterCard ? 'scale-95 bg-gray-100' : 'hover:bg-gray-100'
+              }`}
+            >
               Get Started
             </button>
-            <button className="border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white hover:text-[#000033] transition-colors">
-              Learn More
+            <button 
+              onClick={handleLoginClick}
+              className={`border-2 border-white text-white px-8 py-3 rounded-md font-semibold transition-all duration-300 ${
+                isButtonClicked && showLoginCard ? 'scale-95 bg-white/20' : 'hover:bg-white hover:text-[#000033]'
+              }`}
+            >
+              Contact Us
             </button>
           </div>
         </div>

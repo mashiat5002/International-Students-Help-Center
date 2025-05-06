@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import LoginCard from '@/components/auth/LoginCard';
 
 // Extended country list
 const allCountries = [
@@ -22,6 +23,7 @@ export default function CountrySelector() {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<typeof allCountries>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showLoginCard, setShowLoginCard] = useState(false);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -41,8 +43,18 @@ export default function CountrySelector() {
     // You can add additional handling here when a country is selected
   };
 
+  const handleSearchClick = () => {
+    setShowLoginCard(true);
+  };
+
   return (
     <section className="py-16 bg-gray-50">
+      {/* Login Card Modal */}
+      <LoginCard 
+        isOpen={showLoginCard} 
+        onClose={() => setShowLoginCard(false)}
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -68,19 +80,24 @@ export default function CountrySelector() {
                 onFocus={() => setShowSuggestions(true)}
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <svg 
-                  className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer transition-colors" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
+                <button 
+                  onClick={handleSearchClick}
+                  className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-                  />
-                </svg>
+                  <svg 
+                    className="h-5 w-5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                    />
+                  </svg>
+                </button>
               </div>
               
               {/* Suggestions dropdown */}

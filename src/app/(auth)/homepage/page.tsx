@@ -11,10 +11,12 @@ import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Profile from '@/app/components/Profile';
+import { call_logout } from '@/app/(utils)/call_logout/route';
+
 
 export default function HomePage() {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('Dashboard');
+  const [activeItem, setActiveItem] = useState('Find Study Programmes');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -67,7 +69,8 @@ export default function HomePage() {
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
       </svg>
-    )}
+    )},
+   
   ];
 
   return (
@@ -151,7 +154,7 @@ export default function HomePage() {
                 <span>Profile</span>
               </button>
               <button 
-                onClick={() => router.push('/')}
+                onClick={() => {call_logout(),router.push('/')}}
                 className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,7 +251,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${isDesktopSidebarCollapsed ? 'lg:hidden' : ''}`}>
-                <h3 className="text-sm font-semibold whitespace-nowrap">John Doe</h3>
+                <h3 className="text-sm font-semibold whitespace-nowrap">Mashiat Islam</h3>
                 <p className="text-xs text-gray-300 whitespace-nowrap">Student</p>
               </div>
             </div>
@@ -273,6 +276,7 @@ export default function HomePage() {
               {activeItem === 'Online Seminars' && <OnlineSeminars />}
               {activeItem === 'Scheduled Meetings' && <ScheduledMeetings />}
               {activeItem === 'Past Inquiries' && <PastInquiries />}
+              
             </>
           )}
         </main>

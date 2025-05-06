@@ -23,7 +23,7 @@ const FavoriteResultsSection = React.memo(({
   favorites: Program[], 
   onToggleFavorite: (program: Program) => void 
 }) => (
-  <div className="w-[95%] md:w-[80%] h-[80vh] animate-fadeIn relative mx-auto mt-16">
+  <div className="w-[95%] md:w-[90%] h-[80vh] animate-fadeIn relative mx-auto mt-16">
     <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
     <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
@@ -112,7 +112,7 @@ const FavoriteProgrammes = () => {
   );
 
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden ">
       
 
       {/* Content */}

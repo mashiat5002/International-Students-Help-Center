@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
+import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
 
 interface Journey {
   id: string;
@@ -287,162 +288,15 @@ const JourneyProgress = () => {
 
   // Load demo data
   useEffect(() => {
-    const demoJourneys: Journey[] = [
-      {
-        id: '1',
-        title: 'Computer Science Application',
-        description: 'Application process for MIT Computer Science program',
-        totalSteps: 5,
-        currentStep: 3,
-        lastUpdated: '2024-03-15',
-        institution: 'Massachusetts Institute of Technology',
-        program: 'Master of Science in Computer Science',
-        deadline: '2024-04-15',
-        steps: [
-          {
-            title: 'Document Preparation',
-            description: 'Gather all required documents for application',
-            status: 'completed'
-          },
-          {
-            title: 'Application Form',
-            description: 'Fill out the online application form',
-            status: 'completed'
-          },
-          {
-            title: 'Statement of Purpose',
-            description: 'Write and review statement of purpose',
-            status: 'in-progress'
-          },
-          {
-            title: 'Recommendations',
-            description: 'Obtain letters of recommendation',
-            status: 'not-started'
-          },
-          {
-            title: 'Interview',
-            description: 'Complete the admission interview',
-            status: 'not-started'
-          }
-        ]
-      },
-      {
-        id: '2',
-        title: 'Data Science at Stanford',
-        description: 'Application journey for Stanford Data Science program',
-        totalSteps: 4,
-        currentStep: 2,
-        lastUpdated: '2024-03-14',
-        institution: 'Stanford University',
-        program: 'Master of Science in Data Science',
-        deadline: '2024-04-15',
-        steps: [
-          {
-            title: 'Prerequisites Check',
-            description: 'Verify all academic prerequisites are met',
-            status: 'completed'
-          },
-          {
-            title: 'GRE Preparation',
-            description: 'Complete GRE exam with required scores',
-            status: 'completed'
-          },
-          {
-            title: 'Research Proposal',
-            description: 'Develop and refine research proposal',
-            status: 'in-progress'
-          },
-          {
-            title: 'Faculty Contact',
-            description: 'Connect with potential faculty advisors',
-            status: 'not-started'
-          }
-        ]
-      },
-      {
-        id: '3',
-        title: 'Business Analytics at Harvard',
-        description: 'MBA application process at Harvard Business School',
-        totalSteps: 6,
-        currentStep: 1,
-        lastUpdated: '2024-03-13',
-        institution: 'Harvard University',
-        program: 'Master of Business Administration',
-        deadline: '2024-04-15',
-        steps: [
-          {
-            title: 'GMAT Exam',
-            description: 'Prepare and take GMAT examination',
-            status: 'completed'
-          },
-          {
-            title: 'Resume Building',
-            description: 'Update and refine professional resume',
-            status: 'in-progress'
-          },
-          {
-            title: 'Essays',
-            description: 'Write required application essays',
-            status: 'not-started'
-          },
-          {
-            title: 'Recommendations',
-            description: 'Secure professional recommendations',
-            status: 'not-started'
-          },
-          {
-            title: 'Interview Prep',
-            description: 'Prepare for admission interview',
-            status: 'not-started'
-          },
-          {
-            title: 'Financial Documentation',
-            description: 'Prepare financial statements and documents',
-            status: 'not-started'
-          }
-        ]
-      },
-      {
-        id: '4',
-        title: 'AI Engineering at Berkeley',
-        description: 'Application process for UC Berkeley AI program',
-        totalSteps: 5,
-        currentStep: 0,
-        lastUpdated: '2024-03-12',
-        institution: 'University of California, Berkeley',
-        program: 'Master of Engineering in Artificial Intelligence',
-        deadline: '2024-04-15',
-        steps: [
-          {
-            title: 'Technical Portfolio',
-            description: 'Compile AI/ML project portfolio',
-            status: 'not-started'
-          },
-          {
-            title: 'Statement of Intent',
-            description: 'Write statement of research interests',
-            status: 'not-started'
-          },
-          {
-            title: 'Academic Records',
-            description: 'Submit transcripts and test scores',
-            status: 'not-started'
-          },
-          {
-            title: 'References',
-            description: 'Obtain academic references',
-            status: 'not-started'
-          },
-          {
-            title: 'Research Alignment',
-            description: 'Identify potential research groups',
-            status: 'not-started'
-          }
-        ]
-      }
-    ];
     
-    setJourneys(demoJourneys);
+    // Fetch data from the API
+    const fetchData = async () => {
+      const res=await call_fetch_journey_db("user_id");
+      console.log(res)
+      
+      setJourneys(res.data);
+    }
+    fetchData();
   }, []);
 
   // Add Toast component inside JourneyProgress
@@ -468,7 +322,7 @@ const JourneyProgress = () => {
   return (
     <div className="h-full w-full overflow-hidden ">
       {/* Main container with two separate sections */}
-      <div className="w-[95%] md:w-[80%] h-[85vh] animate-fadeIn relative mx-auto mt-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="w-[95%] md:w-[90%] h-[85vh] animate-fadeIn relative mx-auto mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Journeys List Container */}
         <div className="bg-white/20 backdrop-blur-md rounded-xl shadow-lg overflow-hidden">
           {/* Journeys Header */}

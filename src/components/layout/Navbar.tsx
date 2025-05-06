@@ -1,14 +1,16 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import LoginCard from '@/components/auth/LoginCard';
 import RegisterCard from '@/components/auth/RegisterCard';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,11 +32,23 @@ export default function Navbar() {
     { name: 'AI Assistant', href: '/ai-assistant' }
   ];
 
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
+
+  const handleShowLogin = () => {
+    setIsRegisterOpen(false);
+    setIsLoginOpen(true);
+  };
+
   return (
     <>
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-[#000033]' : 'bg-transparent'
-      } backdrop-blur-sm`}>
+      } `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex-shrink-0">
@@ -47,10 +61,14 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-white/90 hover:text-white relative group px-3 py-2 rounded-md transition-colors duration-300"
+                  className={`text-white/90 hover:text-white relative group px-3 py-2 rounded-md transition-colors duration-300 ${
+                    isActive(link.href) ? 'text-white' : ''
+                  }`}
                 >
                   {link.name}
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform ${
+                    isActive(link.href) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  } transition-transform duration-300`}></span>
                 </Link>
               ))}
             </div>
@@ -107,7 +125,11 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-white/90 hover:text-white px-3 py-2 rounded-md hover:bg-white/10 transition-all duration-300"
+                  className={`text-white/90 hover:text-white px-3 py-2 rounded-md transition-all duration-300 ${
+                    isActive(link.href) 
+                      ? 'text-white bg-white/10' 
+                      : 'hover:bg-white/10'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
@@ -121,10 +143,15 @@ export default function Navbar() {
       <LoginCard 
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
+        onShowRegister={() => {
+          setIsLoginOpen(false);
+          setIsRegisterOpen(true);
+        }}
       />
       <RegisterCard 
         isOpen={isRegisterOpen}
         onClose={() => setIsRegisterOpen(false)}
+        onShowLogin={handleShowLogin}
       />
     </>
   );

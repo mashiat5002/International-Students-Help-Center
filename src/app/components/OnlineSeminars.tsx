@@ -422,70 +422,119 @@ const OnlineSeminars = () => {
     const demoSeminars: Seminar[] = [
       {
         id: '1',
-        title: 'Introduction to Machine Learning',
+        title: 'How to Write a Successful Statement of Purpose',
         institution: 'Stanford University',
         date: '2024-03-25',
         time: '14:00 GMT',
         duration: '2 hours',
         speaker: {
           name: 'Dr. Sarah Johnson',
-          title: 'Professor of Computer Science',
+          title: 'Senior Admissions Officer',
           institution: 'Stanford University',
-          bio: 'Leading researcher in machine learning with over 15 years of experience.'
+          bio: 'Over 10 years experience in graduate admissions, specializing in international student applications.'
         },
-        description: 'A comprehensive introduction to machine learning fundamentals and applications.',
-        topics: ['Neural Networks', 'Supervised Learning', 'Model Evaluation'],
+        description: 'Learn how to craft a compelling statement of purpose that stands out to admission committees.',
+        topics: ['Personal Statement Structure', 'Common Mistakes', 'Success Stories', 'Writing Tips'],
         type: 'upcoming',
-        registrationUrl: 'https://stanford.edu/ml-seminar',
+        registrationUrl: 'https://stanford.edu/admissions-seminar',
         maxParticipants: 100,
         currentParticipants: 65,
-        requirements: ['Basic Python knowledge', 'Understanding of linear algebra'],
+        requirements: ['Basic English writing skills', 'Draft of personal statement (optional)'],
         materials: [
           {
-            title: 'Presentation Slides',
-            url: 'https://stanford.edu/slides'
+            title: 'Statement of Purpose Template',
+            url: 'https://stanford.edu/sop-template'
           },
           {
-            title: 'Code Repository',
-            url: 'https://github.com/ml-seminar'
+            title: 'Writing Guidelines',
+            url: 'https://stanford.edu/writing-guidelines'
           }
         ]
       },
       {
         id: '2',
-        title: 'Data Science in Practice',
+        title: 'International Student Visa Workshop',
         institution: 'MIT',
         date: '2024-03-20',
         time: '18:00 GMT',
         duration: '1.5 hours',
         speaker: {
           name: 'Prof. Michael Chen',
-          title: 'Associate Professor',
+          title: 'International Student Advisor',
           institution: 'MIT'
         },
-        description: 'Real-world applications of data science in industry and research.',
-        topics: ['Data Analysis', 'Statistical Methods', 'Case Studies'],
+        description: 'Essential information about student visa applications, requirements, and interview preparation.',
+        topics: ['Visa Types', 'Document Preparation', 'Interview Tips', 'Common Questions'],
         type: 'live',
-        registrationUrl: 'https://mit.edu/ds-seminar',
+        registrationUrl: 'https://mit.edu/visa-workshop',
         maxParticipants: 150,
         currentParticipants: 120
       },
       {
         id: '3',
-        title: 'Advanced Deep Learning Techniques',
+        title: 'Mastering the Graduate School Application',
         institution: 'Carnegie Mellon University',
         date: '2024-02-15',
         time: '15:00 GMT',
         duration: '2.5 hours',
         speaker: {
           name: 'Dr. Alex Thompson',
-          title: 'Research Director',
+          title: 'Graduate Admissions Director',
           institution: 'CMU'
         },
-        description: 'Advanced concepts in deep learning and their implementations.',
-        topics: ['Transformers', 'GANs', 'Reinforcement Learning'],
+        description: 'Comprehensive guide to preparing a strong graduate school application.',
+        topics: ['Application Timeline', 'Document Checklist', 'Recommendation Letters', 'CV Preparation'],
         type: 'recorded',
-        recordingUrl: 'https://cmu.edu/recording'
+        recordingUrl: 'https://cmu.edu/grad-application-workshop'
+      },
+      {
+        id: '4',
+        title: 'Scholarship and Funding Opportunities',
+        institution: 'Harvard University',
+        date: '2024-04-10',
+        time: '16:00 GMT',
+        duration: '2 hours',
+        speaker: {
+          name: 'Prof. Emily White',
+          title: 'Financial Aid Director',
+          institution: 'Harvard University'
+        },
+        description: 'Learn about various funding options, scholarships, and how to apply for financial aid.',
+        topics: ['Scholarship Types', 'Application Process', 'Financial Documentation', 'Deadlines'],
+        type: 'upcoming',
+        registrationUrl: 'https://harvard.edu/funding-seminar',
+        maxParticipants: 200,
+        currentParticipants: 150
+      },
+      {
+        id: '5',
+        title: 'Research Proposal Writing Workshop',
+        institution: 'University of Cambridge',
+        date: '2024-03-30',
+        time: '13:00 GMT',
+        duration: '3 hours',
+        speaker: {
+          name: 'Dr. James Wilson',
+          title: 'Research Director',
+          institution: 'University of Cambridge'
+        },
+        description: 'Detailed guidance on writing a strong research proposal for graduate programs.',
+        topics: ['Research Methodology', 'Literature Review', 'Project Timeline', 'Budget Planning'],
+        type: 'upcoming',
+        registrationUrl: 'https://cambridge.edu/research-workshop',
+        maxParticipants: 80,
+        currentParticipants: 45,
+        requirements: ['Basic research knowledge', 'Draft research idea'],
+        materials: [
+          {
+            title: 'Research Proposal Template',
+            url: 'https://cambridge.edu/proposal-template'
+          },
+          {
+            title: 'Sample Proposals',
+            url: 'https://cambridge.edu/sample-proposals'
+          }
+        ]
       }
     ];
 

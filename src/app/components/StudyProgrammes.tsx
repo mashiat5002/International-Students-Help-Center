@@ -1,9 +1,12 @@
+
 'use client';
 
 import Spline from '@splinetool/react-spline';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
 import React from 'react';
+import { call_deepseek } from '../(utils)/call_deepseek/route';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Demo questions array
 const questions = [
@@ -40,6 +43,7 @@ const demoPrograms = [
 // Add new interface for program type
 interface Program {
   title: string;
+  deadline: string;
   university: string;
   country: string;
   duration: string;
@@ -50,12 +54,32 @@ interface Program {
 // Move ResultsSection outside the main component
 const ResultsSection = React.memo(({ 
   favorites, 
+  answers,
+  questions,
   onToggleFavorite 
+
 }: { 
+  answers: string[],
+  questions: string[],
   favorites: Program[], 
   onToggleFavorite: (program: Program) => void 
-}) => (
-  <div className="w-[95%] md:w-[80%] h-[70vh] animate-fadeIn relative mx-auto">
+}) => {
+  const [ Programmes, setProgrammes ] = useState<Program[]>([]);
+  const [ loading, setloading ] = useState(false);
+  useEffect(() => {
+    // Simulate fetching data from an API
+    const fetchData = async() => {
+      setloading(true)
+      const res= await call_deepseek("answers",questions,answers)
+      setProgrammes(res)
+      setloading(false)
+      console.log(res)
+    };
+    fetchData();
+
+  },[])
+ return (
+  <div className="w-[100%] md:w-[100%] h-[70vh] animate-fadeIn relative mx-auto">
     <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
     <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
@@ -63,12 +87,12 @@ const ResultsSection = React.memo(({
           Recommended Study Programmes
         </h2>
         <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
-          {demoPrograms.length} Programs
+          {Programmes.length} Programs
         </div>
       </div>
       <div className="h-[calc(100%-4rem)] overflow-y-auto px-1 sm:px-2 md:px-4 custom-scrollbar">
-        <div className="flex flex-col gap-4 md:gap-6 pb-6 max-w-[1200px] mx-auto">
-          {demoPrograms.map(program => (
+        {loading ? <LoadingSpinner/>:<div className="flex flex-col gap-4 md:gap-6 pb-6 min-w-[350px] mx-auto">
+          {Programmes.map(program => (
             <RecommendedProgramCard
               key={program.title}
               {...program}
@@ -77,11 +101,12 @@ const ResultsSection = React.memo(({
               onLearnMore={() => console.log(`Learn more about ${program.title}`)}
             />
           ))}
-        </div>
+        </div>}
+        
       </div>
     </div>
   </div>
-));
+)});
 
 const StudyProgrammes = () => {
   const [text, setText] = useState('');
@@ -97,13 +122,27 @@ const StudyProgrammes = () => {
   const [favorites, setFavorites] = useState<Program[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [started, setstarted] = useState(false);
+  const startedRef = useRef(started);
+  const [q_fetched, setq_fetched] = useState(false);
+  const q_fetchedRef = useRef(q_fetched);
 
   const handleStart = () => {
-    setIsAnimating(true);
+
+    if(! startedRef.current && !q_fetchedRef.current){
+      setLoading(true)
+      setstarted(true)
+
+    }
+    if(q_fetchedRef.current){
+       setIsAnimating(true);
     setTimeout(() => {
       setShowQuestion(true);
       setIsAnimating(false);
     }, 500);
+    }
+   
   };
 
   const handleNextQuestion = () => {
@@ -121,6 +160,7 @@ const StudyProgrammes = () => {
         setIsAnimating(false);
       } else {
         // Show results instead of console.log
+        
         setShowResults(true);
         setIsAnimating(false);
       }
@@ -157,6 +197,7 @@ const StudyProgrammes = () => {
         <RecommendedProgramCard
           {...program}
           isFavorite={isFavorite}
+        
           onFavoriteClick={() => toggleFavorite(program)}
           onLearnMore={() => handleLearnMore(program.title)}
         />
@@ -216,7 +257,42 @@ const StudyProgrammes = () => {
       </div>
     </div>
   );
+  const [Qs,setQs]=useState<string[]>([])
+  
+  useEffect(() => {
+    startedRef.current = started;
+  }, [started]);
+  useEffect(() => {
+    q_fetchedRef.current = q_fetched;
+  }, [q_fetched]);
 
+
+
+  useEffect(() => {
+    const fetchData = async() => {
+      
+        const res= await call_deepseek("questions",[],[])
+        setQs(res)
+        setq_fetched(true)
+        console.log(started)
+        if(startedRef.current){
+          console.log("started")
+          console.log(started)
+          setIsAnimating(true);
+        setTimeout(() => {
+          setLoading(false)
+          setShowQuestion(true);
+          setIsAnimating(false);
+        }, 500); 
+
+      }
+     
+      
+         
+      
+    };
+    fetchData();
+  },[])
   return (
     <div className="h-full w-full overflow-hidden">
       {/* Text Overlay */}
@@ -233,7 +309,7 @@ const StudyProgrammes = () => {
           
           {/* Content */}
           <div className="relative flex flex-col items-center space-y-4 p-6">
-            {!showQuestion ? (
+            {loading? <LoadingSpinner/> : !showQuestion ? (
               <>
                 <h1 className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-black px-4 max-w-2xl text-center 
                   tracking-wider leading-relaxed
@@ -260,13 +336,15 @@ const StudyProgrammes = () => {
               </>
             ) : showResults ? (
               <ResultsSection 
+                questions={questions}
+                answers={answers}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
               />
             ) : (
               <div className="space-y-4 w-full max-w-md animate-fadeIn">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-black text-center">
-                  {questions[currentQuestionIndex]}
+                  {Qs[currentQuestionIndex]}
                 </h2>
                 <div className="relative w-full">
                   <input

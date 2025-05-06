@@ -211,20 +211,22 @@ const MeetingDetails = React.memo(({ meeting }: { meeting: ScheduledMeeting }) =
 ));
 
 const ScheduledMeetings = () => {
+  localStorage.removeItem('scheduledMeetings');
+
   const [meetings, setMeetings] = useState<ScheduledMeeting[]>([
     {
       id: '1',
-      title: 'Introduction to Machine Learning',
+      title: 'Personal Statement Writing Workshop',
       institution: 'Stanford University',
       date: '2024-03-25',
       time: '14:00 GMT',
-      duration: '2 hours',
+      duration: '1 hour',
       type: 'seminar',
       status: 'upcoming',
       joinUrl: 'https://stanford.zoom.us/j/123456789',
       speaker: {
         name: 'Dr. Sarah Johnson',
-        title: 'Professor of Computer Science',
+        title: 'Senior Admissions Officer',
         institution: 'Stanford University'
       },
       registrationDate: '2024-02-15',
@@ -232,7 +234,7 @@ const ScheduledMeetings = () => {
     },
     {
       id: '2',
-      title: 'Data Science in Practice',
+      title: 'Understanding University Requirements',
       institution: 'MIT',
       date: '2024-03-20',
       time: '18:00 GMT',
@@ -242,7 +244,7 @@ const ScheduledMeetings = () => {
       joinUrl: 'https://mit.zoom.us/j/987654321',
       speaker: {
         name: 'Prof. Michael Chen',
-        title: 'Associate Professor',
+        title: 'International Student Advisor',
         institution: 'MIT'
       },
       registrationDate: '2024-02-10',
@@ -250,17 +252,17 @@ const ScheduledMeetings = () => {
     },
     {
       id: '3',
-      title: 'Deep Learning Workshop',
+      title: 'Student Visa Application Process',
       institution: 'Carnegie Mellon University',
       date: '2024-02-15',
       time: '15:00 GMT',
-      duration: '2.5 hours',
+      duration: '2 hours',
       type: 'seminar',
       status: 'completed',
       joinUrl: 'https://cmu.zoom.us/j/456789123',
       speaker: {
         name: 'Dr. Alex Thompson',
-        title: 'Research Director',
+        title: 'International Student Services Director',
         institution: 'CMU'
       },
       registrationDate: '2024-01-20',
@@ -268,17 +270,17 @@ const ScheduledMeetings = () => {
     },
     {
       id: '4',
-      title: 'AI Ethics Symposium',
+      title: 'Admission Interview Preparation',
       institution: 'Harvard University',
       date: '2024-04-05',
       time: '16:00 GMT',
-      duration: '3 hours',
-      type: 'seminar',
+      duration: '45 minutes',
+      type: 'meeting',
       status: 'upcoming',
       joinUrl: 'https://harvard.zoom.us/j/789123456',
       speaker: {
         name: 'Prof. Emily White',
-        title: 'Director of AI Ethics',
+        title: 'Graduate Admissions Counselor',
         institution: 'Harvard University'
       },
       registrationDate: '2024-02-28',
@@ -286,17 +288,17 @@ const ScheduledMeetings = () => {
     },
     {
       id: '5',
-      title: 'Quantum Computing Basics',
+      title: 'Funding and Scholarship Guidance',
       institution: 'Caltech',
       date: '2024-03-10',
       time: '19:00 GMT',
-      duration: '2 hours',
+      duration: '1.5 hours',
       type: 'seminar',
       status: 'cancelled',
       joinUrl: 'https://caltech.zoom.us/j/321654987',
       speaker: {
         name: 'Dr. Robert Brown',
-        title: 'Senior Researcher',
+        title: 'Financial Aid Advisor',
         institution: 'Caltech'
       },
       registrationDate: '2024-02-01',
@@ -378,7 +380,7 @@ const ScheduledMeetings = () => {
                     onSetReminder={() => setReminder(meeting.id)}
                     onCancel={() => cancelMeeting(meeting.id)}
                   />
-                ))}
+                ))} 
               </div>
             ) : (
               <div className="h-full flex items-center justify-center text-gray-500">

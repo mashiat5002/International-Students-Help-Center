@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { call_deepseek } from '../(utils)/call_deepseek/route';
+import { call_deepseek_for_roadmap } from '../(utils)/call_deepseek_for_roadmap/route';
 
 interface ProgramProps {
   title: string;
@@ -27,7 +29,7 @@ const RecommendedProgramCard = React.memo(({
   isFavorite,
   onFavoriteClick,
   onLearnMore,
-  onStartJourney = () => console.log('Start Journey clicked')
+ 
 }: ProgramProps) => {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,7 +48,15 @@ const RecommendedProgramCard = React.memo(({
     const daysUntilDeadline = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return daysUntilDeadline <= 30 && daysUntilDeadline > 0;
   };
+  const onStartJourney=async()=>{
+      console.log(university)
+      console.log(title)  
+      console.log(deadline)
+      const res= await call_deepseek_for_roadmap("journey",university, title, deadline)
+      console.log(res)
+    
 
+  }
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white via-white to-blue-50 
       rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 
@@ -153,7 +163,8 @@ const RecommendedProgramCard = React.memo(({
             <div className="flex-1 relative group/tooltip">
               <button
                 onClick={() => onStartJourney()}
-                disabled={isDeadlinePassed()}
+                // disabled={isDeadlinePassed()}
+                disabled={false}
                 className={`w-full px-4 py-2 rounded-lg font-medium text-xs md:text-xs
                   transition-all duration-300
                   ${isDeadlinePassed()

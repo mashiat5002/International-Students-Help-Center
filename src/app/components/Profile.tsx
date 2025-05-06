@@ -20,8 +20,8 @@ interface UserProfile {
 
 const Profile = () => {
   const [profile, setProfile] = useState<UserProfile>({
-    firstName: 'John',
-    lastName: 'Doe',
+    firstName: 'Mashiat',
+    lastName: 'Islam',
     email: 'john.doe@example.com',
     institution: 'University of Technology',
     country: 'Germany',
