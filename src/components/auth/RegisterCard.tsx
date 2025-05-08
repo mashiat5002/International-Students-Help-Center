@@ -1,20 +1,21 @@
 'use client';
 import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/route';
-import { call_deepseek } from '@/app/(utils)/call_deepseek/route';
 import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import Toast from '../ui/Toast';
 
 interface RegisterCardProps {
   isOpen: boolean;
   onClose: () => void;
   onShowLogin: () => void;
+  initialEmail?: string;
 }
 
-export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterCardProps) {
+export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmail }: RegisterCardProps) {
   const [formData, setFormData] = useState({
     fullName: '',
-    email: '',
+    email: initialEmail || '',
     password: '',
     confirmPassword: '',
   });
@@ -24,8 +25,9 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
   const [showResendSuccess, setShowResendSuccess] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, settoastType] = useState("");
+  const [toastMessage, setToastMessage] = useState('');
 
   const resetForm = () => {
     setFormData({
@@ -40,45 +42,16 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
     setShowResendSuccess(false);
     setIsResending(false);
     setIsRegistering(false);
-    setErrorMessage('');
-    setSuccessMessage('');
+
   };
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (showResendSuccess) {
-      timer = setTimeout(() => {
-        setShowResendSuccess(false);
-      }, 3000);
+    if (initialEmail) {
+      setFormData((prev) => ({ ...prev, email: initialEmail }));
     }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [showResendSuccess]);
+  }, [initialEmail]);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (errorMessage) {
-      timer = setTimeout(() => {
-        setErrorMessage('');
-      }, 3000);
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [errorMessage]);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (successMessage) {
-      timer = setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [successMessage]);
+ 
 
   if (!isOpen) return null;
 
@@ -91,13 +64,24 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
       // console.log("response.res.modifiedCount")
       if (response.res.modifiedCount === 1) {
         
-        setShowResendSuccess(true);
+        settoastType("success")
+        setToastMessage('New OTP has been sent to :' + formData.email);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
       } else {
-        alert('OTP sending failed');
+      
+      settoastType("failed")
+      setToastMessage("OTP sending failed");
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
         console.error('OTP sending failed');
       }
     } catch (error) {
-      console.error('Error during otp sending:', error);
+      
+      settoastType("failed")
+      setToastMessage('Error during otp sending:'+ error);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsResending(false);
     }
@@ -106,7 +90,11 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
     e.preventDefault();
     // Handle registration logic here
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      
+      settoastType("failure")
+      setToastMessage("Passwords do not match");
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       return;
     }
     // setIsRegistering(true);
@@ -123,18 +111,55 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
         }),
       });
      const res= await response.json()
-     console.log(res)
-      if (res.res=="Awaiting to validate you email!!") {
+
+       if (res.res=="Name is required") {
+        settoastType("failed")
+        setToastMessage(res.res);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
         
-        setSuccessMessage("OTP sent to you email")
+      } 
+       else if (res.res=="Invalid Password") {
+        
+       
+        settoastType("failed")
+        setToastMessage(res.reason);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+        
+      } 
+       else if (res.res=="Invalid email input") {
+        
+       
+        settoastType("failed")
+        setToastMessage(res.res);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+        
+      } 
+      else if (res.res=="Awaiting to validate you email!!") {
+        
+       
+        settoastType("success")
+        setToastMessage("OTP sent to you email");
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
         setShowOtpForm(true)
         setIsRegistering(true);
       } else {
-        setErrorMessage(res.res)
+       
+        settoastType("failed")
+      setToastMessage(res.res);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
         
       }
     } catch (error) {
-      console.error('Error during registration:', error);
+    
+      settoastType("failed")
+      setToastMessage('Error during registration:'+ error);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsRegistering(false);
     }
@@ -148,8 +173,11 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
       const response = await call_activate_user_db(formData.email, otp);
 
       if (response.res=="activated") {
-        console.log('Email verified successfully');
-        setSuccessMessage('Registration Successful!');
+       
+        settoastType("failed")
+        setToastMessage('Registration Successful!');
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
         setTimeout(() => {
           resetForm();
           onClose();
@@ -157,17 +185,25 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
       } else {
         const email= formData.email
         const message= "Invalid OTP. A new OTP sent to:"+email
-        setErrorMessage(message);
+        
+        settoastType("failed")
+      setToastMessage(message);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       }
     } catch (error) {
-      console.error('Error during OTP verification:', error);
-      setErrorMessage('An error occurred. Please try again.');
+      
+      settoastType("failed")
+      setToastMessage('Error during OTP verification:'+error);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsVerifying(false);
     }
   };
   
   return (
+    <>
     <div className="fixed inset-0  bg-black bg-opacity-80 z-50 flex items-center justify-center backdrop-blur-md"
          onClick={onClose}>
       <div className="bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md mx-4 border border-white/20"
@@ -195,17 +231,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
           </p>
         </div>
 
-        {errorMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-            {errorMessage}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-            {successMessage}
-          </div>
-        )}
+       
 
         {!showOtpForm ? (
           <>
@@ -386,14 +412,15 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin }: RegisterC
               </button>
             </div>
 
-            {showResendSuccess && (
-              <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-400 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-                New OTP has been sent to {formData.email}
-              </div>
-            )}
+           
           </form>
         )}
       </div>
     </div>
+    {showToast&&<Toast
+      type={toastType}
+      message={toastMessage}
+    />}
+    </>
   );
 }

@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
 import React from 'react';
 import { call_deepseek } from '../(utils)/call_deepseek/route';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import SplineLoader from '@/components/ui/SplineLoader';
 
 // Demo questions array
 const questions = [
@@ -56,9 +56,11 @@ const ResultsSection = React.memo(({
   favorites, 
   answers,
   questions,
-  onToggleFavorite 
+  onToggleFavorite,
+  setSpinner 
 
 }: { 
+  setSpinner: (spinner: boolean) => void;
   answers: string[],
   questions: string[],
   favorites: Program[], 
@@ -66,21 +68,30 @@ const ResultsSection = React.memo(({
 }) => {
   const [ Programmes, setProgrammes ] = useState<Program[]>([]);
   const [ loading, setloading ] = useState(false);
+  
   useEffect(() => {
-    // Simulate fetching data from an API
-    const fetchData = async() => {
-      setloading(true)
-      const res= await call_deepseek("answers",questions,answers)
-      setProgrammes(res)
-      setloading(false)
-      console.log(res)
+    const fetchData = async () => {
+      setloading(true);
+      // setSpinner(true); // Start spinner
+  
+      try {
+        const res = await call_deepseek("answers", questions, answers);
+        setProgrammes(res);
+        console.log(res);
+      } catch (err) {
+        console.error("Failed to fetch programs", err);
+      } finally {
+        setloading(false);
+      
+      }
     };
     fetchData();
 
   },[])
  return (
-  <div className="w-[100%] md:w-[100%] h-[70vh] animate-fadeIn relative mx-auto">
-    <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
+  <>
+  {loading?<SplineLoader/>:<div className="w-[100%] md:w-[100%] h-[70vh] animate-fadeIn relative mx-auto ">
+    <div className="absolute inset-0  backdrop-blur-md bg-white/20 rounded-xl pointer-events-none" />
     <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
       <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
         <h2 className="text-xl md:text-2xl font-bold text-black">
@@ -91,7 +102,7 @@ const ResultsSection = React.memo(({
         </div>
       </div>
       <div className="h-[calc(100%-4rem)] overflow-y-auto px-1 sm:px-2 md:px-4 custom-scrollbar">
-        {loading ? <LoadingSpinner/>:<div className="flex flex-col gap-4 md:gap-6 pb-6 min-w-[350px] mx-auto">
+        <div className="flex flex-col gap-4 md:gap-6 pb-6 min-w-[350px] mx-auto">
           {Programmes.map(program => (
             <RecommendedProgramCard
               key={program.title}
@@ -101,14 +112,16 @@ const ResultsSection = React.memo(({
               onLearnMore={() => console.log(`Learn more about ${program.title}`)}
             />
           ))}
-        </div>}
+        </div>
         
       </div>
     </div>
-  </div>
+  </div>}
+  </>
 )});
 
 const StudyProgrammes = () => {
+  
   const [text, setText] = useState('');
   const [showButton, setShowButton] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
@@ -127,7 +140,8 @@ const StudyProgrammes = () => {
   const startedRef = useRef(started);
   const [q_fetched, setq_fetched] = useState(false);
   const q_fetchedRef = useRef(q_fetched);
-
+  const [ spinner, setSpinner ] = useState(false);
+  const [ submitting, setsubmitting ] = useState(false);
   const handleStart = () => {
 
     if(! startedRef.current && !q_fetchedRef.current){
@@ -146,7 +160,9 @@ const StudyProgrammes = () => {
   };
 
   const handleNextQuestion = () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === '') {
+      setsubmitting(true)
+      return};
 
     setIsAnimating(true);
     
@@ -159,7 +175,6 @@ const StudyProgrammes = () => {
         setCurrentQuestionIndex(prev => prev + 1);
         setIsAnimating(false);
       } else {
-        // Show results instead of console.log
         
         setShowResults(true);
         setIsAnimating(false);
@@ -270,9 +285,10 @@ const StudyProgrammes = () => {
 
   useEffect(() => {
     const fetchData = async() => {
-      
+      setTimeout(async() => {
         const res= await call_deepseek("questions",[],[])
         setQs(res)
+        
         setq_fetched(true)
         console.log(started)
         if(startedRef.current){
@@ -286,30 +302,33 @@ const StudyProgrammes = () => {
         }, 500); 
 
       }
-     
-      
-         
-      
+      }, 10000);
+       
+
     };
     fetchData();
   },[])
+
+  
+
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden  bg-gray-800 ">
       {/* Text Overlay */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+      <div className="absolute top-1/2 left-1/2 transform  -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
         <div className={`flex flex-col items-center space-y-4 relative
           transition-all duration-500 ease-in-out
           ${isAnimating ? 'scale-0' : 'scale-100'}`}>
           
           {/* Blurred Background Panel */}
-          <div className={`absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl -m-6 pointer-events-none
+          <div className={`absolute inset-0 ${submitting?"border-2 border-red-600":""}  rounded-xl -m-6 pointer-events-none
             transition-all duration-500
-            ${showBlur ? 'opacity-100' : 'opacity-0'}`}>
+            ${showBlur ? 'opacity-100' : 'opacity-0'}
+            ${loading || showResults ? '' : 'backdrop-blur-md bg-white/20'}`}>
           </div>
           
           {/* Content */}
           <div className="relative flex flex-col items-center space-y-4 p-6">
-            {loading? <LoadingSpinner/> : !showQuestion ? (
+            {loading || spinner  ? <SplineLoader/> : !showQuestion ? (
               <>
                 <h1 className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-black px-4 max-w-2xl text-center 
                   tracking-wider leading-relaxed
@@ -336,13 +355,14 @@ const StudyProgrammes = () => {
               </>
             ) : showResults ? (
               <ResultsSection 
+                setSpinner={setSpinner}
                 questions={questions}
                 answers={answers}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
               />
             ) : (
-              <div className="space-y-4 w-full max-w-md animate-fadeIn">
+              <div className={`space-y-4 w-full  max-w-md animate-fadeIn `}>
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-black text-center">
                   {Qs[currentQuestionIndex]}
                 </h2>
@@ -350,7 +370,7 @@ const StudyProgrammes = () => {
                   <input
                     type="text"
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(e) => {setsubmitting(false),setInputValue(e.target.value)}}
                     placeholder="Type your answer..."
                     className="w-full px-4 py-2 rounded-lg border-2 border-blue-900 focus:outline-none focus:border-blue-700
                       bg-white/80 backdrop-blur-sm

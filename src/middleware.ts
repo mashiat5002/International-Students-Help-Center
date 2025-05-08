@@ -9,7 +9,10 @@ export function middleware(request: NextRequest) {
   if(session){ 
     return NextResponse.next();
   }
-  else return NextResponse.json({"session":"no stored"})
+  else {
+    // Redirect to a custom error page
+    return NextResponse.redirect(new URL('/error-unauthorized', request.url));
+  }
 }
 
 export const config={

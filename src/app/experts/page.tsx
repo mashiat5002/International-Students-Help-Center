@@ -5,6 +5,7 @@ import { Users, MessageSquare, Clock, CheckCircle2 } from 'lucide-react';
 import RegisterCard from '@/components/auth/RegisterCard';
 import LoginCard from '@/components/auth/LoginCard';
 import BackButton from '@/components/layout/BackButton';
+import Footer from '@/components/layout/Footer';
 
 export default function ExpertsPage() {
   const [isRegisterClicked, setIsRegisterClicked] = useState(false);
@@ -159,6 +160,7 @@ export default function ExpertsPage() {
           Register Now
         </button>
       </div>
+      <Footer />
     </div>
   );
 }

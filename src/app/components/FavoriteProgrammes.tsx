@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
-import Spline from '@splinetool/react-spline';
+import Toast from '@/components/ui/Toast';
 
 interface Program {
   title: string;
@@ -63,6 +63,7 @@ const FavoriteResultsSection = React.memo(({
 const FavoriteProgrammes = () => {
   const [favorites, setFavorites] = useState<Program[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [toastType, settoastType] = useState("");
   const [toastMessage, setToastMessage] = useState('');
 
   // Load favorites from localStorage on component mount
@@ -86,9 +87,10 @@ const FavoriteProgrammes = () => {
   const toggleFavorite = useCallback((program: Program) => {
     setFavorites(prev => {
       const newFavorites = prev.filter(fav => fav.title !== program.title);
-      
+      settoastType("failure")
       setToastMessage(`${program.title} removed from favorites`);
       setShowToast(true);
+      
       setTimeout(() => setShowToast(false), 10000);
       
       // Update localStorage with deadline included
@@ -97,19 +99,8 @@ const FavoriteProgrammes = () => {
     });
   }, []);
 
-  // Add Toast component
-  const Toast = () => (
-    <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 
-      transition-all duration-300 ${showToast ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-      <div className="bg-blue-900 text-white px-6 py-3 rounded-lg shadow-lg
-        flex items-center space-x-2">
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-        </svg>
-        <span>{toastMessage}</span>
-      </div>
-    </div>
-  );
+
+ 
 
   return (
     <div className="h-full w-full overflow-hidden ">
@@ -122,7 +113,10 @@ const FavoriteProgrammes = () => {
       />
 
       {/* Add Toast */}
-      <Toast />
+      {showToast&&<Toast
+        type={toastType}
+        message={toastMessage}
+      />}
     </div>
   );
 };

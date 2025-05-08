@@ -1,15 +1,37 @@
 import { call_nodemailer } from "@/app/(utils)/call_nodemailer/route";
 import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import isValidEmail from "@/app/(utils)/isValidEmailString/isValidEmailString";
+import isValidPassword from "@/app/(utils)/isValidPasswordString/isValidPasswordString";
 import User from "@/app/models/user";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+
+
 
   const generateOTP = () => {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
   const otp = generateOTP();
   const { email, fullName, password } = await request.json();
+ 
+  
+  const isPassInvalid=isValidPassword(password)
+    if(!fullName){
+      return NextResponse.json({"res":"Name is required"})
+    }  
+    if(isPassInvalid.res=="Invalid"){
+      return NextResponse.json({"res":"Invalid Password","reason":isPassInvalid.reason})
+    }  
+    if(!password){
+      return NextResponse.json({"res":"Password is required"})
+    }  
+    if(!email){
+      return NextResponse.json({"res":"Email is required"})
+    }  
+    else if(!isValidEmail(email)){
+      return NextResponse.json({"res":"Invalid email input"})
+    }  
 
   if (
     !email ||

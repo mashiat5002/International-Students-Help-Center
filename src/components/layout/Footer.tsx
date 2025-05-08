@@ -11,6 +11,7 @@ const Footer = () => {
   const [error, setError] = useState('');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [subscriptionEmail, setSubscriptionEmail] = useState('');
 
   const handleShowLogin = () => {
     setIsRegisterOpen(false);
@@ -26,9 +27,10 @@ const Footer = () => {
       setError('Please enter a valid email address');
       return;
     }
-    // Here you would typically make an API call to handle the subscription
     setIsSubscribed(true);
     setError('');
+    setSubscriptionEmail(email);
+    setIsRegisterOpen(true);
     setEmail('');
   };
 
@@ -39,11 +41,11 @@ const Footer = () => {
         {/* Brand & Social */}
         <div className="md:col-span-2 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2 rounded-lg">
+            <div className="bg-blue-950 p-2 rounded-lg">
               {/* Replace with your logo SVG if needed */}
               <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
             </div>
-            <span className="text-2xl font-bold">LeadLinx</span>
+            <span className="text-2xl font-bold">ISHC</span>
           </div>
           <p className="text-gray-400">
             Streamline your administrative tasks, access critical patient data, and enhance collaboration among your healthcare team effortlessly.
@@ -60,21 +62,19 @@ const Footer = () => {
         </div>
         {/* Pages Columns */}
         <div>
-          <h4 className="font-semibold mb-3">Pages</h4>
-          <ul className="space-y-2 text-gray-400">
-            <li><a href="#" onClick={() => setIsRegisterOpen(true)}>Register</a></li>
-            <li><a href="#" onClick={() => setIsLoginOpen(true)}>Sign in</a></li>
+          <ul className="space-y-5 mt-7 text-gray-400">
+            <li><a className='cursor-pointer ' onClick={() => setIsRegisterOpen(true)}>Register</a></li>
+            <li><a className='cursor-pointer' onClick={() => setIsLoginOpen(true)}>Sign in</a></li>
             <li><a href="http://localhost:3000/scholarships">Scholarships</a></li>
-            <li><a href="http://localhost:3000/experts">Find Experts</a></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Pages</h4>
-          <ul className="space-y-2 text-gray-400">
+          <ul className="space-y-5 mt-7 text-gray-400">
             <li><a href="http://localhost:3000/ai-assistant">AI Assistant</a></li>
-            <li><a href="#">Lörem</a></li>
+            <li><a href="http://localhost:3000/experts">Find Experts</a></li>
+
             <li><a href="#">Join Experts Using Video Call</a></li>
-            <li><a href="#">Lörem</a></li>
+           
           </ul>
         </div>
         {/* Contact */}
@@ -87,8 +87,27 @@ const Footer = () => {
           </ul>
         </div>
       </div>
+      {/* Subscription Box at the bottom */}
+      <div className="max-w-2xl mx-auto mt-10 mb-6 ">
+        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full justify-center items-center">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email Address"
+            className="px-4 py-2 rounded-lg bg-[#23263A] border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-white placeholder-gray-400 w-64 max-w-full"
+          />
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Subscribe
+          </button>
+        </form>
+        {error && <p className="text-red-400 text-sm mt-1 text-center">{error}</p>}
+      </div>
       {/* Back to Top Button */}
-      <div className="max-w-7xl mx-auto flex justify-end mt-8">
+      <div className="max-w-7xl mx-auto flex justify-end ">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition"
@@ -110,6 +129,7 @@ const Footer = () => {
     isOpen={isRegisterOpen}
     onClose={() => setIsRegisterOpen(false)}
     onShowLogin={handleShowLogin}
+    initialEmail={subscriptionEmail}
   />
 </>
   );

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
 import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Journey {
   id: string;
@@ -58,7 +59,13 @@ const JourneyCard = React.memo(({
           Step {journey.currentStep} of {journey.totalSteps}
         </span>
         <span className="text-gray-500">
-          Last updated: {journey.lastUpdated}
+          Last updated: { new Date(journey.lastUpdated.toString()).toLocaleString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+})}
         </span>
       </div>
     </div>
@@ -198,6 +205,7 @@ const JourneyProgress = () => {
   const [journeys, setJourneys] = useState<Journey[]>([]);
   const [selectedJourney, setSelectedJourney] = useState<Journey | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [loading, setloading] = useState(false);
 
   // Add function to update step status
   const handleUpdateStatus = (stepIndex: number, newStatus: 'completed' | 'in-progress' | 'not-started') => {
@@ -241,7 +249,15 @@ const JourneyProgress = () => {
           } : step
         );
         
-        const currentDate = new Date().toISOString().split('T')[0];
+        const currentDate = new Date().toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit', // Include seconds for full precision
+          hour12: true       // Set to false for 24-hour format
+        })
         
         // Create document entry for Documents component
         const documentEntry = {
@@ -291,7 +307,9 @@ const JourneyProgress = () => {
     
     // Fetch data from the API
     const fetchData = async () => {
+      setloading(true);
       const res=await call_fetch_journey_db("user_id");
+      setloading(false);
       console.log(res)
       
       setJourneys(res.data);
@@ -330,15 +348,15 @@ const JourneyProgress = () => {
             <h2 className="text-xl md:text-2xl font-bold text-black">
               Your Journey Progress
             </h2>
-            <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
+            {loading?null:<div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
               {journeys.length} Journeys
-            </div>
+            </div>}
           </div>
 
           {/* Scrollable Journeys List */}
           <div className="h-[calc(100%-4rem)] overflow-y-auto custom-scrollbar p-4">
             <div className="flex flex-col gap-4">
-              {journeys.length > 0 ? (
+              {loading? <LoadingSpinner/>:journeys.length > 0 ? (
                 journeys.map(journey => (
                   <JourneyCard
                     key={journey.id}
@@ -382,7 +400,13 @@ const JourneyProgress = () => {
                       </svg>
                       <div>
                         <span className="text-xs font-medium block">Deadline</span>
-                        <span className="block">{selectedJourney.deadline}</span>
+                        <span className="block">{ new Date(selectedJourney.deadline.toString()).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}</span>
                       </div>
                     </div>
                   </div>

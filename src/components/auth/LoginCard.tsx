@@ -5,6 +5,7 @@ import { call_update_password } from '@/app/(utils)/call_update_password/route';
 import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
+import Toast from '../ui/Toast';
 
 interface LoginCardProps {
   isOpen: boolean;
@@ -23,21 +24,13 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [isResetting, setIsResetting] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, settoastType] = useState("");
+  const [toastMessage, setToastMessage] = useState('');
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (errorMessage || successMessage) {
-      timer = setTimeout(() => {
-        setErrorMessage('');
-        setSuccessMessage('');
-      }, 3000);
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [errorMessage, successMessage]);
+  
+   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,18 +39,28 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
       const response = await call_login_authentication(email, password);
       if (response.status === "Login Successful") {
         console.log('Login successful');
-        setSuccessMessage('Login successful');
+       
+        settoastType("success")
+      setToastMessage(`Login successful`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
         setTimeout(() => {
           onClose();
           
         }, 1000);
       } 
        else {
-        setErrorMessage(response.status);
+        settoastType("failure")
+      setToastMessage(response.status);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setErrorMessage('An error occurred during login');
+     
+      settoastType("success")
+      setToastMessage(`An error occurred during login`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +68,11 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
 
   const handleForgotPassword = async () => {
     if (!email) {
-      setErrorMessage('Please enter your email address first');
+      
+      settoastType("failure")
+      setToastMessage(`Please enter your email address first`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       return;
     }
     setIsVerifying(true);
@@ -73,13 +80,24 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
       const res = await call_update_password(email, confirmNewPassword, otp);
       console.log("res", res);
       if (res === "Password Updated") {
-        setSuccessMessage('Password updated successfully');
+        settoastType("success")
+      setToastMessage(`Password Updated`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       } else {
-        setErrorMessage(res.message || 'Failed to update password');
+        
+      settoastType("failure")
+      setToastMessage(`Failed to update password`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       }
     } catch (error) {
-      console.error('Error updating password:', error);
-      setErrorMessage('An error occurred while updating password');
+     
+      
+      settoastType("failure")
+      setToastMessage(`An error occurred while updating password`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsVerifying(false);
     }
@@ -88,7 +106,11 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
-      setErrorMessage('Passwords do not match');
+      
+      settoastType("failure")
+      setToastMessage(`Passwords do not match`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       return;
     }
     setIsResetting(true);
@@ -101,13 +123,24 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
       
       if (res.res2.msg=="successfully sent email") {
         const message= "OTP sent to "+email
-        setSuccessMessage(message);
+      settoastType("success")
+      setToastMessage(`successfully sent email`+message);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
+
       } else {
-        setErrorMessage(res.message || 'Failed to send OTP');
+        
+        settoastType("failed")
+      setToastMessage("Failed to send OTP");
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
       }
     } catch (error) {
       console.error('Error sending OTP:', error);
-      setErrorMessage('An error occurred while sending OTP');
+      settoastType("failure")
+      setToastMessage(`Error sending OTP`);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     } finally {
       setIsResetting(false);
     }
@@ -116,6 +149,7 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
   if (!isOpen) return null;
 
   return (
+    <>
     <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center backdrop-blur-md"
          onClick={onClose}>
       <div className="bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md mx-4 border border-white/20"
@@ -145,17 +179,7 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
           </p>
         </div>
 
-        {errorMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-            {errorMessage}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-out">
-            {successMessage}
-          </div>
-        )}
+       
 
         {!showForgotPassword && !showOtpForm ? (
           <>
@@ -248,12 +272,19 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
                   className="text-blue-400 hover:text-blue-300"
                   onClick={async () => {
                     if (!email) {
-                      setErrorMessage('Please enter your email address first');
+                     
+                      settoastType("failed")
+                      setToastMessage('Please enter your email address first');
+                      setShowToast(true);
+                      setTimeout(() => {setShowToast(false);}, 3000);
                       return;
                     }
                     const res= await call_is_email_existing(email)
                     if(res.status=="You are not registered. Please register with your email first."){
-                      setErrorMessage(res.status)
+                      settoastType("failed")
+                      setToastMessage('You are not registered. Please register with your email first.');
+                      setShowToast(true);
+                      setTimeout(() => {setShowToast(false);}, 3000);
                       return
                     }
                     
@@ -388,5 +419,10 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
         )}
       </div>
     </div>
+    {showToast&&<Toast
+        type={toastType}
+        message={toastMessage}
+      />}
+    </>
   );
 }

@@ -8,9 +8,6 @@ import User from "@/app/models/user"
 export async function POST(request: NextRequest) {
    const body= await request.json()
 
-
-
-
    const current_time= Date.now()/1000
    try{
       await connectToDatabase()
