@@ -4,6 +4,7 @@ import { call_update_varification_key_db } from '@/app/(utils)/call_update_varif
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../ui/Toast';
+import { call_register } from '@/app/(utils)/call_register/route';
 
 interface RegisterCardProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
     email: initialEmail || '',
     password: '',
     confirmPassword: '',
+    isExpert: false,
   });
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [otp, setOtp] = useState('');
@@ -35,6 +37,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
       email: '',
       password: '',
       confirmPassword: '',
+      isExpert: false,
     });
     setOtp('');
     setShowOtpForm(false);
@@ -99,17 +102,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
     }
     // setIsRegistering(true);
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          fullName: formData.fullName,
-          password: formData.password,
-        }),
-      });
+      const response = await call_register(formData.fullName,formData.email,formData.password,formData.isExpert);
      const res= await response.json()
 
        if (res.res=="Name is required") {
@@ -174,7 +167,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
 
       if (response.res=="activated") {
        
-        settoastType("failed")
+        settoastType("success")
         setToastMessage('Registration Successful!');
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
@@ -272,7 +265,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
             </div>
 
             {/* Registration Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
               <div >
                 <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-2">
                   Full Name
@@ -339,6 +332,19 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                 />
+              </div>
+
+              <div className="flex items-center mt-2">
+                <input
+                  id="isExpert"
+                  type="checkbox"
+                  checked={formData.isExpert}
+                  onChange={e => setFormData({ ...formData, isExpert: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isExpert" className="ml-2 block text-sm text-gray-300">
+                  Register as an expert
+                </label>
               </div>
 
               <button

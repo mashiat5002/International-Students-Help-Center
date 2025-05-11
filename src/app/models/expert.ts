@@ -1,9 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IUser extends Document {
+export interface IExpert extends Document {
     email: string;
     full_name: string;
-    is_expert: boolean;
     address: string;
     city: string;
     state: string;
@@ -16,10 +15,9 @@ export interface IUser extends Document {
     active_status: string;
 }
 
-const UserSchema = new Schema<IUser>({
+const ExpertSchema = new Schema<IExpert>({
   email: { type: String,  },
   full_name:  {type: String},
-  is_expert:  {type: Boolean, default: false},
   address:  {type: String},
   city:  {type: String},
   state:  {type: String},
@@ -32,5 +30,5 @@ const UserSchema = new Schema<IUser>({
   active_status:  {type: String},
 });
 
-const User = mongoose.models.User || mongoose.model("User", UserSchema);
-export default User;
+const Expert = mongoose.models.Expert || mongoose.model("Expert", ExpertSchema);
+export default Expert;

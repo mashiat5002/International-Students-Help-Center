@@ -12,6 +12,7 @@ import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Profile from '@/app/components/Profile';
 import { call_logout } from '@/app/(utils)/call_logout/route';
+import ProfileCardList from '@/app/components/ProfileCardList';
 
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showExperts, setShowExperts] = useState(false);
 
   // Remove or modify the authentication check for now
   // useEffect(() => {
@@ -143,6 +145,19 @@ export default function HomePage() {
             <div className="flex items-center space-x-6">
               <button 
                 onClick={() => {
+                  setShowExperts(true);
+                  setActiveItem('');   // Clear active menu item when showing profile
+                }} 
+                className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 13v-2a4 4 0 00-3-3.87M9 20v-2a4 4 0 013-3.87" />
+                </svg>
+                <span>Experts</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setShowExperts(false);
                   setShowProfile(true);
                   setActiveItem('');  // Clear active menu item when showing profile
                 }} 
@@ -215,6 +230,7 @@ export default function HomePage() {
                 onClick={() => {
                   setActiveItem(item.name);
                   setShowProfile(false);
+                  setShowExperts(false);
                 }}
                 className={`flex items-center w-full p-2.5 rounded-xl transition-all duration-300
                   ${activeItem === item.name
@@ -240,6 +256,7 @@ export default function HomePage() {
           <div className="p-6 border-t border-white/10 shrink-0">
             <div 
               onClick={() => {
+                setShowExperts(false);
                 setShowProfile(true);
                 setActiveItem('');  // Clear active menu item when showing profile
               }}
@@ -264,7 +281,7 @@ export default function HomePage() {
           ml-0
           w-full`}
         >
-          {showProfile ? (
+          {showExperts? <ProfileCardList/>: showProfile ? (
             <Profile />
           ) : (
             <>

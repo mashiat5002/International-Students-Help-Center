@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
   const otp = generateOTP();
-  const { email, fullName, password } = await request.json();
+  const { email, fullName, password ,isExpert} = await request.json();
  
   
   const isPassInvalid=isValidPassword(password)
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         
         if(res.length>0){
           
-          return NextResponse.json({"res":"You were previously registered"})
+          return NextResponse.json({"res":"Email already in use"})
 
         }
       } catch (error) {
@@ -96,7 +96,8 @@ export async function POST(request: Request) {
       }
 
      
-     
+     console.log("isExpert")
+     console.log(isExpert)
       const newUser = new User({
         email,
         fullName,
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
         active_status: "inactive",
         varify_timeout : Date.now() + 1000 * 60,
         varification_key: otp,
+        is_expert: isExpert
       });
       console.log(newUser);
       await newUser.save();
