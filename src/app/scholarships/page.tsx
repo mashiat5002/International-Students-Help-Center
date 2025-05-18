@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { Search, Filter, Award } from 'lucide-react';
-import RegisterCard from '@/components/auth/RegisterCard';
-import LoginCard from '@/components/auth/LoginCard';
-import BackButton from '@/components/layout/BackButton';
-import Footer from '@/components/layout/Footer';
+import RegisterCard from '@/app/components/auth/RegisterCard';
+import LoginCard from '@/app/components/auth/LoginCard';
+import BackButton from '@/app/components/layout/BackButton';
+import Footer from '@/app/components/layout/Footer';
 
 interface Scholarship {
   id: string;

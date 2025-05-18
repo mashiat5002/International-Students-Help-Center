@@ -1,10 +1,10 @@
 
 
-export async function call_register(fullName:string,email:string,password:string) {
+export async function call_register_expert(fullName:string,email:string,password:string) {
    
     try{
 
-        const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/register`,{
+        const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/register_expert`,{
             method:"POST",
             headers:{
                 "Content-Type": "application/json"

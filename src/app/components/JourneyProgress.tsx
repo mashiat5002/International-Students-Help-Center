@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
 import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import LoadingSpinner from '@/app/components/common/LoadingSpinner';
 
 interface Journey {
   id: string;

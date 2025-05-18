@@ -5,7 +5,8 @@ import { call_update_password } from '@/app/(utils)/call_update_password/route';
 import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Toast from '../ui/Toast';
+import Toast from '../common/Toast';
+
 
 interface LoginCardProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
       setTimeout(() => {setShowToast(false);}, 3000);
         setTimeout(() => {
           onClose();
+          window.location.href = '/homepage';
           
         }, 1000);
       } 
@@ -82,6 +84,10 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
       if (res === "Password Updated") {
         settoastType("success")
       setToastMessage(`Password Updated`);
+      setTimeout(() => {
+          
+          onClose();
+        }, 2000);
       setShowToast(true);
       setTimeout(() => {setShowToast(false);}, 3000);
       } else {
@@ -167,7 +173,7 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
         {/* Header */}
         <div className="text-center mb-2">
           <h2 className="text-3xl font-bold text-white mb-2">
-            {showOtpForm ? 'Verify OTP' : showForgotPassword ? 'Reset Password' : 'Sign In'}
+            {showOtpForm ? 'Verify OTP' : showForgotPassword ? 'Reset Password' : 'Sign In as Student'}
           </h2>
           <p className="text-gray-300">
             {showOtpForm 
@@ -186,7 +192,9 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
             {/* Google Sign In Button */}
             <button
               type="button"
-              onClick={() => signIn('google')}
+              onClick={() => {signIn('google'),
+                 document.cookie = `registering_as=student`;
+              }}
               className="w-full px-4 py-3 bg-white text-gray-800 rounded-lg 
                        hover:bg-black hover:text-white hover:right-2 hover:outline-blue-500 focus:outline-white focus:ring-2 
                        focus:ring-gray-500 focus:ring-offset-2 transition-all

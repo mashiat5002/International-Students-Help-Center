@@ -1,11 +1,43 @@
 'use client';
+// import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import StudyProgrammes from '@/app/components/StudyProgrammes';
+import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
+import JourneyProgress from '@/app/components/JourneyProgress';
+import Documents from '@/app/components/Documents';
+import ApplicationLinks from '@/app/components/ApplicationLinks';
+import OnlineSeminars from '@/app/components/OnlineSeminars';
+import ScheduledMeetings from '@/app/components/ScheduledMeetings';
+import PastInquiries from '@/app/components/PastInquiries';
+import { call_logout } from '@/app/(utils)/call_logout/route';
+import ProfileCardList from '@/app/components/ProfileCardList';
+
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import LoginCard from '@/components/auth/LoginCard';
-import RegisterCard from '@/components/auth/RegisterCard';
+import LoginCard from '@/app/components/auth/LoginCard';
+import RegisterCard from '@/app/components/auth/RegisterCard';
+import UpcomingMeetings from '../UpcomingMeetings';
+import Profile from '../Profile';
 
-export default function Navbar() {
+
+export default function HomePage() {
+  const router = useRouter();
+  const [activeItem, setActiveItem] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showUpcomingMeetings, setshowUpcomingMeetings] = useState(false);
+  const [showExperts, setShowExperts] = useState(false);
+
+  // Remove or modify the authentication check for now
+  // useEffect(() => {
+  //   const isAuthenticated = false; // This was causing the redirect
+  //   if (!isAuthenticated) {
+  //     router.push('/');
+  //   }
+  // }, [router]);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -25,27 +57,23 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Scholarships', href: '/scholarships' },
-    { name: 'Find Experts', href: '/experts' },
-    { name: 'AI Assistant', href: '/ai-assistant' }
+  const Buttons = [
+    { name: 'Your Blogs', href: '/experts' },
+    { name: 'Upcoming Meetings', href: '/experts' },
+    { name: 'Schedule Meetings', href: '/ai-assistant' },
+    { name: 'Notifications', href: '/ai-assistant' }
   ];
 
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return pathname === href;
-    }
-    return pathname.startsWith(href);
+  const isActive = (item: string) => {
+    return item==activeItem
   };
 
-  const handleShowLogin = () => {
-    setIsRegisterOpen(false);
-    setIsLoginOpen(true);
-  };
+
+
 
   return (
-    <>
+    <div className="min-h-screen bg-black ">
+      {/* Top Navigation Bar */}
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-[#000033]' : 'bg-transparent'
       } `}>
@@ -57,27 +85,27 @@ export default function Navbar() {
               </Link>
             </div>
             <div className="hidden sm:flex sm:space-x-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
+              {Buttons.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => {setActiveItem(item.name); setShowProfile(false)}}
                   className={`text-white/90 hover:text-white relative group px-3 py-2 rounded-md transition-colors duration-300 ${
-                    isActive(link.href) ? 'text-white' : ''
+                    isActive(item.name) ? 'text-white' : ''
                   }`}
                 >
-                  {link.name}
+                  {item.name}
                   <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform ${
-                    isActive(link.href) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    isActive(item.name) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                   } transition-transform duration-300`}></span>
-                </Link>
+                </button>
               ))}
             </div>
             <div className="flex items-center space-x-6">
               <button 
-                onClick={() => setIsRegisterOpen(true)}
+                onClick={() => {setShowProfile(true), setActiveItem('Profile')}}
                 className="text-white/90 hover:text-white transition-colors duration-300"
               >
-                Register
+                Profile
               </button>
               <button 
                 onClick={() => setIsLoginOpen(true)}
@@ -86,7 +114,7 @@ export default function Navbar() {
                   transform hover:scale-105 transition-all duration-300
                   hover:bg-white hover:text-[#000033]"
               >
-                Sign In
+                Sign out
               </button>
 
               <button
@@ -121,10 +149,10 @@ export default function Navbar() {
 
           <div className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} pb-4`}>
             <div className="flex flex-col space-y-2">
-              {navLinks.map((link) => (
-                <Link
+              {Buttons.map((link) => (
+                <button
                   key={link.name}
-                  href={link.href}
+                 
                   className={`text-white/90 hover:text-white px-3 py-2 rounded-md transition-all duration-300 ${
                     isActive(link.href) 
                       ? 'text-white bg-white/10' 
@@ -133,26 +161,50 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
         </div>
       </nav>
 
-      <LoginCard 
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        onShowRegister={() => {
-          setIsLoginOpen(false);
-          setIsRegisterOpen(true);
-        }}
-      />
-      <RegisterCard 
-        isOpen={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
-        onShowLogin={handleShowLogin}
-      />
-    </>
+      {/* Main Container with Sidebar and Content */}
+      <div className="flex pt-16">
+        {/* Sidebar Overlay for Mobile */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar - Fixed height and width for desktop */}
+        
+
+        {/* Main Content */}
+        <main className={`flex-1 transition-all duration-300 
+       
+          ml-0
+          w-full`}
+        >
+          { showProfile ? (
+            <Profile />
+          ) : (
+            <>
+              {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}
+              {activeItem === 'Favorite Programmes' && <FavoriteProgrammes />}
+              {activeItem === 'Journey Progress' && <JourneyProgress />}
+              {activeItem === 'Documents' && <Documents />}
+              {activeItem === 'Application Links' && <ApplicationLinks />}
+              {activeItem === 'Online Seminars' && <OnlineSeminars />}
+              {activeItem === 'Scheduled Meetings' && <ScheduledMeetings />}
+              {activeItem === 'Past Inquiries' && <PastInquiries />}
+              
+            </>
+          )}
+        </main>
+      </div>
+    </div>
   );
 }
+ 

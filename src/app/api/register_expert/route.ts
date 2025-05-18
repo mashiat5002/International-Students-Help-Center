@@ -2,7 +2,7 @@ import { call_nodemailer } from "@/app/(utils)/call_nodemailer/route";
 import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
 import isValidEmail from "@/app/(utils)/isValidEmailString/isValidEmailString";
 import isValidPassword from "@/app/(utils)/isValidPasswordString/isValidPasswordString";
-import User from "@/app/models/user";
+import Expert from "@/app/models/expert";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       try {
         console.log(email)
         
-        const res=await User.find({email:email,active_status:"inactive"});
+        const res=await Expert.find({email:email,active_status:"inactive"});
         console.log("res--")
         console.log(res.length>0)
         if(res.length>0){
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
             return NextResponse.json({"res":"error to send email!!"})
 
           }
-          await User.updateOne({email:email,active_status:"inactive"},
+          await Expert.updateOne({email:email,active_status:"inactive"},
             {$set:{password:password,varify_timeout:Date.now() + 1000 * 60,varification_key:otp}}
           )
          
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       try {
         console.log(email)
         
-        const res=await User.find({email:email,active_status:"active"});
+        const res=await Expert.find({email:email,active_status:"active"});
         
         if(res.length>0){
           
@@ -96,18 +96,18 @@ export async function POST(request: Request) {
       }
 
      
-     
-      const newUser = new User({
+   
+      const newExpert = new Expert({
         email,
         fullName,
         password,
         active_status: "inactive",
         varify_timeout : Date.now() + 1000 * 60,
         varification_key: otp,
-       
+        
       });
-      console.log(newUser);
-      await newUser.save();
+      console.log(newExpert);
+      await newExpert.save();
    
       return NextResponse.json({"res":"Awaiting to validate you email!!"})
 }

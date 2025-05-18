@@ -1,31 +1,38 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { decrypt } from "./app/(utils)/jwt_encrypt_decrypt";
+import { call_is_email_existing } from "./app/(utils)/call_is_email_existing/route";
 
-export function middleware(request: NextRequest) {
-  const session=cookies().get("session")?.value;
-  // const pathnext= request.nextUrl.pathname;
-  // if(pathnext=="/api/login_cookie_auth" || pathnext=="/api/create_stripe_customer" || pathnext=="/api/create_customer_dwolla" || pathnext=="/api/nodemailer" || pathnext=="/api/activate_user_db" || pathnext=="/api/update_varification_key_db" || pathnext=="/api/find_user_active_status"  || pathnext=="/api/db_insertion" || pathnext=="/api/create_saving_acc_in_db" || pathnext=="/api/update_password" || pathnext=="/api/connect_mongodb")
-  //   return NextResponse.next();
-  if(session){ 
+export async function middleware(request: NextRequest) {
+  const session_user = cookies().get("user-session")?.value;
+  const session_expert = cookies().get("expert-session")?.value;
+  const session =
+    request.nextUrl.pathname == "/homepage" ? session_user : session_expert;
+  if (!session) {
+     return NextResponse.redirect(new URL("/error-unauthorized", request.url));
+  }
+
+  const decrypted = (await decrypt(session)) as {
+    Email: string;
+    expires: string;
+    Password: string;
+    iat: number;
+    exp: number;
+  };
+  console.log("decrypted", decrypted);
+  const res = await call_is_email_existing(decrypted.Email);
+ 
+  if (res.status == "email found") {
     return NextResponse.next();
-  }
-  else {
+  } else {
+    console.log("unauthorized-------------------------");
+    return NextResponse.redirect(new URL("/error-unauthorized", request.url));
     // Redirect to a custom error page
-    return NextResponse.redirect(new URL('/error-unauthorized', request.url));
   }
 }
 
-export const config={
- matcher: ['/homepage/:path*']
-}
 
 
-
-
-
-
-
-
-
-
-
+export const config = {
+  matcher: ["/homepage/:path*"],
+};

@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { Bot, MessageSquare, Brain, Zap } from 'lucide-react';
-import RegisterCard from '@/components/auth/RegisterCard';
-import LoginCard from '@/components/auth/LoginCard';
-import BackButton from '@/components/layout/BackButton';
-import Footer from '@/components/layout/Footer';
+import RegisterCard from '@/app/components/auth/RegisterCard';
+import LoginCard from '@/app/components/auth/LoginCard';
+import BackButton from '@/app/components/layout/BackButton';
+import Footer from '@/app/components/layout/Footer';
 
 export default function AIAssistantPage() {
   const [isRegisterClicked, setIsRegisterClicked] = useState(false);

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
-import Toast from '@/components/ui/Toast';
+import Toast from '@/app/components/common/Toast';
 
 interface Program {
   title: string;

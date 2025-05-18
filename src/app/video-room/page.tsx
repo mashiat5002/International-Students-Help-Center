@@ -1,4 +1,3 @@
-import SocketClient from '@/pages/components/SocketClient'
 import React from 'react'
 import VideoMeeting from '../components/VideoMeeting'
 

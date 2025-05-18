@@ -3,7 +3,7 @@ import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/route
 import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Toast from '../ui/Toast';
+import Toast from '../common/Toast';
 import { call_register } from '@/app/(utils)/call_register/route';
 
 interface RegisterCardProps {
@@ -19,7 +19,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
     email: initialEmail || '',
     password: '',
     confirmPassword: '',
-    isExpert: false,
+   
   });
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [otp, setOtp] = useState('');
@@ -37,7 +37,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
       email: '',
       password: '',
       confirmPassword: '',
-      isExpert: false,
+  
     });
     setOtp('');
     setShowOtpForm(false);
@@ -102,7 +102,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
     }
     // setIsRegistering(true);
     try {
-      const response = await call_register(formData.fullName,formData.email,formData.password,formData.isExpert);
+      const response = await call_register(formData.fullName,formData.email,formData.password);
      const res= await response.json()
 
        if (res.res=="Name is required") {
@@ -214,7 +214,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
         {/* Header */}
         <div className="text-center mb-2">
           <h2 className="text-3xl font-bold text-white mb-2">
-            {showOtpForm ? 'Verify Your Email' : 'Create Account'}
+            {showOtpForm ? 'Verify Your Email' : 'Register as Student'}
           </h2>
           <p className="text-gray-300">
             {showOtpForm 
@@ -231,7 +231,11 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
             {/* Google Sign Up Button */}
             <button
               type="button"
-              onClick={()=>signIn('google')}
+              onClick={()=>{
+                document.cookie = `registering_as=student`;
+                signIn('google',{
+     state: JSON.stringify({ isExpert: "formData.isExpert" }),
+  })}}
               className="w-full px-4 py-3 bg-white text-gray-800 rounded-lg 
                        hover:bg-black hover:text-white hover:right-2 hover:outline-blue-500 focus:outline-white focus:ring-2 
                        focus:ring-gray-500 focus:ring-offset-2 transition-all
@@ -334,18 +338,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
                 />
               </div>
 
-              <div className="flex items-center mt-2">
-                <input
-                  id="isExpert"
-                  type="checkbox"
-                  checked={formData.isExpert}
-                  onChange={e => setFormData({ ...formData, isExpert: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isExpert" className="ml-2 block text-sm text-gray-300">
-                  Register as an expert
-                </label>
-              </div>
+             
 
               <button
                 type="submit"
@@ -355,7 +348,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
                          focus:ring-blue-500 focus:ring-offset-2 transition-all
                          disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isRegistering ? 'Creating Account...' : 'Create Account'}
+                {isRegistering ? 'Creating Account...' : 'Create Account as Student'}
               </button>
 
               <div className="text-center text-sm text-gray-300">

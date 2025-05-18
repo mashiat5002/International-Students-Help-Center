@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
 import React from 'react';
 import { call_deepseek } from '../(utils)/call_deepseek/route';
-import SplineLoader from '@/components/ui/SplineLoader';
+import SplineLoader from '@/app/components/common/SplineLoader';
 
 // Demo questions array
 const questions = [

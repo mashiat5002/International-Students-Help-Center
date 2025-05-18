@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { call_deepseek_for_roadmap } from '../(utils)/call_deepseek_for_roadmap/route';
-import Toast from '@/components/ui/Toast';
+import Toast from '@/app/components/common/Toast';
 
 interface ProgramProps {
   title: string;

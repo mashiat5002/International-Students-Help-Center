@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import RegisterCard from '@/components/auth/RegisterCard';
-import LoginCard from '@/components/auth/LoginCard';
+
+import ExpertRegisterCard from '../auth/ExpertRegisterCard';
+import ExpertLoginCard from '../auth/ExpertLoginCard';
 
 const backgroundImages = [
   '/students.jpg',  // You'll need to add these images to your public folder
@@ -50,14 +51,14 @@ export default function Hero() {
   return (
     <div className="relative h-screen overflow-hidden">
       {/* Register Card Modal */}
-      <RegisterCard 
+      <ExpertRegisterCard 
         isOpen={showRegisterCard} 
         onClose={handleClose}
         onShowLogin={handleShowLogin}
       />
 
       {/* Login Card Modal */}
-      <LoginCard 
+      <ExpertLoginCard 
         isOpen={showLoginCard} 
         onClose={handleClose}
         onShowRegister={() => {
@@ -100,7 +101,7 @@ export default function Hero() {
                 isButtonClicked && showRegisterCard ? 'scale-95 bg-gray-100' : 'hover:bg-gray-100'
               }`}
             >
-              Get Started
+              Register as Expert
             </button>
             <button 
               onClick={handleLoginClick}
@@ -108,7 +109,7 @@ export default function Hero() {
                 isButtonClicked && showLoginCard ? 'scale-95 bg-white/20' : 'hover:bg-white hover:text-[#000033]'
               }`}
             >
-              Contact Us
+              Sign In as Expert
             </button>
           </div>
         </div>
