@@ -4,7 +4,7 @@ import { decrypt } from "./app/(utils)/jwt_encrypt_decrypt";
 import { call_is_email_existing } from "./app/(utils)/call_is_email_existing/route";
 
 export async function middleware(request: NextRequest) {
-  const session_user = cookies().get("user-session")?.value;
+  const session_user = cookies().get("student-session")?.value;
   const session_expert = cookies().get("expert-session")?.value;
   const session =
     request.nextUrl.pathname == "/homepage" ? session_user : session_expert;
@@ -19,13 +19,11 @@ export async function middleware(request: NextRequest) {
     iat: number;
     exp: number;
   };
-  console.log("decrypted", decrypted);
   const res = await call_is_email_existing(decrypted.Email);
  
   if (res.status == "email found") {
     return NextResponse.next();
   } else {
-    console.log("unauthorized-------------------------");
     return NextResponse.redirect(new URL("/error-unauthorized", request.url));
     // Redirect to a custom error page
   }
@@ -34,5 +32,5 @@ export async function middleware(request: NextRequest) {
 
 
 export const config = {
-  matcher: ["/homepage/:path*"],
+  matcher: ["/homepage/:path*","/expert-dashboard/:path*"]
 };

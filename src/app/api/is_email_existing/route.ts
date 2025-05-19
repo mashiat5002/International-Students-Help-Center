@@ -11,7 +11,6 @@ export async function POST(request:NextRequest){
   
     await connectToDatabase()
     const result= await User.findOne({email:email,active_status:"active"})
-    console.log(result== null)
     if(result== null){
         return NextResponse.json({"status":"You are not registered. Please register with your email first."})
     }else{

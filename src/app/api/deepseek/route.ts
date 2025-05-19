@@ -45,7 +45,7 @@ export  async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "model": "deepseek/deepseek-prover-v2:free"
+        "model": ""
 ,
   "messages": [
     { "role": "system", "content": "You are a study advisor for international students. you  suggest study programmes unless it satifies all the answers by the user otherwise you reply in one string that no such programmes available" },

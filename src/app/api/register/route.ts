@@ -13,11 +13,11 @@ export async function POST(request: Request) {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
   const otp = generateOTP();
-  const { email, fullName, password } = await request.json();
+  const { email, full_name, password } = await request.json();
  
   
   const isPassInvalid=isValidPassword(password)
-    if(!fullName){
+    if(!full_name){
       return NextResponse.json({"res":"Name is required"})
     }  
     if(isPassInvalid.res=="Invalid"){
@@ -35,9 +35,9 @@ export async function POST(request: Request) {
 
   if (
     !email ||
-    !fullName ||
+    !full_name ||
     typeof email !== "string" ||
-    typeof fullName !== "string"
+    typeof full_name !== "string"
   ) {
     return NextResponse.json({"res":"Invalid input"})
 
@@ -50,8 +50,7 @@ export async function POST(request: Request) {
         console.log(email)
         
         const res=await User.find({email:email,active_status:"inactive"});
-        console.log("res--")
-        console.log(res.length>0)
+      
         if(res.length>0){
           try{
 
@@ -99,7 +98,7 @@ export async function POST(request: Request) {
      
       const newUser = new User({
         email,
-        fullName,
+        full_name,
         password,
         active_status: "inactive",
         varify_timeout : Date.now() + 1000 * 60,

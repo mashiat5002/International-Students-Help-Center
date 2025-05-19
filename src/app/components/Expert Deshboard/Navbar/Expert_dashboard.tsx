@@ -1,7 +1,5 @@
 'use client';
 // import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import StudyProgrammes from '@/app/components/StudyProgrammes';
 import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
 import JourneyProgress from '@/app/components/JourneyProgress';
 import Documents from '@/app/components/Documents';
@@ -9,40 +7,45 @@ import ApplicationLinks from '@/app/components/ApplicationLinks';
 import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
-import { call_logout } from '@/app/(utils)/call_logout/route';
-import ProfileCardList from '@/app/components/ProfileCardList';
-
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import LoginCard from '@/app/components/auth/LoginCard';
-import RegisterCard from '@/app/components/auth/RegisterCard';
 import UpcomingMeetings from '../UpcomingMeetings';
 import Profile from '../Profile';
+import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/route';
 
 
-export default function HomePage() {
-  const router = useRouter();
+const Expert_dashboard=()=> {
   const [activeItem, setActiveItem] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showUpcomingMeetings, setshowUpcomingMeetings] = useState(false);
-  const [showExperts, setShowExperts] = useState(false);
 
-  // Remove or modify the authentication check for now
-  // useEffect(() => {
-  //   const isAuthenticated = false; // This was causing the redirect
-  //   if (!isAuthenticated) {
-  //     router.push('/');
-  //   }
-  // }, [router]);
+ 
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const pathname = usePathname();
+
+    const [details, setDetails] = useState({
+        email: '',
+        full_name: ''
+      });
+  useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await call_fetch_expert_logged_id_info()
+            setDetails(response)
+            console.log(response);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        fetchData();
+      }
+     ,[])
+
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -188,7 +191,7 @@ export default function HomePage() {
           w-full`}
         >
           { showProfile ? (
-            <Profile />
+            <Profile details={details}/>
           ) : (
             <>
               {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}
@@ -207,4 +210,4 @@ export default function HomePage() {
     </div>
   );
 }
- 
+ export default Expert_dashboard;

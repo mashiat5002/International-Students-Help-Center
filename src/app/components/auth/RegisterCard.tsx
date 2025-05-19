@@ -91,6 +91,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
   };
   const handleSubmit = async (e: React.FormEvent ) => {
     e.preventDefault();
+    setIsRegistering(true);
     // Handle registration logic here
     if (formData.password !== formData.confirmPassword) {
       
@@ -106,6 +107,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
      const res= await response.json()
 
        if (res.res=="Name is required") {
+         setIsRegistering(false);
         settoastType("failed")
         setToastMessage(res.res);
         setShowToast(true);
@@ -114,7 +116,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
       } 
        else if (res.res=="Invalid Password") {
         
-       
+         setIsRegistering(false);
         settoastType("failed")
         setToastMessage(res.reason);
         setShowToast(true);
@@ -123,7 +125,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
       } 
        else if (res.res=="Invalid email input") {
         
-       
+       setIsRegistering(false);
         settoastType("failed")
         setToastMessage(res.res);
         setShowToast(true);
@@ -140,7 +142,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
         setShowOtpForm(true)
         setIsRegistering(true);
       } else {
-       
+       setIsRegistering(false);
         settoastType("failed")
       setToastMessage(res.res);
       setShowToast(true);
@@ -160,6 +162,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     setIsVerifying(true);
     try {
       console.log(otp, formData.email);
@@ -348,6 +351,7 @@ export default function RegisterCard({ isOpen, onClose, onShowLogin, initialEmai
                          focus:ring-blue-500 focus:ring-offset-2 transition-all
                          disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                
                 {isRegistering ? 'Creating Account...' : 'Create Account as Student'}
               </button>
 

@@ -1,6 +1,6 @@
 'use client';
 // import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import StudyProgrammes from '@/app/components/StudyProgrammes';
 import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
@@ -12,7 +12,8 @@ import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Profile from '@/app/components/Profile';
 import { call_logout } from '@/app/(utils)/call_logout/route';
-import ProfileCardList from '@/app/components/ProfileCardList';
+import ProfileCardList from '@/app/components/ExpertsProfilesCardsList';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/route';
 
 
 export default function HomePage() {
@@ -22,7 +23,10 @@ export default function HomePage() {
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showExperts, setShowExperts] = useState(false);
-
+  const [details, setDetails] = useState({
+      email: '',
+      full_name: ''
+    });
   // Remove or modify the authentication check for now
   // useEffect(() => {
   //   const isAuthenticated = false; // This was causing the redirect
@@ -74,7 +78,20 @@ export default function HomePage() {
     )},
    
   ];
-
+   useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await call_fetch_logged_id_info()
+          setDetails(response)
+          console.log(response);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }
+   ,[])
   return (
     <div className="min-h-screen bg-gray-100 ">
       {/* Top Navigation Bar */}
@@ -268,7 +285,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${isDesktopSidebarCollapsed ? 'lg:hidden' : ''}`}>
-                <h3 className="text-sm font-semibold whitespace-nowrap">Mashiat Islam</h3>
+                <h3 className="text-xs font-semibold ">{details.full_name}</h3>
                 <p className="text-xs text-gray-300 whitespace-nowrap">Student</p>
               </div>
             </div>
@@ -282,7 +299,7 @@ export default function HomePage() {
           w-full`}
         >
           {showExperts? <ProfileCardList/>: showProfile ? (
-            <Profile />
+            <Profile details={details}/>
           ) : (
             <>
               {activeItem === 'Find Study Programmes' && <StudyProgrammes />}

@@ -92,6 +92,7 @@ export default function ExpertRegisterCard({ isOpen, onClose, onShowLogin, initi
   };
   const handleSubmit = async (e: React.FormEvent ) => {
     e.preventDefault();
+    setIsRegistering(true);
     // Handle registration logic here
     if (formData.password !== formData.confirmPassword) {
       
@@ -139,7 +140,7 @@ export default function ExpertRegisterCard({ isOpen, onClose, onShowLogin, initi
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
         setShowOtpForm(true)
-        setIsRegistering(true);
+        
       } else {
        
         settoastType("failed")

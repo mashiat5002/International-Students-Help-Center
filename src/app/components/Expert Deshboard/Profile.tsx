@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/route';
+import React, { useEffect, useState } from 'react';
 
 const skills = [
   'Digitale Personalakte',
@@ -7,7 +9,9 @@ const skills = [
   'OZG',
 ];
 
-const Profile = () => {
+const Profile = ({ details }: { details: any }) => {
+  
+ 
   return (
     <div className="max-w-3xl mt-16 mx-auto bg-pink-200 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
       {/* Left Side */}
@@ -16,13 +20,13 @@ const Profile = () => {
           &#8592;
         </button>
         <div className="flex items-center gap-2 mb-1">
-          <h2 className="text-3xl font-bold text-black">Frank Turner</h2>
+          <h2 className="text-3xl font-bold text-black">{details.full_name}</h2>
           <span className="inline-flex items-center justify-center w-7 h-7 bg-white rounded-full border border-gray-300">
             {/* Verified badge icon */}
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e0e0e0"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </span>
         </div>
-        <div className="text-gray-700 font-medium mb-4">Stadt Ratingen</div>
+        <div className="text-gray-700 font-medium mb-4">{details.email}</div>
         <div className="text-gray-800 mb-4">
           Ich bin seit 4 Jahren als Digitalisierungsbeauftragter (CDO) verwaltungsübergreifend für die Koordination aller Digitalisierungs- und Smart-City Themen der Stadt Ratingen zuständig.
         </div>

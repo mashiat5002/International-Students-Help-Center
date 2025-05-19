@@ -24,7 +24,7 @@ export  async function POST(request:NextRequest){
         const expires = new Date(Date.now() + 1 * 60 * 60 * 1000);
        
         const session= await encrypt({Email:email,expires,Password:password});
-        cookies().set('user-session',session,{expires, httpOnly:true})
+        cookies().set('student-session',session,{expires, httpOnly:true})
         
 
         return NextResponse.json({"status":"Login Successful"})

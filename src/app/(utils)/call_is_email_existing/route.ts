@@ -13,8 +13,7 @@ export async function call_is_email_existing(email:string) {
         
     })
     const final_res= await res.json()
-    console.log("final_res")
-    console.log(final_res)
+   
     return final_res;
    
 }

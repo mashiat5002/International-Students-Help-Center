@@ -1,11 +1,11 @@
-import HeroSection from '@/app/components/Expert Deshboard/Hero Section/HeroSection';
-import Navbar from '../components/Expert Deshboard/Navbar/Navbar';
-import UpcomingMeetings from '@/app/components/Expert Deshboard/UpcomingMeetings';
+"use client"
+import Expert_dashboard from '../components/Expert Deshboard/Navbar/Expert_dashboard';
 
 export default function HomePage() {
+  
   return (
     <div className='bg-black ' >
-      <Navbar />
+      <Expert_dashboard />
      
     </div>
   );

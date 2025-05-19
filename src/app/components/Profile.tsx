@@ -18,7 +18,9 @@ interface UserProfile {
   };
 }
 
-const Profile = () => {
+const Profile = ({ details }: { details: any }) => {
+  
+
   const [profile, setProfile] = useState<UserProfile>({
     firstName: 'Mashiat',
     lastName: 'Islam',
@@ -95,10 +97,10 @@ const Profile = () => {
                 Personal Information
               </h2>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
+                      Full Name
                     </label>
                     {isEditing ? (
                       <input
@@ -111,27 +113,10 @@ const Profile = () => {
                         className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     ) : (
-                      <p className="text-gray-600">{profile.firstName}</p>
+                      <p className="text-gray-600">{details.full_name}</p>
                     )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editedProfile.lastName}
-                        onChange={(e) => setEditedProfile({
-                          ...editedProfile,
-                          lastName: e.target.value
-                        })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <p className="text-gray-600">{profile.lastName}</p>
-                    )}
-                  </div>
+                
                 </div>
 
                 <div>
@@ -149,7 +134,7 @@ const Profile = () => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   ) : (
-                    <p className="text-gray-600">{profile.email}</p>
+                    <p className="text-gray-600">{details.email}</p>
                   )}
                 </div>
 
