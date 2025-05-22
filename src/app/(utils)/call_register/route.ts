@@ -11,7 +11,7 @@ export async function call_register(fullName:string,email:string,password:string
             },
             body: JSON.stringify({
                 email: email,
-                full_name: fullName,
+                fullName: fullName,
                 password: password,
                
               }),

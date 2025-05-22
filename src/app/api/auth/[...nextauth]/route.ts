@@ -84,6 +84,7 @@ export const authOptions = {
           const result = await new Expert({
             email: email,
             full_name: name,
+            img: profile.picture || profile.image,
             active_status: "active",
            
           }).save();

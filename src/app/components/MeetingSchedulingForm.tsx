@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Choose_expert_for_meeting from './Choose_expert_for_meeting';
 import { MdOutlineClose } from "react-icons/md";
+import Toast from './common/Toast';
 import { call_push_meeting_requests } from '../(utils)/call_push_meeting_requests/route';
 type MeetingRequestDetails = {
   expert_id: string;
@@ -17,13 +18,35 @@ const MeetingSchedulingForm = (
 }
 
 ) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, settoastType] = useState("");
+  const [toastMessage, setToastMessage] = useState('');
 
-
-  const callSubmit=async (e:React.MouseEvent<HTMLButtonElement>)=>{
-    e.preventDefault();
-    call_push_meeting_requests(MeetingRequestDetails)
+  const callSubmit=async ()=>{
+   
+    setIsLoading(true);
+    
+    const res= await call_push_meeting_requests(MeetingRequestDetails)
+  
+  
+    console.log(res.res)
+    setIsLoading(false);
+    if( res.res=="Request Sent Successfully"){
+      settoastType("success")
+        setToastMessage(res.res);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+    }
+    else if( res.res!="Request Sent Successfully"){
+      settoastType("failed")
+      setToastMessage(res.res);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
+    }
   }
   return (
+    <>
     <div className=" rounded-2xl mt-5  bg-gray-100 flex items-center justify-center ">
       
       <div className="bg-white rounded-2xl shadow-xl flex flex-col lg:flex-row w-full max-w-5xl overflow-hidden border border-gray-200">
@@ -39,19 +62,19 @@ const MeetingSchedulingForm = (
         
             <div>
               <label className="block text-sm font-medium mb-1">University/College Name</label>
-              <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,Institution:e.target.value}))}  type="text" defaultValue="" className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black" />
+              <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,Institution:e.target.value}))}  type="text" defaultValue="" className={`w-full border ${MeetingRequestDetails.Institution=="" && toastMessage=="Must select intended institution to study!!"?"border-red-500":"border-gray-300"} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-1">Field of Study</label>
-                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,fieldOfStudy:e.target.value}))} type="text" defaultValue="" className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black" />
+                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,fieldOfStudy:e.target.value}))} type="text" defaultValue="" className={`w-full border ${MeetingRequestDetails.fieldOfStudy=="" && toastMessage=="Must select your intended field of study !!"?"border-red-500":"border-gray-300"}  rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
               </div>
              
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Applying On</label>
+              <label className="block text-sm font-medium mb{`">Applying On</label>
               <div className="relative">
-                <select onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,ApplyingOn:e.target.value}))} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black appearance-none">
+                <select onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,ApplyingOn:e.target.value}))} className={`w-full border ${MeetingRequestDetails.ApplyingOn=="" && toastMessage=="Must select your intended field of study !!"?"border-red-500":"border-gray-300"} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black appearance-none`}>
                   <option value={""}>Select One</option>
                   <option value={"Masters"}>Masters</option>
                   <option value={"Bachelors"}>Bachelors</option>
@@ -62,12 +85,12 @@ const MeetingSchedulingForm = (
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Topic of Meeting</label>
-              <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+              <div className={`flex items-center border ${MeetingRequestDetails.meeting_topic=="" && toastMessage=="Must provide meeting topic !!"?"border-red-500":"border-gray-300"}  rounded-lg px-3 py-2 bg-gray-50`}>
                 <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12l-4-4-4 4m8 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6" /></svg>
-                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,meeting_topic:e.target.value}))} type="text"  className="h-20 w-full bg-transparent focus:outline-none" />
+                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,meeting_topic:e.target.value}))} type="text"  className={`h-20 ${MeetingRequestDetails.meeting_topic=="" && toastMessage=="Must provide meeting topic !!"?"border-red-500":"border-gray-300"}  w-full bg-transparent focus:outline-none`} />
               </div>
             </div>
-            <button onClick={callSubmit} className="w-full bg-black text-white py-3 rounded-lg font-semibold text-lg mt-2 hover:bg-gray-900 transition">Continue to Confirm</button>
+            <div onClick={()=>{callSubmit(), setIsLoading(true)}} className="flex items-center justify-center cursor-pointer w-full bg-black text-white py-3 rounded-lg font-semibold text-lg mt-2 hover:bg-gray-900 transition">{isLoading?"Processing Request..":"Continue to Confirm"}</div>
           </form>
          
         </div>
@@ -78,7 +101,7 @@ const MeetingSchedulingForm = (
               <div  className='h-5 w-5 absolute right-7 z-50 top-2 hover:text-rose-300 cursor-pointer'>
                 <MdOutlineClose onClick={()=>setisMeetingFormDisplayed(false)} size={"25px"}/>
               </div>
-             <Choose_expert_for_meeting setMeetingRequestDetails={setMeetingRequestDetails}/>
+             <Choose_expert_for_meeting toastMessage={toastMessage} MeetingRequestDetails={MeetingRequestDetails}  setMeetingRequestDetails={setMeetingRequestDetails}/>
             </div>
             <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-2 bg-gradient-to-t from-[#e5e1de] via-[#e5e1de]/80 to-transparent rounded-b-2xl">
               <div className="flex items-center justify-between">
@@ -87,7 +110,6 @@ const MeetingSchedulingForm = (
                   {/* <div className="text-gray-700 mt-1">$148</div> */}
                   <div className="text-gray-500 text-sm">Get Expert Review</div>
                 </div>
-                <button className="bg-white border border-gray-300 rounded-lg px-4 py-2 font-semibold text-gray-900 shadow hover:bg-gray-50 transition">Confirm</button>
               </div>
               <div className="flex items-center gap-2 mt-2">
                 {/* <div className="flex items-center text-yellow-400">
@@ -102,6 +124,11 @@ const MeetingSchedulingForm = (
         </div>
       </div>
     </div>
+     {showToast&&<Toast
+      type={toastType}
+      message={toastMessage}
+    />}
+    </>
   );
 };
 

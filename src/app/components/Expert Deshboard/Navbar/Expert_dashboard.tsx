@@ -9,32 +9,29 @@ import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import UpcomingMeetings from '../UpcomingMeetings';
 import Profile from '../Profile';
 import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/route';
+import SeminarSchedulingForm from '../../SeminarSchedulingForm';
+import MeetingRequests from '../MeetingRequests';
+import UpcomingMeetings from '../UpcomingMeetings';
+import UpcomingSeminars from '../UpcomingSeminars';
 
 
 const Expert_dashboard=()=> {
   const [activeItem, setActiveItem] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
- 
-
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-    const [details, setDetails] = useState({
-        email: '',
-        full_name: ''
-      });
+    const [details, setDetails] = useState({});
   useEffect(() => {
         const fetchData = async () => {
           try {
             const response = await call_fetch_expert_logged_id_info()
             setDetails(response)
+            console.log("response");
             console.log(response);
           } catch (error) {
             console.error('Error fetching data:', error);
@@ -62,9 +59,10 @@ const Expert_dashboard=()=> {
 
   const Buttons = [
     { name: 'Your Blogs', href: '/experts' },
-    { name: 'Upcoming Meetings', href: '/experts' },
-    { name: 'Schedule Meetings', href: '/ai-assistant' },
-    { name: 'Notifications', href: '/ai-assistant' }
+    { name: 'Meeting Requests', href: '/experts' },
+    { name: 'Schedule Seminar', href: '/ai-assistant' },
+    { name: 'Upcoming Meetings', href: '/ai-assistant' },
+    { name: 'Upcoming Seminars', href: '/ai-assistant' }
   ];
 
   const isActive = (item: string) => {
@@ -92,7 +90,7 @@ const Expert_dashboard=()=> {
                 <button
                   key={item.name}
                   onClick={() => {setActiveItem(item.name); setShowProfile(false)}}
-                  className={`text-white/90 hover:text-white relative group px-3 py-2 rounded-md transition-colors duration-300 ${
+                  className={`text-white/90 hover:text-white relative group px-1 py-2 rounded-md transition-colors duration-300 ${
                     isActive(item.name) ? 'text-white' : ''
                   }`}
                 >
@@ -151,7 +149,7 @@ const Expert_dashboard=()=> {
           </div>
 
           <div className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} pb-4`}>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-1">
               {Buttons.map((link) => (
                 <button
                   key={link.name}
@@ -191,13 +189,13 @@ const Expert_dashboard=()=> {
           w-full`}
         >
           { showProfile ? (
-            <Profile details={details}/>
+            <Profile details={details} setDetails={setDetails}/>
           ) : (
             <>
+              {activeItem === 'Meeting Requests' && <MeetingRequests />}
+              {activeItem === 'Schedule Seminar' && <SeminarSchedulingForm/>}
               {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}
-              {activeItem === 'Favorite Programmes' && <FavoriteProgrammes />}
-              {activeItem === 'Journey Progress' && <JourneyProgress />}
-              {activeItem === 'Documents' && <Documents />}
+              {activeItem === 'Upcoming Seminars' && <UpcomingSeminars />}
               {activeItem === 'Application Links' && <ApplicationLinks />}
               {activeItem === 'Online Seminars' && <OnlineSeminars />}
               {activeItem === 'Scheduled Meetings' && <ScheduledMeetings />}

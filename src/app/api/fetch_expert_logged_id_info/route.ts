@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     
  
-    result= await Expert.find({email: details.Email},{ email: 1, _id:0, full_name: 1});
+    result= await Expert.find({email: details.Email},{ password:0});
     
    
   if(!result){

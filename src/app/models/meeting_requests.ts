@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-
 export interface IMeetingRequests extends Document {
     expert_id: string;
     Institution: string;
@@ -8,6 +7,7 @@ export interface IMeetingRequests extends Document {
     meeting_topic: string;
     student_email: string;
     student_full_name: string;
+    Request_time: {type:Date };
     Scheduled_time: string;
 
    
@@ -21,6 +21,7 @@ const MeetingRequestsSchema = new Schema<IMeetingRequests>({
     meeting_topic: {type:String, required:true},
     student_email: {type:String, required:true},
     student_full_name: {type:String},
+    Request_time: {type:Date , default: Date.now},
     Scheduled_time: {type:String , default: "Not Scheduled"},
 });
 

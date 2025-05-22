@@ -1,24 +1,46 @@
 'use client';
-import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/route';
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import ExpertProfileForm from '../ExpertProfileForm';
+type details={
+  email: string;
+    full_name: string;
+    about: string;
+    img: string;
+    password: string;
+    social_media_link1: string;
+    social_media_link2: string;
+    social_media_link3: string;
+    profession: string;
+    institution: string;
+    country: string;
+    varification_key: string;
+    varify_timeout: string;
+    active_status: string;
+}
 
-const skills = [
-  'Digitale Personalakte',
-  'Strategie',
-  'Datenmanagement',
-  'OZG',
-];
-
-const Profile = ({ details }: { details: any }) => {
+const Profile = ({ details,setDetails }: { details: any ,setDetails:Dispatch<SetStateAction<details>>}) => {
+  const [isEditing, setIsEditing] = useState(false);
   
- 
+
+  if (isEditing) {
+    return (
+      <div className="max-w-3xl mt-2 mx-auto">
+        <button
+          className="mb-4 bg-gray-200 hover:bg-gray-300 text-black rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold transition"
+          onClick={() => setIsEditing(false)}
+        >
+          &#8592;
+        </button>
+        <ExpertProfileForm details={details} setDetails={setDetails}/>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mt-16 mx-auto bg-pink-200 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
       {/* Left Side */}
       <div className="flex-1 w-full">
-        <button className="mb-4 bg-white/60 hover:bg-white text-black rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold transition">
-          &#8592;
-        </button>
+       
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-3xl font-bold text-black">{details.full_name}</h2>
           <span className="inline-flex items-center justify-center w-7 h-7 bg-white rounded-full border border-gray-300">
@@ -28,23 +50,31 @@ const Profile = ({ details }: { details: any }) => {
         </div>
         <div className="text-gray-700 font-medium mb-4">{details.email}</div>
         <div className="text-gray-800 mb-4">
-          Ich bin seit 4 Jahren als Digitalisierungsbeauftragter (CDO) verwaltungsübergreifend für die Koordination aller Digitalisierungs- und Smart-City Themen der Stadt Ratingen zuständig.
+          {details.about}
         </div>
         <div className="mb-4">
-          <div className="font-semibold text-black mb-2">Kompetenzen</div>
+          <div className="font-semibold text-black mb-2">Profession</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-black text-base">
-            <span>✓ Digitale Personalakte</span>
-            <span>✓ Datenmanagement</span>
-            <span>✓ Strategie</span>
+            <span>✓ {details.institution}</span>
+            <span>✓ {details.profession}</span>
+            <span>✓ {details.country}</span>
             <span>✓ OZG</span>
           </div>
         </div>
-        <button className="mt-4 px-6 py-2 bg-black text-white rounded-full font-semibold shadow hover:bg-gray-900 transition">Nachricht schreiben</button>
+        <div className="flex gap-4">
+          <button className="mt-4 px-6 py-2 bg-black text-white rounded-full font-semibold shadow hover:bg-gray-900 transition">Nachricht schreiben</button>
+          <button
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full font-semibold shadow hover:bg-blue-700 transition"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </button>
+        </div>
       </div>
       {/* Right Side - Profile Image */}
       <div className="flex-shrink-0">
         <img
-          src="https://randomuser.me/api/portraits/men/32.jpg"
+          src={details.img}
           alt="Frank Turner"
           className="w-40 h-40 rounded-full object-cover border-4 border-pink-300 shadow-md"
         />

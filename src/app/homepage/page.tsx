@@ -12,13 +12,13 @@ import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Profile from '@/app/components/Profile';
 import { call_logout } from '@/app/(utils)/call_logout/route';
-import ProfileCardList from '@/app/components/ExpertsProfilesCardsList';
 import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/route';
+import ExpertsProfilesCardsList from '@/app/components/ExpertsProfilesCardsList';
 
 
 export default function HomePage() {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('Find Study Programmes');
+  const [activeItem, setActiveItem] = useState('Journey Progress');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -298,7 +298,7 @@ export default function HomePage() {
           ml-0
           w-full`}
         >
-          {showExperts? <ProfileCardList/>: showProfile ? (
+          {showExperts? <ExpertsProfilesCardsList/>: showProfile ? (
             <Profile details={details}/>
           ) : (
             <>

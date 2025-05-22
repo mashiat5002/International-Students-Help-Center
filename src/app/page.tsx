@@ -1,7 +1,7 @@
 import Navbar from "@/app/components/layout/Navbar";
-import Hero from '@/app/components/home/Hero';
-import CountrySelector from '@/app/components/home/CountrySelector';
-import Features from '@/app/components/home/Features';
+import Hero from '@/app/components/Landing/Hero';
+import CountrySelector from '@/app/components/Landing/CountrySelector';
+import Features from '@/app/components/Landing/Features';
 import Footer from '@/app/components/layout/Footer';
 
 export default function LandingPage() {

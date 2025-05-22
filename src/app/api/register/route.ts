@@ -2,6 +2,7 @@ import { call_nodemailer } from "@/app/(utils)/call_nodemailer/route";
 import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
 import isValidEmail from "@/app/(utils)/isValidEmailString/isValidEmailString";
 import isValidPassword from "@/app/(utils)/isValidPasswordString/isValidPasswordString";
+import RegistrationRequest from "@/app/models/registration_requests";
 import User from "@/app/models/user";
 import { NextResponse } from "next/server";
 
@@ -13,11 +14,11 @@ export async function POST(request: Request) {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
   const otp = generateOTP();
-  const { email, full_name, password } = await request.json();
+  const { email, fullName, password } = await request.json();
  
-  
+    console.log(fullName)
   const isPassInvalid=isValidPassword(password)
-    if(!full_name){
+    if(!fullName){
       return NextResponse.json({"res":"Name is required"})
     }  
     if(isPassInvalid.res=="Invalid"){
@@ -35,9 +36,9 @@ export async function POST(request: Request) {
 
   if (
     !email ||
-    !full_name ||
+    !fullName ||
     typeof email !== "string" ||
-    typeof full_name !== "string"
+    typeof fullName !== "string"
   ) {
     return NextResponse.json({"res":"Invalid input"})
 
@@ -47,6 +48,16 @@ export async function POST(request: Request) {
 
       
       try {
+
+  //       const registrationRequest = new RegistrationRequest({
+  //       email,
+  //       fullName,
+  //       request_time: new Date().toISOString(),
+  //       status: 'pending', 
+  // });
+  // await registrationRequest.save();
+
+
         console.log(email)
         
         const res=await User.find({email:email,active_status:"inactive"});
@@ -98,7 +109,7 @@ export async function POST(request: Request) {
      
       const newUser = new User({
         email,
-        full_name,
+        fullName,
         password,
         active_status: "inactive",
         varify_timeout : Date.now() + 1000 * 60,
