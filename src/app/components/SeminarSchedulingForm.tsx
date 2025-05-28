@@ -28,12 +28,28 @@ const SeminarSchedulingForm = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedDateTimes, setSelectedDateTimes] = useState<{[key: string]: Date | null}>({});
   const [seminarTopic, setSeminarTopic] = useState('');
+  const [seminarDescription, setSeminarDescription] = useState('');
   const [seminarDuration, setSeminarDuration] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('');
+  const [topicsCovered, setTopicsCovered] = useState<string[]>(['']);
   
 
- 
-  
+  const handleTopicChange = (index: number, value: string) => {
+    const newTopics = [...topicsCovered];
+    newTopics[index] = value;
+    setTopicsCovered(newTopics);
+  };
+
+  const addTopicField = () => {
+    setTopicsCovered([...topicsCovered, '']);
+  };
+
+  const removeTopicField = (index: number) => {
+    if (topicsCovered.length > 1) {
+      const newTopics = topicsCovered.filter((_, i) => i !== index);
+      setTopicsCovered(newTopics);
+    }
+  };
 
   const handleDateTimeChange = (id: string, value: Date | null) => {
     setSelectedDateTimes(prev => ({ ...prev, [id]: value }));
@@ -48,30 +64,40 @@ const SeminarSchedulingForm = () => {
     }else{
       setIsDate_Time_given(true)
     }
-    const res= await call_schedule_seminar(seminarTopic,selected,seminarDuration,maxParticipants);
-    console.log(res)
+    // Filter out empty topics
+    const filteredTopics = topicsCovered.filter(topic => topic.trim() !== '');
+    // Create a seminar object that includes topics
+    const seminarData = {
+      topic: seminarTopic,
+      description: seminarDescription,
+      dateTime: selected,
+      duration: seminarDuration,
+      maxParticipants: maxParticipants,
+      topics: filteredTopics
+    };
+    const res = await call_schedule_seminar(seminarData);
+    console.log('Seminar data:', seminarData);
     
     setIsLoading(false);
     if( res.message=="ScheduledSeminars saved successfully"){
-  
       setSeminarTopic('');
+      setSeminarDescription('');
       setSeminarDuration('');
       setMaxParticipants('');
       setSelectedDateTimes({});
+      setTopicsCovered(['']);
 
       settoastType("success")
-        setToastMessage("Seminar Is Scheduled");
-        setShowToast(true);
-        setTimeout(() => {setShowToast(false);}, 3000);
+      setToastMessage("Seminar Is Scheduled");
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
     }
-    
     else {
       settoastType("failed")
       setToastMessage(res.message);
       setShowToast(true);
       setTimeout(() => {setShowToast(false);}, 3000);
     }
-    // You can add your API call or logic here
   };
 
  
@@ -93,11 +119,62 @@ const SeminarSchedulingForm = () => {
                   type="text"
                   value={seminarTopic}
                   onChange={e => setSeminarTopic(e.target.value)}
-                  className={`w-full rounded-lg border ${toastMessage=="Must Provide Seminar Topic"?"ring-2 ring-red-500":"border-gray-300"} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full rounded-lg border ${toastMessage=="Must Provide Seminar Topic" || toastMessage=="Must Not Cross Character limit in Topic"?"ring-2 ring-red-500":"border-gray-300"} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   placeholder="Enter seminar topic (Maximum Character 100)"
                   maxLength={100}
                 />
               </div>
+              <div className="mb-4">
+                <label className="block text-white font-medium mb-1">Description</label>
+                <input
+                  type="text"
+                  value={seminarDescription}
+                  onChange={e => setSeminarDescription(e.target.value)}
+                  className={`w-full rounded-lg border ${toastMessage=="Must Provide Seminar description" || toastMessage=="Must Not Cross Character limit in description"?"ring-2 ring-red-500":"border-gray-300"} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  placeholder="Enter seminar topic (Maximum Character 250)"
+                  maxLength={250}
+                />
+              </div>
+
+              {/* Topics Covered Section */}
+              <div className="mb-4">
+                <label className="block text-white font-medium mb-1">Topics Covered</label>
+                <div className="space-y-2">
+                  {topicsCovered.map((topic, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={topic}
+                        onChange={(e) => handleTopicChange(index, e.target.value)}
+                        className={`${toastMessage=="Must Provide at least one topic"?"ring-2 ring-red-500":"border-gray-300"} w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        placeholder={`Topic ${index + 1}`}
+                      />
+                      {topicsCovered.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeTopicField(index)}
+                          className="px-3 py-2 text-red-400 hover:text-red-600 transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addTopicField}
+                    className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Topic
+                  </button>
+                </div>
+              </div>
+
               <div className="mb-4">
                 <label className="block text-white font-medium mb-1">Seminar Duration (minutes)</label>
                 <input

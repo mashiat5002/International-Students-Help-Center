@@ -1,11 +1,19 @@
 import { call_fetch_expert_logged_id_info } from "../call_fetch_expert_logged_id_info/route";
 
-
-export async function call_schedule_seminar(seminarTopic:string,selected:Date,seminarDuration:string,maxParticipants:string) {
+type seminarData={
+     topic: string,
+     description: string,
+      dateTime: Date,
+      duration: string,
+      maxParticipants: string,
+      topics: string[]
+}
+export async function call_schedule_seminar(seminarData:seminarData) {
    
     try{
-        const expert_id= await call_fetch_expert_logged_id_info()
-      
+        const expertDetails= await call_fetch_expert_logged_id_info()
+      console.log("seminarData")
+      console.log(seminarData)
 
         const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/schedule_seminar`,{
             method:"POST",
@@ -13,11 +21,14 @@ export async function call_schedule_seminar(seminarTopic:string,selected:Date,se
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "seminarTopic":seminarTopic,
-                "date_time":selected,
-                "seminarDuration":seminarDuration,
-                "maxParticipants":maxParticipants,
-                "expert_id":expert_id._id
+                "seminarTopic":seminarData.topic,
+                "description":seminarData.description,
+                "date_time":seminarData.dateTime,
+                "seminarDuration":seminarData.duration,
+                "maxParticipants":seminarData.maxParticipants,
+                "expert_id":expertDetails._id,
+                "expert_name":expertDetails.full_name,
+                "topics":seminarData.topics
             }),
             
             

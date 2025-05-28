@@ -56,21 +56,7 @@ const SelectedExpartCard=({selected_expert}:{selected_expert:profiles})=> {
                     className="bg-white rounded-2xl shadow-md p-6 mt-10 flex flex-col items-center relative max-w-xs mx-auto"
                   >
                     <div className="absolute top-4 right-4 flex space-x-2">
-                    <button
-                      // onClick={() => setIsexpertSelected(true)}
-                      className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-2 rounded-full"
-                    >
-                      <svg
-                        width="18"
-                        height="18"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 4v16m8-8H4" />
-                      </svg>
-                    </button>
+                  
                   </div>
                   {/* Profile image */}
                   <img

@@ -75,7 +75,7 @@ const Profile = ({ details,setDetails }: { details: any ,setDetails:Dispatch<Set
       <div className="flex-shrink-0">
         <img
           src={details.img}
-          alt="Frank Turner"
+          alt={details.full_name}
           className="w-40 h-40 rounded-full object-cover border-4 border-pink-300 shadow-md"
         />
       </div>
@@ -83,4 +83,4 @@ const Profile = ({ details,setDetails }: { details: any ,setDetails:Dispatch<Set
   );
 };
 
-export default Profile; 
+export default Profile;             

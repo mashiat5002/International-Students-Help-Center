@@ -1,5 +1,4 @@
 
-import MeetingRequests from "@/app/models/meeting_requests";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
   
   try{
     
-  const res= await ScheduledSeminars.updateOne({_id:_id},{$set:{Scheduled_time:"declined"}});
+  const res= await ScheduledSeminars.updateOne({_id:_id},{$set:{status:"cancelled"}});
   
   if(!res){
     console.log("No data found")

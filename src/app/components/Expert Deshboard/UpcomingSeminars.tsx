@@ -1,11 +1,8 @@
-import { call_fetch_meeting_requests } from '@/app/(utils)/call_fetch_meeting_requests/route';
-import { call_decline_meetingReq  } from '@/app/(utils)/call_setDateTimeMeeting/route';
 import { ObjectId } from 'mongoose';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Toast from '../common/Toast';
-import { call_setDateTimeMeeting } from '@/app/(utils)/call_decline_meetingReq/route';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { call_fetch_scheduled_seminars } from '@/app/(utils)/call_fetch_scheduled_seminars/route';
 import { call_setDateTimeSeminar } from '@/app/(utils)/call_setDateTimeSeminar/route';
@@ -21,6 +18,7 @@ type details={
     meeting_topic: string,
     max_Participants: string,
     student_full_name: string,
+    status: string,
     Scheduled_time: string,
     Creation_time: string,
     __v: Number
@@ -43,8 +41,9 @@ const UpcomingSeminars = () => {
       setisChangeTimeClicked(false)
       const response= await call_fetch_scheduled_seminars();
       setIsLoading(false)
-      const final_data= response.data.filter((item:details)=> item.Scheduled_time!="Not Scheduled")
-      setDetails(final_data.reverse())
+      // const final_data= response.data.filter((item:details)=> item.Scheduled_time!="Not Scheduled")
+      setDetails(response.data)
+      console.log(response.data.reverse())
      
     }
     fetch_data()
@@ -98,7 +97,7 @@ const UpcomingSeminars = () => {
     if( res.message=="Declined the seminar successfully"){
       setrerender(!rerender)
       settoastType("success")
-        setToastMessage("Seminar had been Canceled");
+        setToastMessage("Seminar had been Cancelled");
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
     }
@@ -114,12 +113,12 @@ const UpcomingSeminars = () => {
 
   return (
     <>
-    <div className={`max-h-[600px] min-h-[600px] custom-scrollbar overflow-scroll overflow-x-hidden ${details.length<5?"overflow-y-hidden":""} w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md`}>
+    <div className={`h-[600px]  custom-scrollbar overflow-scroll overflow-x-hidden ${details.length<5?"overflow-y-hidden":""} w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md`}>
       <h2 className="text-2xl font-bold text-white mb-6">Upcoming Seminars</h2>
       {isLoading?<LoadingSpinner />:details.length==0?<div className='h-full w-full flex items-center justify-center text-white mt-10'>No Meetings Upcoming</div>:<>
-      <ul className="space-y-4">
+      <ul className={`space-y-4 ${details.length>3?"overflow-scroll":""} h-[500px] overflow-x-hidden mb-16`}>
         {details.map((item,k) => (
-          <li key={k} className="flex flex-col md:flex-row md:items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
+          <li key={k} className="flex   flex-col md:flex-row md:items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
             <div className="flex-1">
               <div className="text-lg font-semibold text-white mb-1">{item.student_full_name}</div>
               <div className="text-white/80 text-sm mb-1">Topic: {item.meeting_topic} </div>
@@ -129,7 +128,7 @@ const UpcomingSeminars = () => {
               <div className="text-white/60 text-xs mb-1">Creation time: {new Date(item.Creation_time).toLocaleString()} </div>
             </div>
             <div className="mt-4 md:mt-0 md:ml-6 flex flex-col gap-2 items-end">
-              {item.Scheduled_time=="Not Scheduled"||(isChangeTimeClicked&&keyClicked==k)?<DatePicker
+              {(isChangeTimeClicked&&keyClicked==k)?<DatePicker
                 selected={selectedDateTimes[String(item._id)] || null}
                 onChange={date => handleDateTimeChange(String(item._id), date)}
                 showTimeSelect
@@ -137,7 +136,7 @@ const UpcomingSeminars = () => {
                 timeIntervals={15}
                 dateFormat="MMMM d, yyyy h:mm aa"
                 placeholderText="Select date & time"
-                className={`${item.Scheduled_time=="declined"?"hidden":""} rounded-lg ring-2 ${!IsDate_Time_given&&keyClicked==k?"ring-red-400":"ring-blue-500"} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow`}
+                className={`${item.status=="cancelled"?"hidden":""} rounded-lg ring-2 ${!IsDate_Time_given&&keyClicked==k?"ring-red-400":"ring-blue-500"} px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow`}
                 calendarClassName="!bg-white !rounded-xl !shadow-lg !border !border-gray-200"
                 popperPlacement="bottom-end"
                 minDate={new Date()}
@@ -154,22 +153,22 @@ const UpcomingSeminars = () => {
                     : new Date(0, 0, 0, 0, 0)
                 }
                 maxTime={new Date(0, 0, 0, 23, 45)}
-              />:<p className='text-white'>{item.Scheduled_time!="declined"?`Scheduled on ${new Date(item.Scheduled_time).toLocaleString()}`:"Seminar had been cancelled"}</p>}
+              />:<p className='text-white'>{item.status!="cancelled"?`Scheduled on ${new Date(item.Scheduled_time).toLocaleString()}`:"Seminar had been cancelled"}</p>}
               <div className='w-full h-fit flex '>
 
               <button
-                className={`${item.Scheduled_time=="declined"?"hidden":""} mt-2 px-5 py-2 hover:bg-red-400 text-white rounded-full font-medium shadow  transition`}
+                className={`${item.status=="cancelled"?"hidden":""} mt-2 px-5 py-2 hover:bg-red-400 text-white rounded-full font-medium shadow  transition`}
                 onClick={() => handleDecline(String(item._id))}
               >
                 Cancel Meeting
               </button>
-              {item.Scheduled_time=="Not Scheduled"||(isChangeTimeClicked&&keyClicked==k)?<button
-                className={ ` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+              {item.status=="cancelled"?<div></div>:(isChangeTimeClicked&&keyClicked==k)?<button
+                className={ ` mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
                 onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
               >
                 Confirm
               </button>:<button
-                className={`${item.Scheduled_time=="declined"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                className={`${item.status=="cancelled"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
                 onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}
               >
                 Change Time

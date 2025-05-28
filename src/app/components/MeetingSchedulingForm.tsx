@@ -49,7 +49,7 @@ const MeetingSchedulingForm = (
     <>
     <div className=" rounded-2xl mt-5  bg-gray-100 flex items-center justify-center ">
       
-      <div className="bg-white rounded-2xl shadow-xl flex flex-col lg:flex-row w-full max-w-5xl overflow-hidden border border-gray-200">
+      <div className="bg-white rounded-2xl shadow-xl flex flex-col-reverse lg:flex-row w-full max-w-5xl overflow-hidden border border-gray-200">
         {/* Left: Checkout Form */}
         <div className="flex-1 p-8 flex flex-col justify-between min-w-[340px]">
           {/* Header */}
@@ -95,30 +95,21 @@ const MeetingSchedulingForm = (
          
         </div>
         {/* Right: Product Card */}
-        <div className="flex-1 relative min-w-[340px] flex items-center justify-center bg-[#dce5e6c8]">
-          <div className="relative w-full h-full flex flex-col justify-end">
-            <div className="relative w-full h-[420px] md:h-full  flex items-center justify-center">
-              <div  className='h-5 w-5 absolute right-7 z-50 top-2 hover:text-rose-300 cursor-pointer'>
-                <MdOutlineClose onClick={()=>setisMeetingFormDisplayed(false)} size={"25px"}/>
-              </div>
-             <Choose_expert_for_meeting toastMessage={toastMessage} MeetingRequestDetails={MeetingRequestDetails}  setMeetingRequestDetails={setMeetingRequestDetails}/>
+        <div className="flex-1 relative min-w-[340px]  bg-[#dce5e6c8]">
+          <div className=" w-full h-full  ">
+            <div className=" w-full h-[590px] md:h-full ">
+             
+             <Choose_expert_for_meeting setisMeetingFormDisplayed={setisMeetingFormDisplayed} toastMessage={toastMessage} MeetingRequestDetails={MeetingRequestDetails}  setMeetingRequestDetails={setMeetingRequestDetails}/>
             </div>
             <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-2 bg-gradient-to-t from-[#e5e1de] via-[#e5e1de]/80 to-transparent rounded-b-2xl">
-              <div className="flex items-center justify-between">
+              <div className="flex  items-center justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">Schedule Meeting</h3>
                   {/* <div className="text-gray-700 mt-1">$148</div> */}
                   <div className="text-gray-500 text-sm">Get Expert Review</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                {/* <div className="flex items-center text-yellow-400">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.045 9.394c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
-                  ))}
-                </div> */}
-                {/* <span className="text-gray-600 text-sm ml-2">4.8 reviews</span> */}
-              </div>
+             
             </div>
           </div>
         </div>

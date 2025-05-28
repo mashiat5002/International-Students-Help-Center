@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactHTMLElement, useEffect, useState } from 'react';
 import { MdOutlineClose } from "react-icons/md";
 import Toast from './common/Toast';
 import SelectedExpartCard from './SelectedExpartCard';
 import { call_fetch_an_experts_seminars } from '../(utils)/call_fetch_an_experts_seminars/route';
+import LoadingSpinner from './common/LoadingSpinner';
+import Seminar_Registration_Modal from './Seminar_Registration_Modal';
 type profiles = 
     {email: string;
     _id: string;
@@ -15,6 +17,20 @@ type profiles =
     about: string;
     rating: string;
     joined: string;}
+type seminar={
+     _id: string;
+  speaker: string;
+  expert_id: string;
+  description: string;
+  meeting_topic: string;
+  Creation_time: string;
+  Scheduled_time: string;
+  max_Participants: string;
+  topics: string[];
+  registed_participants: string;
+  duration: string;
+  isregistered: boolean;
+}
 const SeminarRegistrationForm  = ({setIsexpertSelected,selected_expert}:
   {setIsexpertSelected:React.Dispatch<React.SetStateAction<boolean>>,
    selected_expert: profiles
@@ -23,122 +39,144 @@ const SeminarRegistrationForm  = ({setIsexpertSelected,selected_expert}:
  
 
 ) => {
+  const [seminars, setseminars] = useState<seminar[]>([]); 
+  const [selectedSemnar, setselectedSemnar] = useState({
+    _id: "",
+    speaker: "",
+    expert_id: "",
+    description: "",
+    meeting_topic: "",
+    Creation_time: "",
+    Scheduled_time: "",
+    max_Participants: "",
+    topics: [""],
+    registed_participants: "",
+    duration: "",
+    isregistered: false,
+  }); 
   const [isLoading, setIsLoading] = useState(false); 
+  const [rerender, setrerender] = useState(false); 
+  const [showform, setshowform] = useState(false); 
   const [showToast, setShowToast] = useState(false);
   const [toastType, settoastType] = useState("");
   const [toastMessage, setToastMessage] = useState('');
 
-  const callSubmit=async ()=>{
-    // console.log("called")
-    // setIsLoading(true);
-    // const res= await call_push_meeting_requests(MeetingRequestDetails)
   
-    // console.log(res.res)
-    // setIsLoading(false);
-    // if( res.res=="Request Sent Successfully"){
-    //   settoastType("success")
-    //     setToastMessage(res.res);
-    //     setShowToast(true);
-    //     setTimeout(() => {setShowToast(false);}, 3000);
-    // }
-    // else if( res.res!="Request Sent Successfully"){
-    //   settoastType("failed")
-    //   setToastMessage(res.res);
-    //   setShowToast(true);
-    //   setTimeout(() => {setShowToast(false);}, 3000);
-    // }
+  const setSelectedSeminar = (idx: number) => {
+    setselectedSemnar(seminars[idx]);
   }
-
   useEffect(()=>{
     const fetchData=async()=>{
+      setIsLoading(true)
       const res= await call_fetch_an_experts_seminars(selected_expert._id);
       console.log(res)
+      setseminars(res.data )
+      setIsLoading(false)
     }
     fetchData()
-  },[])
+  },[rerender])
   return (
     <>
-    <div className=" rounded-2xl mt-5   flex items-center justify-center ">
-      
-      <div className="bg-white rounded-2xl shadow-xl flex flex-col-reverse  lg:flex-row w-full max-w-5xl overflow-hidden border border-gray-200">
-        {/* Left: Checkout Form */}
-        <div className="flex-1 p-8 flex flex-col justify-between min-w-[340px]">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <span className="font-semibold text-lg">ISHC</span>
+      <div className=" rounded-2xl mt-5   flex items-center justify-center ">
+        <div className="bg-white rounded-2xl shadow-xl flex flex-col-reverse md:min-h-[600px] md:mt-5 lg:flex-row w-full max-w-5xl overflow-hidden border border-gray-200">
+          {/* Left: Checkout Form */}
+          <div className={`${seminars.length>1?"md:overflow-scroll md:overflow-x-hidden custom-scrollbar":""} flex-1 p-8 flex flex-col min-w-[340px] md:max-h-[600px] `}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <span className="font-semibold text-lg">ISHC</span>
+            </div>
+            {/* Form */}
+            <form className="space-y-3  ">
+              <h2 className="text-xl  font-bold mb-4">
+                Upcoming Seminars By {selected_expert.full_name}
+              </h2>
+
+             {isLoading?<div className='h-[300px] w-full  flex items-center justify-center'><LoadingSpinner/></div>:
+             seminars.length==0?<div className='h-[300px] w-full  flex items-center justify-center font-semibold text-black'>No Upcoming Seminars</div>:
+              seminars.map((item,idx)=>
+               <ul key={item._id.toString()} className="gap-4">
+                  <li className="flex w-full flex-col md:flex-row md:items-center justify-between bg-[#dce5e6c8] rounded-xl p-4 border border-white/10">
+                    <div className="flex-1">
+                      <div className="text-lg font-semibold text-black mb-1">
+                        {item.meeting_topic}
+                      </div>
+                      
+                      <div className="text-black/80 text-sm mb-1">
+                        Duration: {item.duration} Minutes
+                      </div>
+                      <div className="text-black/80 text-sm mb-1">
+                        Maximum Allowed Participants: {item.max_Participants}
+                      </div>
+                      <div className="text-black/80 text-sm mb-1">
+                        Registered Participants: {item.registed_participants}
+                      </div>
+                      <div className="text-black/60 text-xs mb-1">
+                        Scheduled on:{" "}
+                        {new Date(item.Scheduled_time).toLocaleString()}
+                      </div>
+                      <div className="text-black/60 text-xs mb-1">
+                        Creation time:{" "}
+                        {new Date(item.Creation_time).toLocaleString()}
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                      disabled={item.isregistered}
+                      type="button"
+                      // onSubmit={(e)=>{e.preventDefault();setShowRegistrationModal(true)}}
+                        onClick={()=>{setshowform(true),setSelectedSeminar(idx)}}
+                        className={`px-6 py-3 ${item.isregistered?"bg-green-300 cursor-default text-black":item.max_Participants<=item.registed_participants?"bg-red-300 cursor-default text-blue-900":"hover:bg-blue-900 hover:text-[#f6f5f5]"}  text-[#000]  font-semibold rounded-2xl shadow-md from-[#1111] to-[333446] transition duration-300 ease-in-out`}
+                      >
+                        {item.isregistered?"You Are Registered":item.max_Participants<=item.registed_participants?"Fully Booked":"Register Now"}
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              )
+             }
+
+
+            </form>
           </div>
-          {/* Form */}
-          <form className="space-y-3">
-            <h2 className="text-xl font-bold mb-4">Upcoming Seminars By {selected_expert.full_name}</h2>
-        
-            <div>
-              <label className="block text-sm font-medium mb-1">University/College Name</label>
-              <input   type="text" defaultValue="" className={`w-full border  rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
-            </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-medium mb-1">Field of Study</label>
-                <input  type="text" defaultValue="" className={`w-full border   rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
+          {/* Right */}
+          <div className="flex-1 relative min-w-[340px] flex  items-center justify-center  bg-[#dce5e6c8]">
+            <div className="relative w-full lg:h-full flex h-[550px] ">
+              <div className="relative  w-full h-[420px] md:h-fit   flex justify-center">
+                <div
+                  onClick={() => setIsexpertSelected(false)}
+                  className="h-5 w-5 absolute right-7 z-50 top-2 hover:text-rose-300 cursor-pointer"
+                >
+                  <MdOutlineClose size={"25px"} />
+                </div>
+                <SelectedExpartCard selected_expert={selected_expert} />
               </div>
-             
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb{`">Applying On</label>
-              <div className="relative">
-                <select  className={`w-full border  rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black appearance-none`}>
-                  <option value={""}>Select One</option>
-                  <option value={"Masters"}>Masters</option>
-                  <option value={"Bachelors"}>Bachelors</option>
-                  <option value={"Other"}>Other</option>
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Topic of Meeting</label>
-              <div className={`flex items-center border   rounded-lg px-3 py-2 bg-gray-50`}>
-                <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12l-4-4-4 4m8 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6" /></svg>
-                <input  type="text"  className={`h-20   w-full bg-transparent focus:outline-none`} />
-              </div>
-            </div>
-            <div onClick={()=>{callSubmit(), setIsLoading(true)}} className="flex items-center justify-center cursor-pointer w-full bg-black text-white py-3 rounded-lg font-semibold text-lg mt-2 hover:bg-gray-900 transition">{isLoading?"Processing Request..":"Continue to Confirm"}</div>
-          </form>
-         
-        </div>
-        {/* Right */}
-        <div className="flex-1 relative min-w-[340px] flex  items-center justify-center  bg-[#dce5e6c8]">
-          <div className="relative w-full lg:h-full flex h-[550px] ">
-            <div className="relative  w-full h-[420px] md:h-fit   flex justify-center">
-              <div onClick={()=>setIsexpertSelected(false)} className='h-5 w-5 absolute right-7 z-50 top-2 hover:text-rose-300 cursor-pointer'>
-                <MdOutlineClose  size={"25px"}/>
-              </div>
-              <SelectedExpartCard selected_expert={selected_expert}/>
-            </div>
-            <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-2 bg-gradient-to-t from-[#e5e1de] via-[#e5e1de]/80 to-transparent rounded-b-2xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Schedule Meeting</h3>
-                  {/* <div className="text-gray-700 mt-1">$148</div> */}
-                  <div className="text-gray-500 text-sm">Get Expert Review</div>
+              <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-2 bg-gradient-to-t from-[#e5e1de] via-[#e5e1de]/80 to-transparent rounded-b-2xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      Register For Seminar
+                    </h3>
+                    {/* <div className="text-gray-700 mt-1">$148</div> */}
+                    <div className="text-gray-500 text-sm">
+                      Get Expert Consultation
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                {/* <div className="flex items-center text-yellow-400">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.045 9.394c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
-                  ))}
-                </div> */}
-                {/* <span className="text-gray-600 text-sm ml-2">4.8 reviews</span> */}
-              </div>
             </div>
           </div>
         </div>
+        {showform?<Seminar_Registration_Modal
+          setrerender={setrerender}
+          rerender={rerender}
+          seminar={selectedSemnar}
+          onClose={() => setshowform(false)}
+        />:null}
       </div>
-    </div>
-     {showToast&&<Toast
-      type={toastType}
-      message={toastMessage}
-    />}
+      {showToast && <Toast type={toastType} message={toastMessage} />}
     </>
   );
 };

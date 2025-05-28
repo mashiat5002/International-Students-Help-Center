@@ -6,15 +6,30 @@ type ParticipantsDetails = {
     motive: string
 }
 export async function POST(request: Request) {
-  const body= await request.json();
-  console.log(body.expert_id)
+  const now = new Date();
+ const {email}= await request.json()
+ console.log("final_res")
   try{
-  const res= await ScheduledSeminars.find({expert_id:body.expert_id});
-  
-    const final_res= res.map((item)=>({
-      ...item.toObject(),
-      isregistered:item.participants.some((p:ParticipantsDetails) => p.email === body.email)
-    }))
+  const res= await ScheduledSeminars.find({});
+  const final_res = res.map((item) => {
+  const startTime = new Date(item.Scheduled_time);
+  const endTime = new Date(startTime.getTime() + parseInt(item.duration) * 60000);
+
+  let status = 'upcoming';
+  if (now > endTime) {
+    status = 'completed';
+  } else if (now >= startTime && now <= endTime) {
+    status = 'ongoing';
+  }
+
+  return {
+    ...item.toObject(),
+    isregistered: item.participants.some((p: ParticipantsDetails) => p.email === email),
+    status,
+  };
+});
+
+  console.log(final_res)
  
   if(!res){
     console.log("No data found")

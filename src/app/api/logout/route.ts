@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export async function POST(request: NextRequest) {
   // Clear the session cookie to log out the user
   try {
-    cookies().set("session", "", {
+    cookies().set("student-session", "", {
       expires: new Date(0), // Expiry date in the past, to delete the cookie
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

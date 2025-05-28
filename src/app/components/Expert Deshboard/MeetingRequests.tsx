@@ -20,6 +20,7 @@ type details={
     student_full_name: string,
     Scheduled_time: string,
     Request_time: string,
+    status: string,
     __v: Number
 }
 const MeetingRequests = () => {
@@ -27,8 +28,8 @@ const MeetingRequests = () => {
   const [isChangeTimeClicked, setisChangeTimeClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rerender, setrerender] = useState(false);
-  const [showToast, setShowToast] = useState(false);
   const [IsDate_Time_given, setIsDate_Time_given] = useState(true);
+  const [showToast, setShowToast] = useState(false);
   const [toastType, settoastType] = useState("");
   const [toastMessage, setToastMessage] = useState('');
   const [details,setDetails]= useState<details[]>([])

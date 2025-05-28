@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SeminarRegistrationForm from './SeminarRegistrationForm';
 import { call_fetch_all_experts } from '../(utils)/call_fetch_all_experts/route';
+import LoadingSpinner from './common/LoadingSpinner';
 
 type profiles = 
     {email: string;
@@ -20,6 +21,7 @@ type profiles =
 const ExpertsProfilesCardsList = () => {
   const [search, setSearch] = useState('');
   const [IsexpertSelected, setIsexpertSelected] = useState(false);
+  const [loading, setloading] = useState(false);
   const [details, setdetails] = useState<profiles[]>([]);
   const [selected_expert, setselected_expert] = useState<profiles>({email: "",
     _id: "",
@@ -35,7 +37,6 @@ const ExpertsProfilesCardsList = () => {
   
 
     const finterSelectedExpert=(id:string)=>{
-      console.log("id selected:"+id)
       const selected_profile_arr=details.filter(profile=>profile._id==id)
       setselected_expert(selected_profile_arr[0])
       setIsexpertSelected(true)
@@ -50,7 +51,9 @@ const ExpertsProfilesCardsList = () => {
   );
 useEffect(()=>{
   const fetchData=async()=>{
+    setloading(true)
     const res= await call_fetch_all_experts()
+    setloading(false)
     console.log(res.data)
     setdetails(res.data)
   }
@@ -72,12 +75,12 @@ useEffect(()=>{
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading?<LoadingSpinner/>:<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProfiles.length > 0 ? (
               filteredProfiles.map((profile, idx) => (
                 <div
                   key={idx}
-                  className="bg-white w-[300px] rounded-2xl shadow-md p-6 flex flex-col items-center relative max-w-xs mx-auto"
+                  className="bg-white w-[350px] rounded-2xl shadow-md p-6 flex flex-col items-center relative max-w-xs mx-auto"
                 >
                   {/* Top-right icons */}
                   <div className="absolute top-4 right-4 flex space-x-2">
@@ -101,7 +104,7 @@ useEffect(()=>{
                   <img
                     src={profile.img}
                     // alt={profile.name}
-                    className="w-30 h-30 rounded-full object-cover border-4 border-white shadow mb-4"
+                    className=" rounded-full object-cover border-4 border-white shadow mb-4"
                   />
                   {/* Name and username */}
                   <h2 className="text-xl font-bold text-gray-900 text-center">
@@ -131,7 +134,7 @@ useEffect(()=>{
                   {/* Stats */}
                   <div className="flex items-center justify-center space-x-4 text-sm text-gray-700 mt-auto">
                     <div>
-                      Rating <span className="font-bold">{profile.rating}</span>{" "}
+                      Ratingg <span className="font-bold">{profile.rating}</span>{" "}
                     </div>
                     <div className="text-gray-400">Joined {profile.joined}</div>
                   </div>
@@ -142,7 +145,7 @@ useEffect(()=>{
                 No profiles found.
               </div>
             )}
-          </div>
+          </div>}
         </div>
       )}
     </>

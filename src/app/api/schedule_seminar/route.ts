@@ -5,13 +5,22 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
 
   try{
-    const {seminarTopic,date_time,seminarDuration,maxParticipants,expert_id} = await request.json();
+    const {seminarTopic,date_time,seminarDuration,maxParticipants,expert_id,expert_name,topics,description} = await request.json();
     
-
+    console.log(description.length)
+    console.log(seminarTopic.length)
     const d_t = new Date(date_time);
    
     if(seminarTopic==""){
      return NextResponse.json({ message: "Must Provide Seminar Topic" }, { status: 500 });}
+     else if(seminarTopic.length>100){
+      return NextResponse.json({ message: "Must Not Cross Character limit in Topic" }, { status: 500 });}
+    else if(description==""){
+     return NextResponse.json({ message: "Must Provide Seminar description" }, { status: 500 });}
+    else if(description.length>250){
+     return NextResponse.json({ message: "Must Not Cross Character limit in description" }, { status: 500 });}
+    else if(topics.length<1 ){
+     return NextResponse.json({ message: "Must Provide at least one topic" }, { status: 500 });}
     else if(seminarDuration==""){
      return NextResponse.json({ message: "Must Provide Seminar Duration" }, { status: 500 });}
     else if(maxParticipants==""){
@@ -35,10 +44,13 @@ export async function POST(request: Request) {
     await connectToDatabase()
     const newScheduledSeminars = new ScheduledSeminars({
       expert_id: expert_id,
+      speaker: expert_name,
       meeting_topic: seminarTopic,
+      description: description,
       Scheduled_time: date_time,
       max_Participants: maxParticipants,
       duration: seminarDuration,
+      topics: topics,
     });
           const saved = await newScheduledSeminars.save();
   

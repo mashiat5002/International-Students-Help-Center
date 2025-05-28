@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 const set_session= async(email:string,registering_as:string)=>{
   const expires = new Date(Date.now() + 1 * 60 * 60 * 1000);
   
-  const session= await encrypt({Email:email,expires,Password:"password"});
+  const session= await encrypt({Email:email,expires});
 
    cookies().set(registering_as+'-session',session,{expires, httpOnly:true})
 }
