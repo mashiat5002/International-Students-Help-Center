@@ -55,7 +55,7 @@ useEffect(()=>{
     const res= await call_fetch_all_experts()
     setloading(false)
     console.log(res.data)
-    setdetails(res.data)
+    setdetails(res.data.reverse())
   }
   fetchData()
 },[])

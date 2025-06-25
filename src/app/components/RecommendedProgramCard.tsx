@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { call_deepseek_for_roadmap } from '../(utils)/call_deepseek_for_roadmap/route';
 import Toast from '@/app/components/common/Toast';
+import { call_deepseek_for_application_links } from '../(utils)/call_deepseek_for_application_links/route';
 
 interface ProgramProps {
   title: string;
@@ -72,13 +73,29 @@ const RecommendedProgramCard = React.memo(({
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
       }
+
+      const res2= await call_deepseek_for_application_links("Application_Links",university, title, deadline)
+
+      if(res2.message=="Application_Links saved successfully"){
+
+        settoastType("success")
+        setToastMessage('Application_Links saved successfully');
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+      } else if(res2.message=="Internal Server Error") {
+
+        settoastType("failed")
+        setToastMessage('Failed to process');
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+      }
       setloading(false)
     
 
   }
   return (
     <>
-      
+      {/*  */}
       <div className="relative mb-10 overflow-hidden bg-gradient-to-br from-white via-white to-blue-50 
         rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 
         border border-blue-100 group w-full">

@@ -6,6 +6,7 @@ import { IoIosArrowBack } from 'react-icons/io';
 import Seminar_Registration_Modal from './Seminar_Registration_Modal';
 import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
+import timeFormatConverter from '../(utils)/time_format_converter/route';
 
 // New seminar details type
 type seminarDetails = {
@@ -36,11 +37,25 @@ const SeminarCard = React.memo(({
   
 }) => {
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'upcoming':
+        return 'bg-green-100 text-green-800';
+      case 'ended':
+        return 'bg-orange-100 text-orange-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'ongoing':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
   
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-xl shadow-lg overflow-hidden border
+      className={`bg-white rounded-xl shadow-lg overflow-hidden border relative
         transition-all duration-300 cursor-pointer 
         ${isSelected
           ? 'border-blue-500 shadow-blue-100 scale-[1.02]'
@@ -57,14 +72,17 @@ const SeminarCard = React.memo(({
             </div>
 
             <div className="text-blue-900/60 font-semibold text-[10px] sm:text-xs mb-1">
-              Scheduled on: {new Date(seminar.Scheduled_time).toLocaleString()}
+              Scheduled on: {timeFormatConverter(seminar.Scheduled_time)}
             </div>
             <div className="text-blue-900/60 font-semibold text-[10px] sm:text-xs mb-1">
-              Creation time: {new Date(seminar.Creation_time).toLocaleString()}
+              Creation time: {timeFormatConverter(seminar.Creation_time)}
             </div>
           </div>
         </li>
       </ul>
+      <div className={`right-4 top-4 p-2 absolute z-50 rounded-full text-xs  ${getStatusColor(seminar.status)}`}>
+            {seminar.status}
+          </div>
     </div>
   );
 });
@@ -140,13 +158,13 @@ const SeminarDetails = ({
           </div>
           <button
             onClick={() => onRegister(seminar)}
-            disabled={availableSlots <= 0 || seminar.isregistered}
-            className={`${seminar.isregistered?"bg-green-400 ":seminar.max_Participants<=seminar.registed_participants?"bg-red-400":""} w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r text-blue-900 font-semibold rounded-2xl shadow-md transition duration-300 ease-in-out text-sm sm:text-base
-              ${availableSlots > 0 && !seminar.isregistered
+            disabled={availableSlots <= 0 || seminar.isregistered || seminar.status=="cancelled" || seminar.status=="ended" }
+            className={`${seminar.status=="ended" || seminar.status=="cancelled"?"bg-red-400 cursor-default":seminar.isregistered?"bg-green-400 ":seminar.max_Participants<=seminar.registed_participants?"bg-red-400":""} w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r text-blue-900 font-semibold rounded-2xl shadow-md transition duration-300 ease-in-out text-sm sm:text-base
+              ${availableSlots > 0 && !seminar.isregistered && seminar.status!="ended"
                 ? ' hover:bg-blue-500 hover:text-white from-[#1111] to-[333446]'
                 : 'bg-green-400 text-blue-600 cursor-default '}`}
           > 
-            {seminar.isregistered?"You Are Registered":availableSlots > 0 ? 'Register Now' : 'Fully Booked'}
+            {seminar.status=="cancelled"?"cancelled":seminar.status=="ended"?"Ended":seminar.isregistered?"You Are Registered":availableSlots > 0 ? 'Register Now' : 'Fully Booked'}
           </button>
         </div>
       </div>
@@ -207,6 +225,7 @@ const OnlineSeminars = () => {
     const topicsMatch = (seminar.topics ?? []).some(topic =>
       (topic ?? '').toLowerCase().includes(lowerCaseSearchTerm)
     );
+     
 
     return (
 
@@ -228,7 +247,7 @@ const OnlineSeminars = () => {
             <h2 className="text-lg sm:text-xl font-bold text-blue-900">Online Seminars</h2>
             <div className='h-20  w-fit flex flex-col justify-between'> 
             <div className="flex gap-2">
-                {(['all', 'upcoming','ongoing', 'completed', 'cancelled'] as const).map((type) => (
+                {(['all', 'upcoming','ongoing', 'ended', 'cancelled'] as const).map((type) => (
                   <button
                   key={type}
                   onClick={() => setFilter(type)}

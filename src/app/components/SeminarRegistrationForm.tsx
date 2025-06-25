@@ -29,6 +29,7 @@ type seminar={
   topics: string[];
   registed_participants: string;
   duration: string;
+  status: string;
   isregistered: boolean;
 }
 const SeminarRegistrationForm  = ({setIsexpertSelected,selected_expert}:
@@ -52,6 +53,7 @@ const SeminarRegistrationForm  = ({setIsexpertSelected,selected_expert}:
     topics: [""],
     registed_participants: "",
     duration: "",
+    status: "upcoming",
     isregistered: false,
   }); 
   const [isLoading, setIsLoading] = useState(false); 
@@ -115,19 +117,19 @@ const SeminarRegistrationForm  = ({setIsexpertSelected,selected_expert}:
                         {new Date(item.Scheduled_time).toLocaleString()}
                       </div>
                       <div className="text-black/60 text-xs mb-1">
-                        Creation time:{" "}
+                        Creations time:{" "}
                         {new Date(item.Creation_time).toLocaleString()}
                       </div>
                     </div>
                     <div>
                       <button
-                      disabled={item.isregistered}
+                      disabled={item.isregistered || item.status=="cancelled" || item.status=="completed" || item.status=="ended" || item.max_Participants<=item.registed_participants}
                       type="button"
                       // onSubmit={(e)=>{e.preventDefault();setShowRegistrationModal(true)}}
                         onClick={()=>{setshowform(true),setSelectedSeminar(idx)}}
-                        className={`px-6 py-3 ${item.isregistered?"bg-green-300 cursor-default text-black":item.max_Participants<=item.registed_participants?"bg-red-300 cursor-default text-blue-900":"hover:bg-blue-900 hover:text-[#f6f5f5]"}  text-[#000]  font-semibold rounded-2xl shadow-md from-[#1111] to-[333446] transition duration-300 ease-in-out`}
+                        className={`px-6 py-3 ${item.status=="cancelled"?"bg-red-300 cursor-default text-black":item.status=="completed"?"bg-purple-300 cursor-default text-black":item.isregistered?"bg-green-300 cursor-default text-black":item.max_Participants<=item.registed_participants?"bg-red-300 cursor-default text-blue-900":"hover:bg-blue-900 hover:text-[#f6f5f5]"}  text-[#000]  font-semibold rounded-2xl shadow-md from-[#1111] to-[333446] transition duration-300 ease-in-out`}
                       >
-                        {item.isregistered?"You Are Registered":item.max_Participants<=item.registed_participants?"Fully Booked":"Register Now"}
+                        {item.status=="cancelled"?"cancelled":item.status=="completed"?"Ended":item.isregistered?"You Are Registered":item.max_Participants<=item.registed_participants?"Fully Booked":"Register Now"}
                       </button>
                     </div>
                   </li>

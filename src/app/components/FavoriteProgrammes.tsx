@@ -30,9 +30,9 @@ const FavoriteResultsSection = React.memo(({
         <h2 className="text-xl md:text-2xl font-bold text-black">
           Favorite Study Programmes
         </h2>
-        <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
+        {favorites.length>0?<div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
           {favorites.length} Programs
-        </div>
+        </div>:null}
       </div>
       <div className="h-[calc(100%-4rem)] overflow-y-auto px-1 sm:px-2 md:px-4 custom-scrollbar">
         <div className="flex flex-col gap-4 md:gap-6 pb-6 max-w-[1200px] mx-auto">
@@ -75,7 +75,7 @@ const FavoriteProgrammes = () => {
         // Ensure all favorites have a deadline
         const favoritesWithDeadlines = parsedFavorites.map((fav: Program) => ({
           ...fav,
-          deadline: fav.deadline || '2024-12-31' // Provide a default deadline if none exists
+          deadline: fav.deadline || '2025-12-31' // Provide a default deadline if none exists
         }));
         setFavorites(favoritesWithDeadlines);
       }

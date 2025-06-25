@@ -1,19 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import RecommendedProgramCard from './RecommendedProgramCard';
-
-interface Answer {
-  questionId: string;
-  answer: string | string[];
-}
+import React, { useState, useEffect, useRef } from 'react';
+import ResultsSection from './ResultSection';
+import timeFormatConverter from '../(utils)/time_format_converter/route';
 
 interface Inquiry {
   id: string;
   date: string;
-  answers: Answer[];
+  questions: string[];
+  answers: string[];
   heading: string;
-  programs?: any[]; // Using the same program type as in StudyProgrammes component
+  // programs?: any[];
 }
 
 const InquiryCard = React.memo(({ 
@@ -37,7 +34,7 @@ const InquiryCard = React.memo(({
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-bold text-blue-900 mb-1">{inquiry.heading}</h3>
-          <p className="text-sm text-gray-600">Inquiry Date: {inquiry.date}</p>
+          <p className="text-sm text-gray-600">Inquiry Time: {timeFormatConverter(inquiry.date)}</p>
         </div>
         <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -50,200 +47,174 @@ const InquiryCard = React.memo(({
 
 const InquiryDetails = React.memo(({ 
   inquiry,
-  onShowResults 
+  onShowResults,
+  onUpdateAnswer
 }: { 
   inquiry: Inquiry;
   onShowResults: () => void;
-}) => (
-  <div className="space-y-6">
-    {/* Header */}
-    <div className="bg-blue-50/50 p-4 rounded-xl">
-      <h2 className="text-xl font-bold text-blue-900 mb-2">{inquiry.heading}</h2>
-      <p className="text-sm text-gray-600">Submitted on {inquiry.date}</p>
-    </div>
+  onUpdateAnswer: (index: number, newAnswer: string) => void;
+}) => {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
+  const editRef = useRef<HTMLDivElement>(null);
 
-    {/* Questions and Answers */}
-    <div className="bg-blue-50/50 p-4 rounded-xl">
-      <h4 className="text-lg font-semibold text-blue-900 mb-4">Your Responses</h4>
-      <div className="space-y-4">
-        {inquiry.answers.map((answer, index) => (
-          <div key={index} className="border-b border-blue-100 last:border-0 pb-4 last:pb-0">
-            <p className="text-sm font-medium text-gray-700 mb-2">
-              Question {index + 1}
-            </p>
-            <p className="text-sm text-gray-600">
-              {Array.isArray(answer.answer) 
-                ? answer.answer.join(', ')
-                : answer.answer}
-            </p>
-          </div>
-        ))}
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editRef.current && !editRef.current.contains(event.target as Node)) {
+        setEditingIndex(null);
+      }
+    };
+
+    if (editingIndex !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [editingIndex]);
+
+  const handleEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditValue(inquiry.answers[index]);
+  };
+
+  const handleSave = (index: number) => {
+    onUpdateAnswer(index, editValue);
+    setEditingIndex(null);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-blue-50/50 p-4 rounded-xl">
+        <h2 className="text-xl font-bold text-blue-900 mb-2">{inquiry.heading}</h2>
+        <p className="text-sm text-gray-600">Submitted on {timeFormatConverter(inquiry.date)}</p>
       </div>
-    </div>
 
-    {/* Action Button */}
-    <div>
-      <button
-        onClick={onShowResults}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 
-          transition-colors flex items-center justify-center gap-2"
-      >
-        View Suggested Programs
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-            d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-      </button>
-    </div>
-  </div>
-));
-
-// Add this new component for the results view
-const ResultsSection = React.memo(({ 
-  onBack,
-  favorites = [], 
-  onToggleFavorite = (program: any) => {} 
-}) => (
-  <div className="w-[95%] md:w-[80%] h-[70vh] animate-fadeIn relative mx-auto">
-    <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
-    <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
-      <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="bg-white/80 backdrop-blur-sm p-2 rounded-lg 
-              shadow-lg text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h2 className="text-xl md:text-2xl font-bold text-black">
-            Recommended Study Programmes
-          </h2>
-        </div>
-        <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
-          {demoPrograms.length} Programs
-        </div>
-      </div>
-      <div className="h-[calc(100%-4rem)] overflow-y-auto px-1 sm:px-2 md:px-4 custom-scrollbar">
-        <div className="flex flex-col gap-4 md:gap-6 pb-6 max-w-[1200px] mx-auto">
-          {demoPrograms.map(program => (
-            <RecommendedProgramCard
-              key={program.title}
-              {...program}
-              isFavorite={favorites.some(fav => fav.title === program.title)}
-              onFavoriteClick={() => onToggleFavorite(program)}
-              onLearnMore={() => console.log(`Learn more about ${program.title}`)}
-            />
+      {/* Questions and Answers */}
+      <div className="bg-blue-50/50 p-4 rounded-xl">
+        <h4 className="text-lg font-semibold text-blue-900 mb-4">Your Responses</h4>
+        <div className="space-y-4">
+          {inquiry.questions.map((question, index) => (
+            <div key={index} className="border-b border-blue-100 last:border-0 pb-4 last:pb-0">
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                {question}
+              </p>
+              {editingIndex === index ? (
+                <div ref={editRef} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => handleSave(index)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-600">
+                    {inquiry.answers[index]}
+                  </p>
+                  <button
+                    onClick={() => handleEdit(index)}
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
-    </div>
-  </div>
-));
 
-// Add demo programs data (same as in StudyProgrammes)
-const demoPrograms = [
-  {
-    title: "Computer Science",
-    university: "Massachusetts Institute of Technology",
-    country: "United States",
-    duration: "2 years",
-    tuition: "$53,450 per year",
-    description: "A comprehensive program covering advanced computing concepts, algorithms, and software development.",
-    deadline: "2024-12-15"
-  },
-  {
-    title: "Data Science",
-    university: "Stanford University",
-    country: "United States",
-    duration: "18 months",
-    tuition: "$52,479 per year",
-    description: "An intensive program focusing on big data analytics, machine learning, and statistical analysis.",
-    deadline: "2024-04-30"
-  },
-  {
-    title: "Artificial Intelligence",
-    university: "University of Cambridge",
-    country: "United Kingdom",
-    duration: "1 year",
-    tuition: "£38,000 per year",
-    description: "Advanced study of AI principles, machine learning, and intelligent systems.",
-    deadline: "2024-06-15"
-  },
-  {
-    title: "Software Engineering",
-    university: "ETH Zurich",
-    country: "Switzerland",
-    duration: "2 years",
-    tuition: "CHF 1,500 per year",
-    description: "Comprehensive software development and engineering principles program.",
-    deadline: "2024-08-30"
-  }
-];
+      {/* Action Button */}
+      <div>
+        <button
+          onClick={onShowResults}
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 
+            transition-colors flex items-center justify-center gap-2"
+        >
+          View Suggested Programs
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+              d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+});
+
+
 
 const PastInquiries = () => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [clicked_inquiry_idx, setclicked_inquiry_idx] = useState(-1);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [spinner, setSpinner] = useState(true);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [Qs, setQs] = useState<string[]>([]);
 
+    useEffect(() => {
+      if (favorites.length > 0) {
+        localStorage.setItem('studyProgramFavorites', JSON.stringify(favorites));
+      }
+    }, [favorites]);
   useEffect(() => {
     // Load inquiries from localStorage
     const storedInquiries = localStorage.getItem('pastInquiries');
+    
     if (storedInquiries) {
+      console.log(JSON.parse(storedInquiries));
       setInquiries(JSON.parse(storedInquiries));
     } else {
-      // Demo data if no stored inquiries
-      const demoInquiries: Inquiry[] = [
-        {
-          id: '1',
-          date: '2024-03-01',
-          heading: 'Computer Science Masters in Europe',
-          answers: [
-            { questionId: 'field', answer: 'Computer Science' },
-            { questionId: 'level', answer: 'Masters' },
-            { questionId: 'location', answer: ['Germany', 'Netherlands'] },
-            { questionId: 'duration', answer: '2 years' },
-            { questionId: 'language', answer: 'English' }
-          ]
-        },
-        {
-          id: '2',
-          date: '2024-02-15',
-          heading: 'Data Science Programs in USA',
-          answers: [
-            { questionId: 'field', answer: 'Data Science' },
-            { questionId: 'level', answer: 'Masters' },
-            { questionId: 'location', answer: ['United States'] },
-            { questionId: 'duration', answer: '1.5 years' },
-            { questionId: 'language', answer: 'English' }
-          ]
-        },
-        {
-          id: '3',
-          date: '2024-02-01',
-          heading: 'AI and Machine Learning in UK',
-          answers: [
-            { questionId: 'field', answer: 'Artificial Intelligence' },
-            { questionId: 'level', answer: 'Masters' },
-            { questionId: 'location', answer: ['United Kingdom'] },
-            { questionId: 'duration', answer: '1 year' },
-            { questionId: 'language', answer: 'English' }
-          ]
-        }
-      ];
-      setInquiries(demoInquiries);
+    
+      setInquiries([]);
     }
   }, []);
 
+
+
+
+  
+  const handleUpdateAnswer = (index: number, newAnswer: string) => {
+    if (!selectedInquiry) return;
+
+    const updatedInquiry = {
+      ...selectedInquiry,
+      answers: selectedInquiry.answers.map((answer, i) =>
+        i === index ? newAnswer : answer
+      )
+    };
+
+    setSelectedInquiry(updatedInquiry);
+    setInquiries(prev =>
+      prev.map(inquiry =>
+        inquiry.id === selectedInquiry.id ? updatedInquiry : inquiry
+      )
+    );
+
+    // Update localStorage
+    localStorage.setItem('pastInquiries', JSON.stringify(inquiries));
+  };
+
   const handleShowResults = () => {
     setShowResults(true);
-    // Here you would typically trigger the same program search logic 
-    // as in the StudyProgrammes component
   };
 
   const toggleFavorite = (program: any) => {
@@ -279,15 +250,31 @@ const PastInquiries = () => {
     </div>
   );
 
-  // If showing results, render the ResultsSection
   if (showResults && selectedInquiry) {
     return (
-      <div className="w-full h-full">
+      <div className="w-[95%] md:w-[90%] h-[80vh] animate-fadeIn relative mx-auto mt-16">
+    <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-xl pointer-events-none" />
+    <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
+      {spinner?<div  className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
+        <h2 className="text-xl md:text-2xl font-bold text-black">
+          Processing Suggestions...
+        </h2>
+        
+      </div>:null}
+      <div className={`h-[calc(100%-4rem)]  px-1 sm:px-2 md:px-4 overflow-hidden `}>
+        <div className="flex flex-col gap-4 md:gap-6 pb-6 max-w-[1200px] mx-auto overflow-hidden">
+
         <ResultsSection 
-          onBack={() => setShowResults(false)}
+          setSpinner={setSpinner}
+          questions={selectedInquiry.questions}
+          answers={selectedInquiry.answers}
           favorites={favorites}
           onToggleFavorite={toggleFavorite}
-        />
+          />
+
+          </div>
+          </div>
+          </div>
         <Toast />
       </div>
     );
@@ -302,20 +289,20 @@ const PastInquiries = () => {
             <h2 className="text-xl font-bold text-blue-900">Past Inquiries</h2>
           </div>
           <div className="p-4 h-[calc(100%-4rem)] overflow-y-auto custom-scrollbar">
-            {inquiries.length > 0 ? (
+            {inquiries.length > 0 ?  (
               <div className="space-y-4">
-                {inquiries.map(inquiry => (
+                {inquiries.map((inquiry,idx) => (
                   <InquiryCard
-                    key={inquiry.id}
+                    key={idx}
                     inquiry={inquiry}
-                    isSelected={selectedInquiry?.id === inquiry.id}
-                    onClick={() => setSelectedInquiry(inquiry)}
+                    isSelected={clicked_inquiry_idx === idx}
+                    onClick={() =>{setclicked_inquiry_idx(idx); setSelectedInquiry(inquiry)}}
                   />
                 ))}
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-500">
-                <p>No past inquiries found</p>
+              <div className="h-full  flex items-center justify-center text-gray-500">
+                <p className='p-8 text-center'>No past inquiries found <br /> If you're supposed to see any, try checking in the browser you used previously.</p>
               </div>
             )}
           </div>
@@ -329,6 +316,7 @@ const PastInquiries = () => {
                 <InquiryDetails 
                   inquiry={selectedInquiry}
                   onShowResults={handleShowResults}
+                  onUpdateAnswer={handleUpdateAnswer}
                 />
               </div>
             ) : (

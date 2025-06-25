@@ -13,6 +13,7 @@ type seminarDetails = {
   topics: string[];
   registed_participants: string;
   duration: string;
+  status: string;
   isregistered: boolean;
 };
 interface RegistrationModalProps {
@@ -109,11 +110,11 @@ useEffect(()=>{
               Cancel
             </button>
             <button
-             disabled={isloading}
+             disabled={isloading || seminar.isregistered || seminar.status=="completed"}
               type="submit"
               className={`px-4 py-2 text-sm ${seminar.isregistered?"bg-green-600 cursor-default":"bg-blue-600 hover:bg-blue-700 "}  text-white rounded-lg `}
             >
-              {seminar.isregistered?"You Are Registed":isloading?"Processing.." :"Register"}
+              {seminar.status=="completed"?"Ended":seminar.isregistered?"You Are Registed":isloading?"Processing.." :"Register"}
             </button>
           </div>
         </form>

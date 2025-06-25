@@ -34,7 +34,7 @@ export  async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "model": "deepseek/deepseek-prover-v2:free"
+        "model": "deepseek/deepseek-chat-v3-0324"
 ,
   "messages": [
     { "role": "system", "content": "You are a study advisor for international students. you just provide an object which contains steps of roadmap of the given application" },

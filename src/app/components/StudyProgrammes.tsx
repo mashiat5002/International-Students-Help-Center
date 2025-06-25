@@ -7,38 +7,11 @@ import RecommendedProgramCard from './RecommendedProgramCard';
 import React from 'react';
 import { call_deepseek } from '../(utils)/call_deepseek/route';
 import SplineLoader from '@/app/components/common/SplineLoader';
+import ResultsSection from './ResultSection';
 
-// Demo questions array
-const questions = [
-  "What is your desired field of study?",
-  "Which country would you prefer to study in?",
-  "What is your preferred language of instruction?",
-  "What is your budget range for tuition (in USD/year)?",
-  "When do you plan to start your studies?"
-];
 
-// Add this demo data for study programmes
-const demoPrograms = [
-  {
-    title: "Computer Science",
-    university: "Massachusetts Institute of Technology",
-    country: "United States",
-    duration: "2 years",
-    tuition: "$53,450 per year",
-    description: "A comprehensive program covering advanced computing concepts, algorithms, and software development.",
-    deadline: "2024-12-15"
-  },
-  {
-    title: "Data Science",
-    university: "Stanford University",
-    country: "United States",
-    duration: "18 months",
-    tuition: "$52,479 per year",
-    description: "An intensive program focusing on big data analytics, machine learning, and statistical analysis.",
-    deadline: "2024-04-30"
-  },
-  // ... add deadlines for other programs
-];
+
+
 
 // Add new interface for program type
 interface Program {
@@ -52,73 +25,7 @@ interface Program {
 }
 
 // Move ResultsSection outside the main component
-const ResultsSection = React.memo(({ 
-  favorites, 
-  answers,
-  questions,
-  onToggleFavorite,
-  setSpinner 
 
-}: { 
-  setSpinner: (spinner: boolean) => void;
-  answers: string[],
-  questions: string[],
-  favorites: Program[], 
-  onToggleFavorite: (program: Program) => void 
-}) => {
-  const [ Programmes, setProgrammes ] = useState<Program[]>([]);
-  const [ loading, setloading ] = useState(false);
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      setloading(true);
-      // setSpinner(true); // Start spinner
-  
-      try {
-        const res = await call_deepseek("answers", questions, answers);
-        setProgrammes(res);
-        console.log(res);
-      } catch (err) {
-        console.error("Failed to fetch programs", err);
-      } finally {
-        setloading(false);
-      
-      }
-    };
-    fetchData();
-
-  },[])
- return (
-  <>
-  {loading?<SplineLoader/>:<div className="w-[100%] md:w-[100%] h-[70vh] animate-fadeIn relative mx-auto ">
-    <div className="absolute inset-0  backdrop-blur-md bg-white/20 rounded-xl pointer-events-none" />
-    <div className="relative z-10 h-full pointer-events-auto overflow-hidden">
-      <div className="flex justify-between items-center mb-6 px-4 sticky top-0 z-20 py-4">
-        <h2 className="text-xl md:text-2xl font-bold text-black">
-          Recommended Study Programmes
-        </h2>
-        <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
-          {Programmes.length} Programs
-        </div>
-      </div>
-      <div className="h-[calc(100%-4rem)] overflow-y-auto px-1 sm:px-2 md:px-4 custom-scrollbar">
-        <div className="flex flex-col gap-4 md:gap-6 pb-6 min-w-[350px] mx-auto">
-          {Programmes.map(program => (
-            <RecommendedProgramCard
-              key={program.title}
-              {...program}
-              isFavorite={favorites.some(fav => fav.title === program.title)}
-              onFavoriteClick={() => onToggleFavorite(program)}
-              onLearnMore={() => console.log(`Learn more about ${program.title}`)}
-            />
-          ))}
-        </div>
-        
-      </div>
-    </div>
-  </div>}
-  </>
-)});
 
 const StudyProgrammes = () => {
   
@@ -171,7 +78,7 @@ const StudyProgrammes = () => {
       setAnswers(prev => [...prev, inputValue]);
       setInputValue('');
 
-      if (currentQuestionIndex < questions.length - 1) {
+      if (currentQuestionIndex < 4) {
         setCurrentQuestionIndex(prev => prev + 1);
         setIsAnimating(false);
       } else {
@@ -312,7 +219,7 @@ const StudyProgrammes = () => {
   
 
   return (
-    <div className="h-full w-full overflow-hidden  bg-gray-800 ">
+    <div className="h-full w-full overflow-hidden   bg-gray-800 ">
       {/* Text Overlay */}
       <div className="absolute top-1/2 left-1/2 transform  -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
         <div className={`flex flex-col items-center space-y-4 relative
@@ -356,7 +263,7 @@ const StudyProgrammes = () => {
             ) : showResults ? (
               <ResultsSection 
                 setSpinner={setSpinner}
-                questions={questions}
+                questions={Qs}
                 answers={answers}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
@@ -397,7 +304,7 @@ const StudyProgrammes = () => {
       </div>
 
       {/* Spline 3D Background */}
-      <div className="fixed inset-0 z-0 overflow-hidden flex items-center justify-center">
+      <div className="fixed inset-0  overflow-hidden flex items-center justify-center">
         <div className="w-full h-full transform-gpu will-change-transform">
           <Spline
             scene="/spline/nexbot_robot_character_concept.spline"

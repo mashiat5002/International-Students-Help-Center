@@ -1,14 +1,16 @@
 // models/progress_track.ts
 import mongoose from 'mongoose';
-
 const StepSchema = new mongoose.Schema({
   title: String,
   description: String,
   status: {
     type: String,
     enum: ['completed', 'in-progress', 'not-started'],
-    default: 'not-started'
-  }
+    default: 'not-started',
+  },
+  doc_name: String,
+  document: Buffer,
+  uploadDate: {type: Date},
 });
 
 const JourneySchema = new mongoose.Schema({

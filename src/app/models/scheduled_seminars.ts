@@ -10,7 +10,7 @@ export interface IScheduledSeminars extends Document {
     description: string;
     meeting_topic: string;
     Creation_time: Date ;
-    Scheduled_time: string;
+    Scheduled_time: Date;
     max_Participants: string;
     registed_participants: number;
     duration: string;
@@ -34,7 +34,7 @@ const ScheduledSeminarsSchema = new Schema<IScheduledSeminars>({
     description: {type:String, required:true},
     meeting_topic: {type:String, required:true},
     Creation_time: {type:Date , default: Date.now},
-    Scheduled_time: {type:String ,required:true},
+    Scheduled_time: {type:Date ,required:true},
     max_Participants: {type:String},
     registed_participants: {type:Number,default:0},
     duration: {type:String},

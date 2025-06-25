@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { call_fetch_application_links } from '../(utils)/call_fetch_application_links/route';
+import LoadingSpinner from './common/LoadingSpinner';
 
 interface ApplicationInfo {
   journeyId: string;
@@ -17,11 +19,6 @@ interface ApplicationInfo {
   requirements: string[];
   documents: string[];
   tips: string[];
-  roadmap: {
-    step: string;
-    description: string;
-    timeline: string;
-  }[];
   additionalResources: {
     title: string;
     url: string;
@@ -194,28 +191,7 @@ const ApplicationDetails = React.memo(({ application }: { application: Applicati
       )}
     </div>
 
-    {/* Application Roadmap */}
-    <div className="bg-blue-50/50 p-4 rounded-xl">
-      <h4 className="text-lg font-semibold text-blue-900 mb-3">Application Roadmap</h4>
-      {application.roadmap && application.roadmap.length > 0 ? (
-        <div className="space-y-4">
-          {application.roadmap.map((step, index) => (
-            <div key={index} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                {index + 1}
-              </div>
-              <div>
-                <h5 className="font-medium text-blue-900">{step.step}</h5>
-                <p className="text-sm text-gray-600 mb-1">{step.description}</p>
-                <span className="text-xs text-blue-600 font-medium">{step.timeline}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-gray-500 italic">Not Available</p>
-      )}
-    </div>
+    
 
     {/* Additional Resources */}
     <div className="bg-blue-50/50 p-4 rounded-xl">
@@ -249,280 +225,18 @@ const ApplicationDetails = React.memo(({ application }: { application: Applicati
 
 const ApplicationLinks = () => {
   const [applications, setApplications] = useState<ApplicationInfo[]>([]);
+  const [isloading, setisloading] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<ApplicationInfo | null>(null);
 
   useEffect(() => {
-    const demoApplications: ApplicationInfo[] = [
-      {
-        journeyId: '1',
-        title: 'Computer Science Application',
-        institution: 'Massachusetts Institute of Technology',
-        program: 'Master of Science in Computer Science',
-        deadline: '2024-04-15',
-        applicationUrl: 'https://gradadmissions.mit.edu/apply',
-        emailAddresses: {
-          admissions: 'admissions@mit.edu',
-          department: 'csgrad@mit.edu',
-          international: ''
-        },
-        requirements: [
-          'Bachelor\'s degree in Computer Science or related field',
-          'Minimum GPA of 3.5',
-          'GRE General Test scores',
-          'TOEFL/IELTS scores for international students',
-          'Three letters of recommendation'
-        ],
-        documents: [
-          'Official transcripts',
-          'Statement of Purpose',
-          'Resume/CV',
-          'GRE score report',
-          'TOEFL/IELTS score report',
-          'Letters of recommendation',
-          'Portfolio (if applicable)'
-        ],
-        tips: [
-          'Start your application early to meet all deadlines',
-          'Focus on research experience in your statement of purpose',
-          'Choose recommenders who know your academic work well',
-          'Highlight specific faculty members you\'d like to work with',
-          'Be specific about your research interests and goals'
-        ],
-        roadmap: [
-          {
-            step: 'Prepare Documentation',
-            description: 'Gather all required documents and start drafting your statement of purpose',
-            timeline: '3-4 months before deadline'
-          },
-          {
-            step: 'Take Required Tests',
-            description: 'Register and prepare for GRE and TOEFL/IELTS if needed',
-            timeline: '2-3 months before deadline'
-          },
-          {
-            step: 'Request Recommendations',
-            description: 'Contact potential recommenders and provide them necessary information',
-            timeline: '6-8 weeks before deadline'
-          },
-          {
-            step: 'Submit Application',
-            description: 'Complete and submit the online application with all required documents',
-            timeline: '2-3 weeks before deadline'
-          }
-        ],
-        additionalResources: [
-          {
-            title: 'Department Website',
-            url: 'https://www.csail.mit.edu/',
-            description: 'Explore research areas and faculty profiles'
-          },
-          {
-            title: 'Funding Opportunities',
-            url: 'https://gradadmissions.mit.edu/costs-funding',
-            description: 'Information about scholarships and assistantships'
-          },
-          {
-            title: 'Student Life',
-            url: 'https://student.mit.edu/',
-            description: 'Learn about campus life and student resources'
-          }
-        ]
-      },
-      {
-        journeyId: '2',
-        title: 'Data Science Program',
-        institution: 'Stanford University',
-        program: 'Master in Data Science',
-        deadline: '2024-03-30',
-        applicationUrl: 'https://gradadmissions.stanford.edu',
-        emailAddresses: {
-          admissions: 'gradadmissions@stanford.edu',
-          department: 'datascience@stanford.edu',
-          international: 'intloffice@stanford.edu'
-        },
-        requirements: [
-          'Bachelor\'s degree in quantitative field',
-          'Strong mathematical background',
-          'Programming experience in Python/R',
-          'GRE scores (optional for 2024)',
-          'TOEFL/IELTS for international students'
-        ],
-        documents: [
-          'Official transcripts',
-          'Statement of Purpose',
-          'Three letters of recommendation',
-          'CV/Resume',
-          'Programming portfolio (optional)',
-          'Research statement'
-        ],
-        tips: [
-          'Emphasize data analysis projects',
-          'Highlight any research publications',
-          'Include links to GitHub repositories',
-          'Describe any industry experience',
-          'Mention specific research interests'
-        ],
-        roadmap: [
-          {
-            step: 'Initial Application',
-            description: 'Complete online application form and pay fees',
-            timeline: '4 months before deadline'
-          },
-          {
-            step: 'Document Preparation',
-            description: 'Prepare and upload all required documents',
-            timeline: '3 months before deadline'
-          },
-          {
-            step: 'Recommendations',
-            description: 'Ensure all recommendation letters are submitted',
-            timeline: '1 month before deadline'
-          }
-        ],
-        additionalResources: [
-          {
-            title: 'Program Overview',
-            url: 'https://statistics.stanford.edu/data-science-masters',
-            description: 'Detailed program information and curriculum'
-          },
-          {
-            title: 'Financial Aid',
-            url: 'https://financialaid.stanford.edu',
-            description: 'Scholarship and funding opportunities'
-          }
-        ]
-      },
-      {
-        journeyId: '3',
-        title: 'AI & Machine Learning',
-        institution: 'Carnegie Mellon University',
-        program: 'Master of Artificial Intelligence',
-        deadline: '2024-05-01',
-        applicationUrl: 'https://apply.cmu.edu',
-        emailAddresses: {
-          admissions: 'ml-admissions@cmu.edu',
-          department: 'ai-department@cmu.edu',
-          international: 'iso@cmu.edu'
-        },
-        requirements: [
-          'Strong CS/Math background',
-          'Machine learning experience',
-          'Research experience preferred',
-          'GRE required',
-          'Coding proficiency in PyTorch/TensorFlow'
-        ],
-        documents: [
-          'Academic transcripts',
-          'Research proposal',
-          'Coding samples',
-          'Publications list',
-          'GRE scores',
-          'Three academic references'
-        ],
-        tips: [
-          'Detail ML projects extensively',
-          'Include GitHub/project links',
-          'Highlight research contributions',
-          'Specify preferred research groups',
-          'Demonstrate mathematical aptitude'
-        ],
-        roadmap: [
-          {
-            step: 'Portfolio Preparation',
-            description: 'Organize coding projects and research papers',
-            timeline: '5 months before deadline'
-          },
-          {
-            step: 'Research Proposal',
-            description: 'Write and refine research statement',
-            timeline: '3 months before deadline'
-          },
-          {
-            step: 'Application Review',
-            description: 'Final check of all materials',
-            timeline: '2 weeks before deadline'
-          }
-        ],
-        additionalResources: [
-          {
-            title: 'ML Department',
-            url: 'https://ml.cmu.edu',
-            description: 'Research areas and faculty profiles'
-          },
-          {
-            title: 'Student Projects',
-            url: 'https://ml.cmu.edu/projects',
-            description: 'Past student work and publications'
-          }
-        ]
-      },
-      {
-        journeyId: '4',
-        title: 'Robotics Engineering',
-        institution: 'University of California, Berkeley',
-        program: 'MS in Robotics',
-        deadline: '2024-06-15',
-        applicationUrl: 'https://grad.berkeley.edu/apply',
-        emailAddresses: {
-          admissions: 'robotics-admissions@berkeley.edu',
-          department: 'robotics@berkeley.edu',
-          international: 'international@berkeley.edu'
-        },
-        requirements: [
-          'Engineering background',
-          'Control systems knowledge',
-          'Programming skills',
-          'Mathematics proficiency',
-          'Hardware experience preferred'
-        ],
-        documents: [
-          'Academic records',
-          'Technical project portfolio',
-          'Statement of purpose',
-          'Two letters of recommendation',
-          'GRE scores',
-          'Technical writing sample'
-        ],
-        tips: [
-          'Showcase hands-on projects',
-          'Emphasize teamwork experience',
-          'Detail technical challenges solved',
-          'Include CAD/simulation work',
-          'Highlight industry collaborations'
-        ],
-        roadmap: [
-          {
-            step: 'Technical Portfolio',
-            description: 'Compile project documentation and results',
-            timeline: '4 months before deadline'
-          },
-          {
-            step: 'Application Essays',
-            description: 'Write and revise statements',
-            timeline: '2 months before deadline'
-          },
-          {
-            step: 'Final Submission',
-            description: 'Submit all materials and follow up',
-            timeline: '1 week before deadline'
-          }
-        ],
-        additionalResources: [
-          {
-            title: 'Robotics Lab',
-            url: 'https://robotics.berkeley.edu',
-            description: 'Research labs and ongoing projects'
-          },
-          {
-            title: 'Industry Partners',
-            url: 'https://berkeley.edu/industry-connect',
-            description: 'Industry collaboration opportunities'
-          }
-        ]
-      }
-    ];
-
-    setApplications(demoApplications);
+    const call_fun = async () => {
+      setisloading(true);
+      const res=await call_fetch_application_links("empty");
+      setisloading(false);
+      console.log(res.data);
+      setApplications(res.data);
+    }
+    call_fun();
   }, []);
 
   return (
@@ -535,7 +249,7 @@ const ApplicationLinks = () => {
           </div>
           <div className="p-4 h-[calc(100%-4rem)] overflow-y-auto custom-scrollbar">
             <div className="space-y-4">
-              {applications.map(app => (
+              {isloading?<LoadingSpinner/>:applications.map(app => (
                 <ApplicationCard
                   key={app.journeyId}
                   application={app}

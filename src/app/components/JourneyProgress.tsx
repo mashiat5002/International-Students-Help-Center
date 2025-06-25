@@ -2,14 +2,18 @@
 import { GrUserExpert } from "react-icons/gr";
 import { RiRobot2Line } from "react-icons/ri";
 import React, { useState, useEffect } from 'react';
-import Spline from '@splinetool/react-spline';
 import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
 import LoadingSpinner from '@/app/components/common/LoadingSpinner';
-import Choose_expert_for_meeting from "./Choose_expert_for_meeting";
 import MeetingSchedulingForm from "./MeetingSchedulingForm";
-
+import { call_push_document } from "../(utils)/call_push_document/route";
+import Toast from "./common/Toast";
+import prepare_and_view from "../(utils)/prepare_and_view/route";
+interface data{
+  data: Buffer
+  type: string
+}
 interface Journey {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   totalSteps: number;
@@ -22,8 +26,8 @@ interface Journey {
     title: string;
     description: string;
     status: 'completed' | 'in-progress' | 'not-started';
-    document?: string;
-    documentName?: string;
+    document?: data;
+    doc_name?: string;
     uploadDate?: string;
   }[];
 }
@@ -75,142 +79,19 @@ const JourneyCard = React.memo(({
   </div>
 ));
 
-const convertToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
 
-const ProgressTracker = React.memo(({ 
-  journey,
-  onUpdateStatus,
-  onUpdateDocument 
-}: { 
-  journey: Journey;
-  onUpdateStatus: (stepIndex: number, newStatus: 'completed' | 'in-progress' | 'not-started') => void;
-  onUpdateDocument: (stepIndex: number, document: string, documentName: string) => void;
-}) => (
-  <div className="bg-white/90  backdrop-blur-sm rounded-xl shadow-lg p-8 animate-fadeIn">
-    <h3 className="text-xl font-bold text-blue-900 mb-8 border-b pb-4">
-      Progress Tracker
-    </h3>
-    <div></div>
-    <div className="space-y-8">
-      {journey.steps.map((step, index) => (
-        <div key={index} className="relative">
-          {/* Connector line */}
-          {index < journey.steps.length - 1 && (
-            <div className="absolute left-[23px] top-[40px] w-[2px] h-[calc(100%+32px)] 
-              bg-gradient-to-b from-blue-200 to-gray-200" />
-          )}
-          
-          {/* Step */}
-          <div className="flex items-start gap-6">
-            {/* Status indicator button */}
-            <button
-              onClick={() => {
-                const nextStatus = 
-                  step.status === 'not-started' ? 'in-progress' :
-                  step.status === 'in-progress' ? 'completed' : 
-                  'not-started';
-                onUpdateStatus(index, nextStatus);
-              }}
-              className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0
-                transition-all duration-300 cursor-pointer hover:scale-110
-                ${step.status === 'completed' 
-                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg shadow-green-200' 
-                  : step.status === 'in-progress'
-                  ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-200'
-                  : 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-600 hover:from-blue-50 hover:to-blue-200'}`}
-            >
-              {step.status === 'completed' ? '✓' : index + 1}
-            </button>
-            
-            <div className="flex-1 space-y-4">
-              {/* Step content */}
-              <div className="pt-2">
-                <h4 className="text-lg font-semibold text-blue-900 mb-2">{step.title}</h4>
-                <p className="text-gray-600 text-sm leading-relaxed">{step.description} </p>
-              </div>
 
-              {/* Document upload section */}
-              <div className="flex items-center gap-5">
-                <div className="relative group">
-                  <label className="relative">
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const base64 = await convertToBase64(file);
-                          onUpdateDocument(index, base64, file.name);
-                        }
-                      }}
-                    />
-                    
-                    <div className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg border border-blue-200
-                      hover:bg-blue-100 transition-colors duration-300 cursor-pointer text-sm">
-                      {step.document ? 'Replace PDF' : 'Upload PDF'}
-                    </div>
-                  </label>
-                  
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50">
-                    <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm shadow-lg">
-                      <p className="mb-1">Note:</p>
-                      <p className="text-gray-300 text-xs leading-relaxed">
-                        Documents are stored locally and not submitted to the Institution. 
-                        Experts can review these documents to provide verification and improvement tips.
-                      </p>
-                      {/* Tooltip arrow */}
-                      <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 
-                        border-solid border-t-gray-900 border-t-4 border-x-transparent border-x-4 border-b-0">
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
-                {step.document && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                      <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                    </svg>
-                    <span>{step.documentName}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Status badge */}
-            <div className={`px-4 py-2 rounded-full text-sm font-medium mt-2
-              transition-all duration-300
-              ${step.status === 'completed' 
-                ? 'bg-green-100 text-green-800 border border-green-200' 
-                : step.status === 'in-progress'
-                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                : 'bg-gray-100 text-gray-800 border border-gray-200'}`}
-            >
-              {step.status.charAt(0).toUpperCase() + step.status.slice(1).replace('-', ' ')}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-));
 
 const JourneyProgress = () => {
   const [journeys, setJourneys] = useState<Journey[]>([]);
   const [selectedJourney, setSelectedJourney] = useState<Journey | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setloading] = useState(false);
+    const [clicked, setclicked] = useState(-1);
+    const [showToast, setShowToast] = useState(false);
+    const [toastType, settoastType] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
+  const [loading, setloading] = useState(true);
+  const [upload_loading, setupload_loading] = useState(false);
   const [showExpertTooltip, setShowExpertTooltip] = useState(false);
   const [showAiTooltip, setShowAiTooltip] = useState(false);
   const [isMeetingFormDisplayed, setisMeetingFormDisplayed] = useState(false);
@@ -228,7 +109,7 @@ const JourneyProgress = () => {
     if (!selectedJourney) return;
 
     const updatedJourneys = journeys.map(journey => {
-      if (journey.id === selectedJourney.id) {
+      if (journey._id === selectedJourney._id) {
         const updatedSteps = journey.steps.map((step, idx) => 
           idx === stepIndex ? { ...step, status: newStatus } : step
         );
@@ -247,76 +128,11 @@ const JourneyProgress = () => {
     });
 
     setJourneys(updatedJourneys);
-    setSelectedJourney(updatedJourneys.find(j => j.id === selectedJourney.id) || null);
+    setSelectedJourney(updatedJourneys.find(j => j._id === selectedJourney._id) || null);
   };
 
   // Add document update handler
-  const handleUpdateDocument = (stepIndex: number, document: string, documentName: string) => {
-    if (!selectedJourney) return;
 
-    const updatedJourneys = journeys.map(journey => {
-      if (journey.id === selectedJourney.id) {
-        const updatedSteps = journey.steps.map((step, idx) => 
-          idx === stepIndex ? {
-            ...step,
-            document,
-            documentName,
-            uploadDate: new Date().toISOString().split('T')[0]
-          } : step
-        );
-        
-        const currentDate = new Date().toLocaleString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          second: '2-digit', // Include seconds for full precision
-          hour12: true       // Set to false for 24-hour format
-        })
-        
-        // Create document entry for Documents component
-        const documentEntry = {
-          journeyTitle: journey.title,
-          stepTitle: journey.steps[stepIndex].title,
-          fileName: documentName,
-          uploadDate: currentDate,
-          institution: journey.institution,
-          program: journey.program,
-          content: document
-        };
-
-        // Get existing documents or initialize empty array
-        const existingDocs = JSON.parse(localStorage.getItem('journeyDocuments') || '[]');
-        
-        // Remove any previous version of this document if it exists
-        const filteredDocs = existingDocs.filter((doc: any) => 
-          !(doc.journeyTitle === journey.title && 
-            doc.stepTitle === journey.steps[stepIndex].title)
-        );
-        
-        // Add new document
-        const updatedDocs = [...filteredDocs, documentEntry];
-        
-        // Save to localStorage
-        localStorage.setItem('journeyDocuments', JSON.stringify(updatedDocs));
-
-        return {
-          ...journey,
-          steps: updatedSteps,
-          lastUpdated: currentDate
-        };
-      }
-      return journey;
-    });
-
-    setJourneys(updatedJourneys);
-    setSelectedJourney(updatedJourneys.find(j => j.id === selectedJourney.id) || null);
-    
-    // Show tooltip
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 10000);
-  };
 
   // Load demo data
   useEffect(() => {
@@ -333,25 +149,7 @@ const JourneyProgress = () => {
     fetchData();
   }, []);
 
-  // Add Toast component inside JourneyProgress
-  const Toast = () => (
-    <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 
-      transition-all duration-300 ${showToast ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-      <div className="bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-4 rounded-xl shadow-xl
-        flex items-start space-x-3 max-w-md border border-blue-100">
-        <svg className="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-        <div className="flex-1">
-          <p className="font-medium mb-1">Document Uploaded Successfully</p>
-          <p className="text-sm text-gray-600">
-            Note: This document is stored locally and not submitted to the Institution. It is not a part of the real application process. 
-            Experts can review these documents to provide verification and improvement tips.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+
 
   return (
     isMeetingFormDisplayed?<MeetingSchedulingForm MeetingRequestDetails={MeetingRequestDetails} setMeetingRequestDetails={setMeetingRequestDetails} setisMeetingFormDisplayed={setisMeetingFormDisplayed}/>:<div className=" h-full w-full overflow-hidden ">
@@ -380,9 +178,9 @@ const JourneyProgress = () => {
               ) : journeys.length > 0 ? (
                 journeys.map((journey) => (
                   <JourneyCard
-                    key={journey.id}
+                    key={journey._id}
                     journey={journey}
-                    isSelected={selectedJourney?.id === journey.id}
+                    isSelected={selectedJourney?._id === journey._id}
                     onClick={() => setSelectedJourney(journey)}
                   />
                 ))
@@ -582,23 +380,101 @@ const JourneyProgress = () => {
 
                           {/* Document upload section */}
                           <div className="flex items-center gap-4">
+                          {step.document && (
+                              <div className="flex  items-center gap-2 text-sm text-gray-600">
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                <span 
+                                  className="text-sm cursor-pointer hover:text-blue-600 transition-colors duration-200" 
+                                  onClick={() => {
+                                    if (!step.document) return;
+                                    prepare_and_view(step.document.data)
+                                  }}
+                                >
+                                  {step.doc_name || 'Document'}
+                                </span>
+                              </div>
+                            )}
                             <div className="relative group">
                               <label className="relative">
-                                <input
+                               <input
+                                  disabled={upload_loading}
                                   type="file"
                                   accept="application/pdf"
                                   className="hidden"
                                   onChange={async (e) => {
+                                    
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                      const base64 = await convertToBase64(
-                                        file
-                                      );
-                                      handleUpdateDocument(
-                                        index,
-                                        base64,
-                                        file.name
-                                      );
+                                      console.log(file)
+                                      const formData = new FormData();
+                                      formData.append("pdf", file);
+                                      formData.append("journey_id", selectedJourney._id);
+                                      formData.append("step_no", index.toString());
+                                      
+                                      try {
+                                        setclicked(index);
+                                        setupload_loading(true);
+                                        const res= await call_push_document(formData);
+                                        setupload_loading(false);
+
+
+
+
+                                        if(res.message=="document pushed successfully"){   
+
+                                          setToastMessage("Document uploaded successfully. Note That you can create expert meetings to get review on these documents.");
+                                          settoastType("success");
+                                          setShowToast(true);
+                                          setTimeout(() => {setShowToast(false);}, 7000);
+                                           // Convert file to Buffer
+                                        const arrayBuffer = await file.arrayBuffer();
+                                        const buffer = Buffer.from(arrayBuffer);
+                                        
+                                        // Update the journey state immediately with the new document name
+                                        const updatedJourneys = journeys.map(journey => {
+                                          if (journey._id === selectedJourney._id) {
+                                            const updatedSteps = journey.steps.map((step, idx) => 
+                                              idx === index ? {
+                                                ...step,
+                                                document: { data: buffer, type: file.type },
+                                                doc_name: file.name
+                                              } : step
+                                            );
+                                            return {
+                                              ...journey,
+                                              steps: updatedSteps
+                                            };
+                                          }
+                                          return journey;
+                                        });
+                                        
+                                        setJourneys(updatedJourneys);
+                                        setSelectedJourney(updatedJourneys.find(j => j._id === selectedJourney._id) || null);
+                                        
+                                        
+                                        }
+                                        else{
+                                          setToastMessage(res.message);
+                                          settoastType("failed");
+                                          setShowToast(true);
+                                          setTimeout(() => {setShowToast(false);}, 3000);
+                                        }
+                                       
+                                       
+                                      } catch (error) {
+                                        console.error('Error processing file:', error);
+                                      }
                                     }
                                   }}
                                 />
@@ -606,7 +482,7 @@ const JourneyProgress = () => {
                                   className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg border border-blue-200
                                   hover:bg-blue-100 transition-colors duration-300 cursor-pointer text-sm"
                                 >
-                                  {step.document ? "Replace PDF" : "Upload PDF"}
+                                  { (upload_loading && index===clicked)?"Processing..":step.document ? "Update PDF" : "Upload PDF"}
                                 </div>
                               </label>
 
@@ -632,23 +508,7 @@ const JourneyProgress = () => {
                               </div>
                             </div>
 
-                            {step.document && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                <span>{step.documentName}</span>
-                              </div>
-                            )}
+                            
                           </div>
                         </div>
 
@@ -670,7 +530,12 @@ const JourneyProgress = () => {
       </div>
       
       {/* Add Toast at the end */}
-      <Toast />
+      
+      {showToast&&<Toast
+      type={toastType}
+      message={toastMessage}
+    />}
+      
     </div>
   );
 };

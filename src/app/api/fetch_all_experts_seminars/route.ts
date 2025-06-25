@@ -7,8 +7,7 @@ type ParticipantsDetails = {
 }
 export async function POST(request: Request) {
   const now = new Date();
- const {email}= await request.json()
- console.log("final_res")
+  const {email}= await request.json()
   try{
   const res= await ScheduledSeminars.find({});
   const final_res = res.map((item) => {
@@ -16,8 +15,11 @@ export async function POST(request: Request) {
   const endTime = new Date(startTime.getTime() + parseInt(item.duration) * 60000);
 
   let status = 'upcoming';
-  if (now > endTime) {
-    status = 'completed';
+  if(item.status=="cancelled"){
+    status="cancelled"
+  }
+  else if (now > endTime) {
+    status = 'ended';
   } else if (now >= startTime && now <= endTime) {
     status = 'ongoing';
   }

@@ -1,4 +1,5 @@
 
+import Past_inquiries from '@/app/models/past_inquiries';
 import { NextRequest, NextResponse } from 'next/server';
 const prompt = "Generate an array of JSON objects. Each object should represent a graduate program application process. Include the following fields:  \
 - `title`: A short name for the application (e.g., \"Computer Science Application\")  \
@@ -45,7 +46,8 @@ export  async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "model": ""
+        "model": "deepseek/deepseek-chat-v3-0324"
+        // "model": "deepseek/deepseek-r1-0528:free"
 ,
   "messages": [
     { "role": "system", "content": "You are a study advisor for international students. you  suggest study programmes unless it satifies all the answers by the user otherwise you reply in one string that no such programmes available" },
@@ -55,11 +57,12 @@ export  async function POST(req: NextRequest) {
     });
 
     const data = await response.json();
-    console.log(data)
+    
+    
 
-    return NextResponse.json({message:data}, {status: 201});
+    return NextResponse.json({message:data,}, {status: 201});
   } catch (error) {
-   
-    return NextResponse.json({message:"Failed to contact DeepSeek"}, {status: 500});
+    
+    return NextResponse.json({message:"Failed to contact DeepSeek "+error}, {status: 500});
   }
 }

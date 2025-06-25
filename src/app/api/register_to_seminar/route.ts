@@ -17,13 +17,17 @@ export async function POST(request: Request) {
       throw new Error("Seminar not found");
     }
     
-    
-
+   
+    const now= new Date()
+  
     const res = await ScheduledSeminars.findOneAndUpdate(
       {
       _id:seminarID,
+      Scheduled_time: { $gt: now },
       registed_participants: { $lt: parseInt(seminar.max_Participants) },
-      "participants.email": { $ne: participantEmail }
+      "participants.email": { $ne: participantEmail },
+      status: {  $nin: ["cancelled", "ended", "completed"]},
+      
 
     },
         {
