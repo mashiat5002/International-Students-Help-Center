@@ -1,4 +1,6 @@
+import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 type ParticipantsDetails = {
     email: string,
@@ -7,7 +9,27 @@ type ParticipantsDetails = {
 }
 export async function POST(request: Request) {
   const now = new Date();
-  const {email}= await request.json()
+  // fetching email of logged in user
+      const session = cookies().get("student-session")?.value;
+      if (!session) {
+        console.log("Session not found");
+        return NextResponse.json(
+          { message: "Session not found" },
+          { status: 404 }
+        );
+      }
+
+
+      // decrypting the session to get user details cannot be done in the server side as it is not secure
+      const details = (await decrypt(session)) as {
+        Email: string;
+        expires: string;
+        Password: string;
+        iat: number;
+        exp: number;
+      };
+
+  
   try{
   const res= await ScheduledSeminars.find({});
   const final_res = res.map((item) => {
@@ -24,9 +46,11 @@ export async function POST(request: Request) {
     status = 'ongoing';
   }
 
+ 
   return {
     ...item.toObject(),
-    isregistered: item.participants.some((p: ParticipantsDetails) => p.email === email),
+
+    isregistered: item.participants.some((p: ParticipantsDetails) => p.email === details.Email),
     status,
   };
 });

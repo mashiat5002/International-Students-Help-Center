@@ -8,9 +8,13 @@ export async function POST(request: Request) {
     const body = await request.json();
     const object = typeof body.object === "string" ? JSON.parse(body.object) : body.object
     
+
+
+
+
     await connectToDatabase()
     const newJourney= new Journey({
-      id: object.id,
+      id: body.email,
       title: object.title,
       description: object.description,
       totalSteps: object.totalSteps,

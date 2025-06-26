@@ -1,11 +1,11 @@
 'use client';
-import { call_is_email_existing } from '@/app/(utils)/call_is_email_existing/route';
 import { call_login_authentication } from '@/app/(utils)/call_login_auth/route';
 import { call_update_password } from '@/app/(utils)/call_update_password/route';
 import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';
+import { call_is_student_email_existing } from '@/app/(utils)/call_is_email_existing/route';
 
 
 interface LoginCardProps {
@@ -287,7 +287,7 @@ export default function LoginCard({ isOpen, onClose, onShowRegister }: LoginCard
                       setTimeout(() => {setShowToast(false);}, 3000);
                       return;
                     }
-                    const res= await call_is_email_existing(email)
+                    const res= await call_is_student_email_existing(email)
                     if(res.status=="You are not registered. Please register with your email first."){
                       settoastType("failed")
                       setToastMessage('You are not registered. Please register with your email first.');

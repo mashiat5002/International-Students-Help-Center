@@ -1,12 +1,11 @@
 'use client';
-import { call_is_email_existing } from '@/app/(utils)/call_is_email_existing/route';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';
 import { call_update_expert_password } from '@/app/(utils)/call_update_expert_password/route';
 import { call_expert_login_authentication } from '@/app/(utils)/call_expert_login_authentication/route';
 import { call_expert_update_varification_key_db } from '@/app/(utils)/call_expert_update_varification_key_db/route';
-import { call_is_exper_email_existing } from '@/app/(utils)/call_is_exper_email_existing/route';
+import { call_is_expert_email_existing } from '@/app/(utils)/call_is_exper_email_existing/route';
 
 interface LoginCardProps {
   isOpen: boolean;
@@ -290,7 +289,7 @@ export default function ExpertLoginCard({ isOpen, onClose, onShowRegister }: Log
                       setTimeout(() => {setShowToast(false);}, 3000);
                       return;
                     }
-                    const res= await call_is_exper_email_existing(email)
+                    const res= await call_is_expert_email_existing(email)
                     if(res.status=="You are not registered. Please register with your email first."){
                       settoastType("failed")
                       setToastMessage('You are not registered. Please register with your email first.');

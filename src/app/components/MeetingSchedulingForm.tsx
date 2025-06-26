@@ -1,17 +1,45 @@
 import React, { useState } from 'react';
 import Choose_expert_for_meeting from './Choose_expert_for_meeting';
 import Toast from './common/Toast';
+import { call_push_meeting_requests } from '../(utils)/call_push_meeting_requests/route';
+interface data{
+  data: Buffer
+  type: string
+}
+interface Journey {
+  _id: string;
+  title: string;
+  description: string;
+  totalSteps: number;
+  currentStep: number;
+  lastUpdated: string;
+  institution: string;
+  program: string;
+  deadline: string;
+  steps: {
+    title: string;
+    description: string;
+    status: 'completed' | 'in-progress' | 'not-started';
+    document?: data;
+    doc_name?: string;
+    uploadDate?: string;
+  }[];
+}
+
 type MeetingRequestDetails = {
   expert_id: string;
   Institution: string;
   fieldOfStudy: string;
   ApplyingOn: string;
   meeting_topic: string;
+  
 }
 const MeetingSchedulingForm = (
-  {setisMeetingFormDisplayed,setMeetingRequestDetails,MeetingRequestDetails}:{setisMeetingFormDisplayed: React.Dispatch<React.SetStateAction<boolean>>,
+  {setisMeetingFormDisplayed,setMeetingRequestDetails,MeetingRequestDetails,selectedJourney}:{setisMeetingFormDisplayed: React.Dispatch<React.SetStateAction<boolean>>,
   setMeetingRequestDetails:React.Dispatch<React.SetStateAction<MeetingRequestDetails>>,
-  MeetingRequestDetails:MeetingRequestDetails
+  MeetingRequestDetails:MeetingRequestDetails,
+  selectedJourney: Journey | null | undefined,
+
 
 }
 
@@ -24,24 +52,24 @@ const MeetingSchedulingForm = (
   const callSubmit=async ()=>{
    
     setIsLoading(true);
-    console.log(MeetingRequestDetails)
-    // const res= await call_push_meeting_requests(MeetingRequestDetails)
+    console.log(selectedJourney?._id)
+    const res= await call_push_meeting_requests(MeetingRequestDetails,selectedJourney?._id)
   
   
-    // console.log(res.res)
-    // setIsLoading(false);
-    // if( res.res=="Request Sent Successfully"){
-    //   settoastType("success")
-    //     setToastMessage(res.res);
-    //     setShowToast(true);
-    //     setTimeout(() => {setShowToast(false);}, 3000);
-    // }
-    // else if( res.res!="Request Sent Successfully"){
-    //   settoastType("failed")
-    //   setToastMessage(res.res);
-    //   setShowToast(true);
-    //   setTimeout(() => {setShowToast(false);}, 3000);
-    // }
+    console.log(res.res)
+    setIsLoading(false);
+    if( res.res=="Request Sent Successfully"){
+      settoastType("success")
+        setToastMessage(res.res);
+        setShowToast(true);
+        setTimeout(() => {setShowToast(false);}, 3000);
+    }
+    else if( res.res!="Request Sent Successfully"){
+      settoastType("failed")
+      setToastMessage(res.res);
+      setShowToast(true);
+      setTimeout(() => {setShowToast(false);}, 3000);
+    }
   }
   return (
     <>
@@ -60,20 +88,20 @@ const MeetingSchedulingForm = (
         
             <div>
               <label className="block text-sm font-medium mb-1">University/College Name</label>
-              <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,Institution:e.target.value}))}  type="text" defaultValue="" className={`w-full border ${MeetingRequestDetails.Institution=="" && toastMessage=="Must select intended institution to study!!"?"border-red-500":"border-gray-300"} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
+              <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,Institution:e.target.value}))}  type="text" defaultValue={selectedJourney?.institution} className={`w-full border ${MeetingRequestDetails.Institution=="" && toastMessage=="Must select intended institution to study!!"?"border-red-500":"border-gray-300"} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-1">Field of Study</label>
-                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,fieldOfStudy:e.target.value}))} type="text" defaultValue="" className={`w-full border ${MeetingRequestDetails.fieldOfStudy=="" && toastMessage=="Must select your intended field of study !!"?"border-red-500":"border-gray-300"}  rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
+                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,fieldOfStudy:e.target.value}))} type="text" defaultValue={selectedJourney?.description} className={`w-full border ${MeetingRequestDetails.fieldOfStudy=="" && toastMessage=="Must select your intended field of study !!"?"border-red-500":"border-gray-300"}  rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black`} />
               </div>
              
             </div>
             <div>
-              <label className="block text-sm font-medium mb{`">Applying On</label>
+              <label className="block text-sm font-medium mb{`">Applying On</label> 
               <div className="relative">
                 <select onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,ApplyingOn:e.target.value}))} className={`w-full border ${MeetingRequestDetails.ApplyingOn=="" && toastMessage=="Must select your intended field of study !!"?"border-red-500":"border-gray-300"} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black appearance-none`}>
-                  <option value={""}>Select One</option>
+                  <option value={selectedJourney?.institution}>{selectedJourney?.program}</option>
                   <option value={"Masters"}>Masters</option>
                   <option value={"Bachelors"}>Bachelors</option>
                   <option value={"Other"}>Other</option>

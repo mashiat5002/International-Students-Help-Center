@@ -3,7 +3,7 @@
 
 export async function call_fetch_logged_id_info() {
     
-    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/fetch_logged_id_info`,{
+    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/fetch_student_logged_id_info`,{
         method:"POST",
         headers:{
             "Content-Type": "application/json",

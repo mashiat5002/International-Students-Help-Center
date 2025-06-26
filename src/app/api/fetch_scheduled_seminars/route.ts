@@ -1,11 +1,33 @@
+import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
+import Expert from "@/app/models/expert";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const body= await request.json();
-  console.log(body.expert_id)
+export async function POST() {
+   // fetching email of logged in user
+      const session = cookies().get("expert-session")?.value;
+      if (!session) {
+        console.log("Session not found");
+        return NextResponse.json(
+          { message: "Session not found" },
+          { status: 404 }
+        );
+      }
+
+
+      // decrypting the session to get user details cannot be done in the server side as it is not secure
+      const details = (await decrypt(session)) as {
+        Email: string;
+        expires: string;
+        Password: string;
+        iat: number;
+        exp: number;
+      };
+  
+  var result= await Expert.find({email: details.Email},{ email: 0, _id:1, full_name: 0 })
   try{
-  const res= await ScheduledSeminars.find({expert_id:body.expert_id});
+  const res= await ScheduledSeminars.find({expert_id: result[0]._id});
  
   if(!res){
     console.log("No data found")

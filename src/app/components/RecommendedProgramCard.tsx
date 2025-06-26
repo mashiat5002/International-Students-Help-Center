@@ -59,7 +59,7 @@ const RecommendedProgramCard = React.memo(({
        setloading(true)
      
       const res= await call_deepseek_for_roadmap("journey",university, title, deadline)
-     
+     console.log(res)
       if(res.message=="Journey saved successfully"){
       
         settoastType("success")

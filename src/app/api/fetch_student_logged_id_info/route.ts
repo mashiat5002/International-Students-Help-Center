@@ -1,23 +1,18 @@
 
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
-import Expert from "@/app/models/expert";
 import User from "@/app/models/user";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
 
   try{
     
-      const session=  cookies().get("student-session")?.value;
-    
-   
+    const session=  cookies().get("student-session")?.value;
     if(!session){
       console.log("Session not found")
       return NextResponse.json({ message: "Session not found" }, { status: 404 });
     }
-    
-    
     const details = (await decrypt(session)) as {
     Email: string;
     expires: string;
@@ -25,14 +20,9 @@ export async function POST(request: Request) {
     iat: number;
     exp: number;
   };
-    // const extracted_details= JSON.parse(details.toString());
-    
-  
+   
 
-    var result;
-
-     
-      result= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 });
+  var result= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 });
     
    
    

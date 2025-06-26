@@ -8,6 +8,7 @@ import MeetingSchedulingForm from "./MeetingSchedulingForm";
 import { call_push_document } from "../(utils)/call_push_document/route";
 import Toast from "./common/Toast";
 import prepare_and_view from "../(utils)/prepare_and_view/route";
+import timeFormatConverter from "../(utils)/time_format_converter/route";
 interface data{
   data: Buffer
   type: string
@@ -66,13 +67,7 @@ const JourneyCard = React.memo(({
           Step {journey.currentStep} of {journey.totalSteps}
         </span>
         <span className="text-gray-500">
-          Last updated: { new Date(journey.lastUpdated.toString()).toLocaleString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-})}
+          Last updated: {timeFormatConverter(journey.lastUpdated)}
         </span>
       </div>
     </div>
@@ -152,7 +147,7 @@ const JourneyProgress = () => {
 
 
   return (
-    isMeetingFormDisplayed?<MeetingSchedulingForm MeetingRequestDetails={MeetingRequestDetails} setMeetingRequestDetails={setMeetingRequestDetails} setisMeetingFormDisplayed={setisMeetingFormDisplayed}/>:<div className=" h-full w-full overflow-hidden ">
+    isMeetingFormDisplayed?<MeetingSchedulingForm selectedJourney={selectedJourney} MeetingRequestDetails={MeetingRequestDetails} setMeetingRequestDetails={setMeetingRequestDetails} setisMeetingFormDisplayed={setisMeetingFormDisplayed}/>:<div className=" h-full w-full overflow-hidden ">
       {/* Main container with two separate sections */}
       <div className="w-[95%] md:w-[90%] h-fit  lg:h-[85vh] animate-fadeIn relative mx-auto mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Journeys List Container */}
@@ -181,7 +176,13 @@ const JourneyProgress = () => {
                     key={journey._id}
                     journey={journey}
                     isSelected={selectedJourney?._id === journey._id}
-                    onClick={() => setSelectedJourney(journey)}
+                    onClick={() => {setMeetingRequestDetails({
+                      expert_id: "",
+                      Institution: journey.institution,
+                      fieldOfStudy: journey.program,
+                      ApplyingOn: journey.title,
+                      meeting_topic: "",
+                    }), setSelectedJourney(journey)}}
                   />
                 ))
               ) : (
@@ -243,7 +244,7 @@ const JourneyProgress = () => {
                       <GrUserExpert />
                       {showExpertTooltip && (
                         <div  className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black text-white text-sm rounded shadow-lg whitespace-nowrap">
-                          Get Expert Review
+                          Review Your Uploaded Documents With Expert
                         </div>
                       )}
                     </button>
@@ -293,15 +294,7 @@ const JourneyProgress = () => {
                           Deadline
                         </span>
                         <span className="block">
-                          {new Date(
-                            selectedJourney.deadline.toString()
-                          ).toLocaleString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
+                          {timeFormatConverter(selectedJourney.deadline)}
                         </span>
                       </div>
                     </div>
