@@ -1,14 +1,12 @@
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import Expert from "@/app/models/expert";
-import ScheduledSeminars from "@/app/models/scheduled_seminars";
+import Journey from "@/app/models/journey";
+import MeetingRequests from "@/app/models/meeting_requests";
+import User from "@/app/models/user";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-type ParticipantsDetails = {
-    email: string,
-    name: string,
-    motive: string
-}
-export async function POST(request: Request) {
+
+export async function POST() {
   const now = new Date();
   // fetching email of logged in user
       const session = cookies().get("student-session")?.value;
@@ -29,34 +27,35 @@ export async function POST(request: Request) {
         iat: number;
         exp: number;
       };
-
-  
   try{
-  const res= await ScheduledSeminars.find({});
-  const final_res = res.map((item) => {
-  const startTime = new Date(item.Scheduled_time);
-  const endTime = new Date(startTime.getTime() + parseInt(item.duration) * 60000);
+  var result= await User.find({email: details.Email},{ email: 1, _id:0 })
+  
+  const res= await MeetingRequests.find({student_email:result[0].email});
 
-  let status = 'upcoming';
-  if(item.status=="cancelled"){
-    status="cancelled"
+   const final_res = res.map((item) => {
+  const startTime = new Date(item.Scheduled_time);
+
+  let status = '';
+  if(item.Scheduled_time=="Not Scheduled"){
+    status="Not Scheduled"
   }
-  else if (now > endTime) {
-    status = 'ended';
-  } else if (now >= startTime && now <= endTime) {
+   else if (now < startTime) {
+    status = 'upcoming';
+  }
+   else if (now > startTime) {
     status = 'ongoing';
   }
 
- 
   return {
     ...item.toObject(),
-
-    isregistered: item.participants.some((p: ParticipantsDetails) => p.email === details.Email),
     status,
   };
 });
 
-   const combined = await Promise.all(
+
+
+// combining expert details with meeting requests details
+ const combined = await Promise.all(
   final_res.map(async (item, idx) => {
     const expert = await Expert.find(
       { _id: item.expert_id },
@@ -71,6 +70,8 @@ export async function POST(request: Request) {
       }
     );
 
+  
+
     return {
       ...item,
       expert_full_name: expert[0]?.full_name || "Unknown Expert",
@@ -79,10 +80,13 @@ export async function POST(request: Request) {
       expert_institution: expert[0]?.institution || "",
       expert_email: expert[0]?.email || "",
       expert_profession: expert[0]?.profession || "",
+
     };
   })
 );
- 
+
+
+  
   if(!res){
     console.log("No data found")
     return NextResponse.json({ message: "No data found" }, { status: 404 });}

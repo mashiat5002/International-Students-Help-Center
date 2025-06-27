@@ -23,6 +23,13 @@ type seminarDetails = {
   duration: string;
   status: string;
   isregistered: boolean;
+
+   expert_institution: string;
+   expert_email: string;
+  expert_profession: string;
+  expert_about: string;
+  expert_img: string;
+  expert_full_name: string;
 };
 
 const SeminarCard = React.memo(({
@@ -105,14 +112,29 @@ const SeminarDetails = ({
  
   return (
     <div className="flex flex-col justify-between  p-4    h-[calc(100vh-6rem)]  overflow-x-hidden overflow-scroll backdrop-blur-md rounded-xl shadow-lg ">
-      <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl">
-        <h2   className="text-lg sm:text-xl font-bold text-blue-900 ">{seminar.meeting_topic}</h2>
+      
+      {/* Expert Card */}
+      <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
+        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Speaker:</h4>
+        <div className="flex flex-col sm:flex-row items-center gap-4 bg-white/80 rounded-lg shadow p-4">
+          <img
+            src={seminar.expert_img}
+            alt={seminar.expert_full_name}
+            className="w-20 h-20 rounded-full object-cover border-2 border-blue-200 shadow"
+          />
+          <div className="flex-1 flex flex-col items-center sm:items-start gap-1">
+            <span className="text-blue-900 text-lg font-bold">{seminar.expert_full_name}</span>
+            <span className="text-blue-700 text-sm font-semibold">{seminar.expert_profession}</span>
+            <span className="text-blue-800 text-xs font-medium">{seminar.expert_institution}</span>
+            <span className="text-gray-600 text-xs">Email: {seminar.expert_email}</span>
+            <span className="text-gray-700 text-xs italic mt-1 text-center sm:text-left">{seminar.expert_about}</span>
+          </div>
+        </div>
       </div>
       <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl">
-        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Speaker</h4>
-        <div className="space-y-1 sm:space-y-2">
-          <p className="font-medium text-blue-900 text-sm sm:text-base">{seminar.speaker}</p>
-        </div>
+        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Seminar Topic</h4>
+        <h4 className="font-medium text-blue-900 text-sm sm:text-base">{seminar.meeting_topic}</h4>
+
       </div>
       <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl">
         <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Seminar Description</h4>
@@ -200,6 +222,8 @@ const OnlineSeminars = () => {
     const fetchData = async () => {
       setloading(true);
       const res = await call_fetch_all_experts_seminars();
+      console.log("Fetched Seminars: ", res.data);
+      console.log(res)
       setloading(false);
       setSeminars(res.data.reverse());
       setSelectedSeminar(res.data[clickedIdx])

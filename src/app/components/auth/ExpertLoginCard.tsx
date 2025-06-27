@@ -5,7 +5,7 @@ import Toast from '../common/Toast';
 import { call_update_expert_password } from '@/app/(utils)/call_update_expert_password/route';
 import { call_expert_login_authentication } from '@/app/(utils)/call_expert_login_authentication/route';
 import { call_expert_update_varification_key_db } from '@/app/(utils)/call_expert_update_varification_key_db/route';
-import { call_is_expert_email_existing } from '@/app/(utils)/call_is_exper_email_existing/route';
+import { call_is_expert_email_existing } from '../../../../lib/auth/is_email_existing';
 
 interface LoginCardProps {
   isOpen: boolean;

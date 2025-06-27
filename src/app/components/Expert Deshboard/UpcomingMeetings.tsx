@@ -1,4 +1,3 @@
-import { call_fetch_meeting_requests } from '@/app/(utils)/call_fetch_meeting_requests/route';
 import { call_decline_meetingReq  } from '@/app/(utils)/call_setDateTimeMeeting/route';
 import { ObjectId } from 'mongoose';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Toast from '../common/Toast';
 import { call_setDateTimeMeeting } from '@/app/(utils)/call_decline_meetingReq/route';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { call_fetch_meeting_requests_for_expert } from '@/app/(utils)/call_fetch_meeting_requests_for_expert/route';
 
 
 type details={
@@ -38,7 +38,7 @@ const UpcomingMeetings = () => {
     const fetch_data= async()=>{
       setIsLoading(true)
       setisChangeTimeClicked(false)
-      const response= await call_fetch_meeting_requests();
+      const response= await call_fetch_meeting_requests_for_expert();
       setIsLoading(false)
       const final_data= response.data.filter((item:details)=>item.Scheduled_time!="declined" && item.Scheduled_time!="Not Scheduled")
       setDetails(final_data.reverse())

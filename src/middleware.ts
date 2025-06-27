@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt } from "./app/(utils)/jwt_encrypt_decrypt";
-import { call_is_student_email_existing } from "./app/(utils)/call_is_email_existing/route";
-import { call_is_expert_email_existing } from "./app/(utils)/call_is_exper_email_existing/route";
+import { call_is_student_email_existing } from "../lib/auth/is_student_email_existing";
+import { call_is_expert_email_existing } from "../lib/auth/is_email_existing";
 
 export async function middleware(request: NextRequest) {
   const session_user = cookies().get("student-session")?.value;

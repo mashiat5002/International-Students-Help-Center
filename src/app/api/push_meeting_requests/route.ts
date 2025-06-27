@@ -52,7 +52,7 @@ export async function POST(request: Request) {
             };
             // getting more details of the user from the database
             var final_details= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 })
-
+         
        var   newMeetingReq = new MeetingRequests(
         {...MeetingRequestDetails,
           journey_id:jouney_id

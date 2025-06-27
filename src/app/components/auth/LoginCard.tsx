@@ -5,7 +5,7 @@ import { call_update_varification_key_db } from '@/app/(utils)/call_update_varif
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';
-import { call_is_student_email_existing } from '@/app/(utils)/call_is_email_existing/route';
+import { call_is_student_email_existing } from '../../../../lib/auth/is_student_email_existing';
 
 
 interface LoginCardProps {

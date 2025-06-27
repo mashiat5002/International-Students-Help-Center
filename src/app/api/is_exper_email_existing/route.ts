@@ -10,8 +10,8 @@ export async function POST(request:NextRequest){
    
   
     await connectToDatabase()
-    console.log("email",email)
-    
+ 
+
     const result= await Expert.findOne({email:email,active_status:"active"})
     console.log(result== null)
     if(result== null){

@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 export interface IMeetingRequests extends Document {
     expert_id: string;
+    expert_full_name: string;
     journey_id: string;
     Institution: string;
     fieldOfStudy: string;
@@ -17,6 +18,7 @@ export interface IMeetingRequests extends Document {
 const MeetingRequestsSchema = new Schema<IMeetingRequests>({
     expert_id: {type:String, required:true},
     journey_id: {type:String, required:true}, 
+    expert_full_name: {type:String},
     Institution: {type:String},
     fieldOfStudy: {type:String},
     ApplyingOn: {type:String},

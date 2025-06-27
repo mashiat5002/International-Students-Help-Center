@@ -153,7 +153,7 @@ const Choose_expert_for_meeting =
                 <button className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
                 </button>
-                <button onClick={()=>{select_profile(profile._id),setMeetingRequestDetails((prev)=>({...prev,expert_id:profile._id}))}} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-2 rounded-full">
+                <button onClick={()=>{select_profile(profile._id),setMeetingRequestDetails((prev)=>({...prev,expert_id:profile._id,expert_full_name:profile.full_name}))}} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-2 rounded-full">
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" /></svg>
                 </button>
               </div>
