@@ -65,7 +65,7 @@ const StudyProgrammes = () => {
     }
    
   };
-
+// i will do here
   const handleNextQuestion = () => {
     if (inputValue.trim() === '') {
       setsubmitting(true)
