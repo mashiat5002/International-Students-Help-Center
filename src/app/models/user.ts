@@ -1,14 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
-    email: string;
     full_name: string;
+    email: string;
+    institution: string;
+    country: string;
+    preferred_field_of_study: string;
+    preferred_level_of_study: string;
+    bio: string;
+    enable_email: boolean;
     is_expert: boolean;
-    address: string;
-    city: string;
-    state: string;
-    postal: string;
-    dob: string;
     password: string;
     phone: string;
     varification_key: string;
@@ -20,12 +21,13 @@ const UserSchema = new Schema<IUser>({
   email: { type: String,  },
   full_name:  {type: String},
   is_expert:  {type: Boolean, default: false},
-  address:  {type: String},
-  city:  {type: String},
-  state:  {type: String},
-  postal:  {type: String},
-  dob:  {type: String},
+  institution:  {type: String},
+  country:  {type: String},
+  preferred_field_of_study:  {type: String},
+  preferred_level_of_study:  {type: String},
+  bio:  {type: String},
   password:  {type: String},
+  enable_email:  {type: Boolean, default: true},
   phone:  {type: String},
   varification_key:  {type: String},
   varify_timeout:  {type: String},

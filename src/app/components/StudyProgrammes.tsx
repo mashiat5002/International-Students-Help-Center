@@ -1,17 +1,12 @@
+"use client";
 
-'use client';
-
-import Spline from '@splinetool/react-spline';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import RecommendedProgramCard from './RecommendedProgramCard';
-import React from 'react';
-import { call_deepseek } from '../(utils)/call_deepseek/route';
-import SplineLoader from '@/app/components/common/SplineLoader';
-import ResultsSection from './ResultSection';
-
-
-
-
+import Spline from "@splinetool/react-spline";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import RecommendedProgramCard from "./RecommendedProgramCard";
+import React from "react";
+import SplineLoader from "@/app/components/common/SplineLoader";
+import ResultsSection from "./ResultSection";
+import { call_deepseek_single_followup_question } from "../(utils)/call_deepseek_single_followup_question/route";
 
 // Add new interface for program type
 interface Program {
@@ -26,63 +21,81 @@ interface Program {
 
 // Move ResultsSection outside the main component
 
-
 const StudyProgrammes = () => {
-  
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [showButton, setShowButton] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const fullText = "Welcome to International Students Help Center, I am your AI assistant to help you find your study destination";
+  const [inputValue, setInputValue] = useState("");
+  const fullText =
+    "Welcome to International Students Help Center, I am your AI assistant to help you find your study destination";
   const [showResults, setShowResults] = useState(false);
   const [favorites, setFavorites] = useState<Program[]>([]);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [started, setstarted] = useState(false);
   const startedRef = useRef(started);
   const [q_fetched, setq_fetched] = useState(false);
   const q_fetchedRef = useRef(q_fetched);
-  const [ spinner, setSpinner ] = useState(false);
-  const [ submitting, setsubmitting ] = useState(false);
+  const [spinner, setSpinner] = useState(false);
+  const [submitting, setsubmitting] = useState(false);
   const handleStart = () => {
-
-    if(! startedRef.current && !q_fetchedRef.current){
-      setLoading(true)
-      setstarted(true)
-
+    if (!startedRef.current && !q_fetchedRef.current) {
+      setLoading(true);
+      setstarted(true);
     }
-    if(q_fetchedRef.current){
-       setIsAnimating(true);
-    setTimeout(() => {
-      setShowQuestion(true);
-      setIsAnimating(false);
-    }, 500);
+    if (q_fetchedRef.current) {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setShowQuestion(true);
+        setIsAnimating(false);
+      }, 500);
     }
-   
   };
-// i will do here
+  
   const handleNextQuestion = () => {
-    if (inputValue.trim() === '') {
-      setsubmitting(true)
-      return};
+    var ans = [];
+    if (inputValue.trim() === "") {
+      setsubmitting(true);
+      return;
+    }
 
-    setIsAnimating(true);
-    
-    setTimeout(() => {
-      // Save current answer
-      setAnswers(prev => [...prev, inputValue]);
-      setInputValue('');
 
-      if (currentQuestionIndex < 4) {
-        setCurrentQuestionIndex(prev => prev + 1);
+
+    setTimeout(async () => {
+
+     
+        setAnswers((prev) => [...prev, inputValue]);
+        ans = [...answers];
+        ans.push(inputValue);
+        setInputValue("");
+        setShowQuestion(false)
+        setShowBlur(false)
+        setIsAnimating(true)
+        setLoading(true)
+        setTimeout(() => {setIsAnimating(false)}, 2000);
+        const single_Q = await call_deepseek_single_followup_question("questions", Qs,ans);
+        
+        
+        
+        setIsAnimating(true)
+        
+        setTimeout(() => {setLoading(false)
+        setShowQuestion(true),setShowBlur(true),setIsAnimating(false)}, 2000);
+        
+      
+        setQs((prev) => [...prev, single_Q[0]]);
+      
+
+      if (currentQuestionIndex < 7) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      
         setIsAnimating(false);
       } else {
-        
         setShowResults(true);
         setIsAnimating(false);
       }
@@ -90,20 +103,20 @@ const StudyProgrammes = () => {
   };
 
   const toggleFavorite = useCallback((program: Program) => {
-    setFavorites(prev => {
-      const isAlreadyFavorite = prev.some(fav => fav.title === program.title);
+    setFavorites((prev) => {
+      const isAlreadyFavorite = prev.some((fav) => fav.title === program.title);
       const newFavorites = isAlreadyFavorite
-        ? prev.filter(fav => fav.title !== program.title)
+        ? prev.filter((fav) => fav.title !== program.title)
         : [...prev, program];
-      
+
       setToastMessage(
-        isAlreadyFavorite 
+        isAlreadyFavorite
           ? `${program.title} removed from favorites`
           : `${program.title} added to favorites`
       );
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
-      
+
       return newFavorites;
     });
   }, []);
@@ -112,20 +125,22 @@ const StudyProgrammes = () => {
     console.log(`Learn more about ${title}`);
   }, []);
 
-  const renderProgramCard = useCallback((program: Program) => {
-    const isFavorite = favorites.some(fav => fav.title === program.title);
-    return (
-      <div className="w-full" key={program.title}>
-        <RecommendedProgramCard
-          {...program}
-          isFavorite={isFavorite}
-        
-          onFavoriteClick={() => toggleFavorite(program)}
-          onLearnMore={() => handleLearnMore(program.title)}
-        />
-      </div>
-    );
-  }, [favorites, toggleFavorite, handleLearnMore]);
+  const renderProgramCard = useCallback(
+    (program: Program) => {
+      const isFavorite = favorites.some((fav) => fav.title === program.title);
+      return (
+        <div className="w-full" key={program.title}>
+          <RecommendedProgramCard
+            {...program}
+            isFavorite={isFavorite}
+            onFavoriteClick={() => toggleFavorite(program)}
+            onLearnMore={() => handleLearnMore(program.title)}
+          />
+        </div>
+      );
+    },
+    [favorites, toggleFavorite, handleLearnMore]
+  );
 
   useEffect(() => {
     // Add initial delay of 3 seconds
@@ -154,13 +169,13 @@ const StudyProgrammes = () => {
   // Optional: Save favorites to localStorage whenever it changes
   useEffect(() => {
     if (favorites.length > 0) {
-      localStorage.setItem('studyProgramFavorites', JSON.stringify(favorites));
+      localStorage.setItem("studyProgramFavorites", JSON.stringify(favorites));
     }
   }, [favorites]);
 
   // Optional: Load favorites from localStorage on component mount
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('studyProgramFavorites');
+    const savedFavorites = localStorage.getItem("studyProgramFavorites");
     if (savedFavorites) {
       setFavorites(JSON.parse(savedFavorites));
     }
@@ -168,19 +183,31 @@ const StudyProgrammes = () => {
 
   // Add Toast component
   const Toast = () => (
-    <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 
-      transition-all duration-300 ${showToast ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-      <div className="bg-blue-900 text-white px-6 py-3 rounded-lg shadow-lg
-        flex items-center space-x-2">
+    <div
+      className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 
+      transition-all duration-300 ${
+        showToast ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+    >
+      <div
+        className="bg-blue-900 text-white px-6 py-3 rounded-lg shadow-lg
+        flex items-center space-x-2"
+      >
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+          <path
+            fillRule="evenodd"
+            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+            clipRule="evenodd"
+          />
         </svg>
         <span>{toastMessage}</span>
       </div>
     </div>
   );
-  const [Qs,setQs]=useState<string[]>([])
-  
+  const [Qs, setQs] = useState<string[]>([
+    "Have you already chosen a university, and what academic level, program duration, and tuition fee range are you looking for?",
+  ]);
+
   useEffect(() => {
     startedRef.current = started;
   }, [started]);
@@ -188,66 +215,67 @@ const StudyProgrammes = () => {
     q_fetchedRef.current = q_fetched;
   }, [q_fetched]);
 
-
-
   useEffect(() => {
-    const fetchData = async() => {
-      setTimeout(async() => {
-        const res= await call_deepseek("questions",[],[])
-        setQs(res)
-        
-        setq_fetched(true)
-        console.log(started)
-        if(startedRef.current){
-          console.log("started")
-          console.log(started)
+    const fetchData = async () => {
+      setTimeout(async () => {
+        // const res= await call_deepseek("questions",[],[])
+        // setQs(res)
+
+        setq_fetched(true);
+        console.log(started);
+        if (startedRef.current) {
+          console.log("started");
+          console.log(started);
           setIsAnimating(true);
-        setTimeout(() => {
-          setLoading(false)
-          setShowQuestion(true);
-          setIsAnimating(false);
-        }, 500); 
-
-      }
+          setTimeout(() => {
+            setLoading(false);
+            setShowQuestion(true);
+            setIsAnimating(false);
+          }, 500);
+        }
       }, 10000);
-       
-
     };
     fetchData();
-  },[])
-
-  
+  }, []);
 
   return (
     <div className="h-full w-full overflow-hidden   bg-gray-800 ">
       {/* Text Overlay */}
       <div className="absolute top-1/2 left-1/2 transform  -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
-        <div className={`flex flex-col items-center space-y-4 relative
+        <div
+          className={`flex flex-col items-center space-y-4 relative
           transition-all duration-500 ease-in-out
-          ${isAnimating ? 'scale-0' : 'scale-100'}`}>
-          
+          ${isAnimating ? "scale-0" : "scale-100"}`}
+        >
           {/* Blurred Background Panel */}
-          <div className={`absolute inset-0 ${submitting?"border-2 border-red-600":""}  rounded-xl -m-6 pointer-events-none
+          <div
+            className={`absolute inset-0 ${
+              submitting ? "border-2 border-red-600" : ""
+            }  rounded-xl -m-6 pointer-events-none
             transition-all duration-500
-            ${showBlur ? 'opacity-100' : 'opacity-0'}
-            ${loading || showResults ? '' : 'backdrop-blur-md bg-white/20'}`}>
-          </div>
-          
+            ${showBlur ? "opacity-100" : "opacity-0"}
+            ${loading || showResults ? "" : "backdrop-blur-md bg-white/20"}`}
+          ></div>
+
           {/* Content */}
           <div className="relative flex flex-col items-center space-y-4 p-6">
-            {loading || spinner  ? <SplineLoader/> : !showQuestion ? (
+            {loading || spinner ? (
+              <SplineLoader />
+            ) : !showQuestion ? (
               <>
-                <h1 className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-black px-4 max-w-2xl text-center 
+                <h1
+                  className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-black px-4 max-w-2xl text-center 
                   tracking-wider leading-relaxed
                   font-montserrat
                   text-black
                   text-shadow-[2px_2px_0px_#000,4px_4px_8px_rgba(0,0,0,0.5)]
                   uppercase
-                  letter-spacing-wide">
+                  letter-spacing-wide"
+                >
                   {text}
                 </h1>
-                
-                <button 
+
+                <button
                   onClick={handleStart}
                   disabled={!showButton}
                   className={`px-6 py-2.5 text-base font-semibold text-white 
@@ -255,13 +283,18 @@ const StudyProgrammes = () => {
                     rounded-full transform
                     transition-all duration-500 pointer-events-auto
                     opacity-0 translate-y-4
-                    ${showButton ? 'opacity-100 translate-y-0 hover:shadow-lg hover:-translate-y-0.5' : ''}
-                    ${!showButton ? 'cursor-default' : 'cursor-pointer'}`}>
+                    ${
+                      showButton
+                        ? "opacity-100 translate-y-0 hover:shadow-lg hover:-translate-y-0.5"
+                        : ""
+                    }
+                    ${!showButton ? "cursor-default" : "cursor-pointer"}`}
+                >
                   Start
                 </button>
               </>
             ) : showResults ? (
-              <ResultsSection 
+              <ResultsSection
                 setSpinner={setSpinner}
                 questions={Qs}
                 answers={answers}
@@ -277,23 +310,36 @@ const StudyProgrammes = () => {
                   <input
                     type="text"
                     value={inputValue}
-                    onChange={(e) => {setsubmitting(false),setInputValue(e.target.value)}}
+                    onChange={(e) => {
+                      setsubmitting(false), setInputValue(e.target.value);
+                    }}
                     placeholder="Type your answer..."
                     className="w-full px-4 py-2 rounded-lg border-2 border-blue-900 focus:outline-none focus:border-blue-700
                       bg-white/80 backdrop-blur-sm
                       pointer-events-auto"
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         handleNextQuestion();
                       }
                     }}
                   />
-                  <button 
+                  <button
                     onClick={handleNextQuestion}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2
-                      text-blue-900 hover:text-blue-700 pointer-events-auto">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      text-blue-900 hover:text-blue-700 pointer-events-auto"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -319,4 +365,4 @@ const StudyProgrammes = () => {
   );
 };
 
-export default StudyProgrammes; 
+export default StudyProgrammes;
