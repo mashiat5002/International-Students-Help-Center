@@ -79,3 +79,21 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+
+.fade-in-up {
+  animation: fadeInUp 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes fadeInSidebar {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.fade-in-sidebar {
+  animation: fadeInSidebar 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
