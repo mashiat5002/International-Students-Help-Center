@@ -5,6 +5,7 @@ export interface IUser extends Document {
     email: string;
     institution: string;
     country: string;
+    img: string;
     preferred_field_of_study: string;
     preferred_level_of_study: string;
     bio: string;
@@ -15,6 +16,7 @@ export interface IUser extends Document {
     varification_key: string;
     varify_timeout: string;
     active_status: string;
+    status: string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -23,6 +25,7 @@ const UserSchema = new Schema<IUser>({
   is_expert:  {type: Boolean, default: false},
   institution:  {type: String},
   country:  {type: String},
+  img:  {type: String, default:"https://www.gravatar.com/avatar/?d=mp"},
   preferred_field_of_study:  {type: String},
   preferred_level_of_study:  {type: String},
   bio:  {type: String},
@@ -32,6 +35,7 @@ const UserSchema = new Schema<IUser>({
   varification_key:  {type: String},
   varify_timeout:  {type: String},
   active_status:  {type: String},
+  status:  {type: String, default:"Unblocked"},
 });
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);

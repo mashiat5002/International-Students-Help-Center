@@ -8,6 +8,7 @@ import LoadingSpinner from './common/LoadingSpinner';
 interface UserProfile {
   full_name: string;
   email: string;
+  img: string;
   institution?: string;
   country?: string;
   preferred_field_of_study?: string;
@@ -22,6 +23,7 @@ const Profile = ({ details }: { details: any }) => {
     email: '',
     institution: '',
     country: '',
+    img: '',
     preferred_field_of_study: '',
     preferred_level_of_study: '',
     bio: '',
@@ -53,6 +55,7 @@ const Profile = ({ details }: { details: any }) => {
           bio: userData.bio || '',
           enable_email: userData.enable_email !== undefined ? 
             (userData.enable_email === 'true' || userData.enable_email === true) : true,
+          img: userData.img || '',
         };
         
         console.log('Mapped profile data:', mappedProfile);
@@ -74,6 +77,7 @@ const Profile = ({ details }: { details: any }) => {
             bio: details.bio || '',
             enable_email: details.enable_email !== undefined ? 
               (details.enable_email === 'true' || details.enable_email === true) : true,
+            img: details.img || '',
           };
           setProfile(fallbackProfile);
           setEditedProfile(fallbackProfile);
@@ -113,6 +117,17 @@ const Profile = ({ details }: { details: any }) => {
     setIsEditing(false);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditedProfile((prev) => ({ ...prev, img: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="w-full h-full overflow-y-hidden">
       {isloading ? (
@@ -122,54 +137,85 @@ const Profile = ({ details }: { details: any }) => {
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="bg-white/20 backdrop-blur-md rounded-xl shadow-lg p-6 mb-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-2xl font-bold text-blue-900 mb-2">
-                    {isEditing ? 'Edit Profile' : 'My Profile'}
-                  </h1>
-                  <p className="text-gray-600">
-                    Manage your personal information and preferences
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {isEditing && (
-                    <button
-                      onClick={handleCancel}
-                      className="px-4 py-2 rounded-lg transition-colors bg-gray-500 hover:bg-gray-600 text-white flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Cancel
-                    </button>
-                  )}
-                  <button
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                    disabled={isloading}
-                    className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2
-                      ${isEditing 
-                        ? 'bg-green-600 hover:bg-green-700 text-white' 
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'}
-                      ${isloading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {isEditing ? (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M5 13l4 4L19 7" />
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center gap-4">
+                {/* Profile Image */}
+                <div className="flex flex-col items-center">
+                  <div className="relative">
+                    <img
+                      src={isEditing ? (editedProfile.img || '/default-profile.png') : (profile.img || '/default-profile.png')}
+                      alt="Profile"
+                      className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 shadow-md bg-white"
+                    />
+                    {isEditing && (
+                      <label className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 cursor-pointer shadow-lg hover:bg-blue-700 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageChange}
+                        />
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
-                        Save Changes
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        Edit Profile
-                      </>
+                      </label>
                     )}
-                  </button>
+                  </div>
+                  {isEditing && (
+                    <span className="text-xs text-gray-500 mt-2">Click the icon to change your photo</span>
+                  )}
+                </div>
+                {/* Header Text and Buttons */}
+                <div className="flex-1 w-full">
+                  <div className="flex justify-between items-start w-full">
+                    <div>
+                      <h1 className="text-2xl font-bold text-blue-900 mb-2">
+                        {isEditing ? 'Edit Profile' : 'My Profile'}
+                      </h1>
+                      <p className="text-gray-600">
+                        Manage your personal information and preferences
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {isEditing && (
+                        <button
+                          onClick={handleCancel}
+                          className="px-4 py-2 rounded-lg transition-colors bg-gray-500 hover:bg-gray-600 text-white flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Cancel
+                        </button>
+                      )}
+                      <button
+                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                        disabled={isloading}
+                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2
+                          ${isEditing 
+                            ? 'bg-green-600 hover:bg-green-700 text-white' 
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'}
+                          ${isloading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        {isEditing ? (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M5 13l4 4L19 7" />
+                            </svg>
+                            Save Changes
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            Edit Profile
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

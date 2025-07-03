@@ -1,5 +1,6 @@
 
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
+import Admin from "@/app/models/admin";
 import User from "@/app/models/user";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -8,7 +9,7 @@ export async function POST() {
 
   try{
     
-    const session=  cookies().get("student-session")?.value;
+    const session=  cookies().get("admin-session")?.value;
     if(!session){
       console.log("Session not found")
       return NextResponse.json({ message: "Session not found" }, { status: 404 });
@@ -22,7 +23,7 @@ export async function POST() {
   };
    
 
-  var result= await User.find({email: details.Email},{img:1, email: 1, _id:0, full_name: 1 });
+  var result= await Admin.find({email: details.Email},{img:1, email: 1, _id:0, full_name: 1 });
    
    
    

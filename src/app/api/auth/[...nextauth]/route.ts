@@ -38,6 +38,7 @@ export const authOptions = {
       const email = profile.email;
       const name = profile.name;
      
+     
       // const full_name = profile.email;
       //students registration
       if (registering_as == "student") {
@@ -58,6 +59,7 @@ export const authOptions = {
           const result = await new User({
             email: email,
             full_name: name,
+            img: profile.picture || profile.image,
             active_status: "active",
             isExpert: account?.params?.isExpert,
           }).save();

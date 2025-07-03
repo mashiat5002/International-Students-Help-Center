@@ -97,3 +97,21 @@ body {
 .fade-in-sidebar {
   animation: fadeInSidebar 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
+
+.truncate-email {
+  max-width: 180px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+@keyframes fadeInNumber {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.fade-in-number {
+  animation: fadeInNumber 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+}

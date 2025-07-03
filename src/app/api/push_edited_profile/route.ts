@@ -9,8 +9,7 @@ import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt"
 export async function POST(request: NextRequest) {
    const req= await request.json()
    const info=req.info;
-   console.log("info is here--------")
-   console.log(info)
+ 
 
   
    try{
@@ -46,6 +45,7 @@ export async function POST(request: NextRequest) {
             const db_res= await User.updateOne({email:details.Email},
              {$set:{
              full_name: info.full_name,
+             img: info.img,
             institution: info.institution,
             country: info.country,
             preferred_field_of_study: info.preferred_field_of_study,

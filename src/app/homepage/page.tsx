@@ -25,7 +25,8 @@ export default function HomePage() {
   const [showExperts, setShowExperts] = useState(false);
   const [details, setDetails] = useState({
       email: '',
-      full_name: ''
+      full_name: '',
+      img: ''
     });
   // Remove or modify the authentication check for now
   // useEffect(() => {
@@ -83,7 +84,7 @@ export default function HomePage() {
         try {
           const response = await call_fetch_logged_id_info()
           setDetails(response)
-          console.log(response);
+         
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -280,9 +281,15 @@ export default function HomePage() {
               className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
             >
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {details.img!=""?
+                <img
+                    src={details.img}
+                    // alt={profile.name}
+                   className="w-full h-full rounded-full object-cover border-4 border-white shadow "
+                  />
+                :<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                </svg>}
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${isDesktopSidebarCollapsed ? 'lg:hidden' : ''}`}>
                 <h3 className="text-xs font-semibold ">{details.full_name}</h3>

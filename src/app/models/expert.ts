@@ -17,12 +17,13 @@ export interface IExpert extends Document {
     active_status: string;
     joined: string;
     rating: string;
+    status: string;
 }
 
 const ExpertSchema = new Schema<IExpert>({
   email: { type: String,  },
   full_name:  {type: String},
-  img:  {type: String},
+  img:  {type: String, default: "https://www.gravatar.com/avatar/?d=mp"},
   password:  {type: String},
   about:  {type: String,default:"Not Provided"},
   profession:  {type: String,default:"Not Provided"},
@@ -36,6 +37,7 @@ const ExpertSchema = new Schema<IExpert>({
   active_status:  {type: String},
   joined:  {type: String, default:new Date().toLocaleString('default', { month: 'long' })+" "+new Date().getFullYear()},
   rating:  {type: String, default:"0"},
+  status:  {type: String, default:"Unblocked"},
 });
 
 const Expert = mongoose.models.Expert || mongoose.model("Expert", ExpertSchema);
