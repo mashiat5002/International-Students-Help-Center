@@ -1,6 +1,6 @@
 export async function call_expert_login_authentication(email:string,password:string) {
     
-    const res= await fetch("../../api/expert_login_authentication",{  
+    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/expert_login_authentication`,{  
         method:"POST",
         body:JSON.stringify({
             email:email,
