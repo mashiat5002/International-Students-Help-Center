@@ -1,4 +1,4 @@
-import { call_fetch_expert_logged_id_info } from "../call_fetch_expert_logged_id_info/route";
+import { call_fetch_expert_logged_id_info } from "../call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info";
 
 type seminarData={
      topic: string,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route"
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb"
 import User from "@/app/models/user"
 import { cookies } from "next/headers"
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt"

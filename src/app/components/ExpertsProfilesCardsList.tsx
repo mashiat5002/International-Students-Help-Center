@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SeminarRegistrationForm from './SeminarRegistrationForm';
-import { call_fetch_all_experts } from '../(utils)/call_fetch_all_experts/route';
+import { call_fetch_all_experts } from '../(utils)/call_fetch_all_experts/call_fetch_all_experts';
 import LoadingSpinner from './common/LoadingSpinner';
 
 type profiles = 

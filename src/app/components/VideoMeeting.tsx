@@ -3,7 +3,7 @@ import React from 'react';
 import { useEffect, useRef } from 'react';
 import io from 'socket.io-client'; // Default import of io
 import { Socket } from 'socket.io-client'; // Importing the Socket class
-import { startMedia } from '../(utils)/start_media/route';
+import { startMedia } from '../(utils)/start_media/start_media';
 
 
 const participants = [

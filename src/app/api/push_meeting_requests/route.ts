@@ -1,5 +1,5 @@
 
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import MeetingRequests from "@/app/models/meeting_requests";
 import User from "@/app/models/user";

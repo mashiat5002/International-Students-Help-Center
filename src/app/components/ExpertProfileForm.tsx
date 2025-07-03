@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { call_fetch_expert_logged_id_info } from '../(utils)/call_fetch_expert_logged_id_info/route';
-import { call_update_expert_profile_info } from '../(utils)/call_update_expert_profile_info/route';
+import { call_fetch_expert_logged_id_info } from '../(utils)/call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info';
+import { call_update_expert_profile_info } from '../(utils)/call_update_expert_profile_info/call_update_expert_profile_info';
 import Toast from './common/Toast';
 
 const initialState = {

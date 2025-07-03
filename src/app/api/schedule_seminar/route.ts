@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
 import { NextResponse } from "next/server";
 

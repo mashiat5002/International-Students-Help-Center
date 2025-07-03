@@ -1,4 +1,4 @@
-import { call_fetch_logged_id_info } from "../call_fetch_logged_id_info/route";
+import { call_fetch_logged_id_info } from "../call_fetch_logged_id_info/call_fetch_logged_id_info";
 
 export async function call_register_to_seminar(seminarID:string,purpose:string) {
    

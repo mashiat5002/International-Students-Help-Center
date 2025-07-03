@@ -4,9 +4,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Toast from '../common/Toast';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { call_fetch_scheduled_seminars } from '@/app/(utils)/call_fetch_scheduled_seminars/route';
-import { call_setDateTimeSeminar } from '@/app/(utils)/call_setDateTimeSeminar/route';
-import { call_decline_seminar } from '@/app/(utils)/call_decline_seminar/route';
+import { call_fetch_scheduled_seminars } from '@/app/(utils)/call_fetch_scheduled_seminars/call_fetch_scheduled_seminars';
+import { call_setDateTimeSeminar } from '@/app/(utils)/call_setDateTimeSeminar/call_setDateTimeSeminar';
+import { call_decline_seminar } from '@/app/(utils)/call_decline_seminar/call_decline_seminar';
 
 
 type details={

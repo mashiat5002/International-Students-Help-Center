@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { call_deepseek_for_roadmap } from '../(utils)/call_deepseek_for_roadmap/route';
+import { call_deepseek_for_roadmap } from '../(utils)/call_deepseek_for_roadmap/call_deepseek_for_roadmap';
 import Toast from '@/app/components/common/Toast';
-import { call_deepseek_for_application_links } from '../(utils)/call_deepseek_for_application_links/route';
+import { call_deepseek_for_application_links } from '../(utils)/call_deepseek_for_application_links/call_deepseek_for_application_links';
 
 interface ProgramProps {
   title: string;

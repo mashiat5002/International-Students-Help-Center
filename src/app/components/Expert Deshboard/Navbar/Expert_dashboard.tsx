@@ -10,7 +10,7 @@ import PastInquiries from '@/app/components/PastInquiries';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Profile from '../Profile';
-import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/route';
+import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info';
 import SeminarSchedulingForm from '../../SeminarSchedulingForm';
 import MeetingRequests from '../MeetingRequests';
 import UpcomingMeetings from '../UpcomingMeetings';

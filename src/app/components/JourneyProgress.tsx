@@ -2,13 +2,13 @@
 import { GrUserExpert } from "react-icons/gr";
 import { RiRobot2Line } from "react-icons/ri";
 import React, { useState, useEffect } from 'react';
-import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
+import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/call_fetch_journey_db';
 import LoadingSpinner from '@/app/components/common/LoadingSpinner';
 import MeetingSchedulingForm from "./MeetingSchedulingForm";
-import { call_push_document } from "../(utils)/call_push_document/route";
+import { call_push_document } from '../(utils)/call_push_document/call_push_document';
 import Toast from "./common/Toast";
-import prepare_and_view from "../(utils)/prepare_and_view/route";
-import timeFormatConverter from "../(utils)/time_format_converter/route";
+import prepare_and_view from "../(utils)/prepare_and_view/prepare_and_view";
+import timeFormatConverter from "../(utils)/time_format_converter/time_format_converter";
 interface data{
   data: Buffer
   type: string

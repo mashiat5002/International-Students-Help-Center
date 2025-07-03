@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import Journey from "@/app/models/journey";
 import { NextResponse } from "next/server";
 

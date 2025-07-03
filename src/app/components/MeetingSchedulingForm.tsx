@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Choose_expert_for_meeting from './Choose_expert_for_meeting';
 import Toast from './common/Toast';
-import { call_push_meeting_requests } from '../(utils)/call_push_meeting_requests/route';
+import { call_push_meeting_requests } from '../(utils)/call_push_meeting_requests/call_push_meeting_requests';
 interface data{
   data: Buffer
   type: string

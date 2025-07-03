@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route"
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb"
 import User from "@/app/models/user"
-import { call_update_varification_key_db } from "@/app/(utils)/call_update_varification_key_db/route"
+import { call_update_varification_key_db } from "@/app/(utils)/call_update_varification_key_db/call_update_varification_key_db"
 
 
 

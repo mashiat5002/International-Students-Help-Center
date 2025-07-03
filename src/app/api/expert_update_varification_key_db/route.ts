@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { call_nodemailer } from "@/app/(utils)/call_nodemailer/route";
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { call_nodemailer } from "@/app/(utils)/call_nodemailer/call_nodemailer";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 
 import Expert from "@/app/models/expert";
 

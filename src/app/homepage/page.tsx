@@ -11,8 +11,8 @@ import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
 import Profile from '@/app/components/Profile';
-import { call_logout } from '@/app/(utils)/call_logout/route';
-import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/route';
+import { call_logout } from '@/app/(utils)/call_logout/call_logout';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 import ExpertsProfilesCardsList from '@/app/components/ExpertsProfilesCardsList';
 
 

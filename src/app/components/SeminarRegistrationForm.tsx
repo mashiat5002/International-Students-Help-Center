@@ -2,7 +2,7 @@ import React, { ReactHTMLElement, useEffect, useState } from 'react';
 import { MdOutlineClose } from "react-icons/md";
 import Toast from './common/Toast';
 import SelectedExpartCard from './SelectedExpartCard';
-import { call_fetch_an_experts_seminars } from '../(utils)/call_fetch_an_experts_seminars/route';
+import { call_fetch_an_experts_seminars } from '../(utils)/call_fetch_an_experts_seminars/call_fetch_an_experts_seminars';
 import LoadingSpinner from './common/LoadingSpinner';
 import Seminar_Registration_Modal from './Seminar_Registration_Modal';
 type profiles = 

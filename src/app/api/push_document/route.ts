@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import Journey from "@/app/models/journey";
 
-
-   export const config = {
-    api: {
-    bodyParser: false,
-  },
-};
 export async function POST(request: Request) {
     const formData = await request.formData();
     const pdf= formData.get("pdf");

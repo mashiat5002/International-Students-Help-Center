@@ -23,11 +23,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-export function HomePageLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
-}

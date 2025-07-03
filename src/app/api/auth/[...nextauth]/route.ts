@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import { encrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import Expert from "@/app/models/expert";
 import User from "@/app/models/user";
@@ -21,7 +21,7 @@ declare module "next-auth" {
   }
 }
 
-export const authOptions = {
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

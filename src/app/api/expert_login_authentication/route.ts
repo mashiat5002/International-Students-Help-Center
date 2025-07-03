@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import { encrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import Expert from "@/app/models/expert";
 import { cookies } from "next/headers";

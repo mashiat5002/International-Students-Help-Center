@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/route';
-import prepare_and_view from '../(utils)/prepare_and_view/route';
-import prepare_and_download from '../(utils)/prepare_and_download/route';
+import { call_fetch_journey_db } from '../(utils)/call_fetch_journey_db/call_fetch_journey_db';
+import prepare_and_view from '../(utils)/prepare_and_view/prepare_and_view';
+import prepare_and_download from '../(utils)/prepare_and_download/prepare_and_download';
 import LoadingSpinner from './common/LoadingSpinner';
-import timeFormatConverter from '../(utils)/time_format_converter/route';
+import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
 
 interface Document {
   journeyTitle: string;

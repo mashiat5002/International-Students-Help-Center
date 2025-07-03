@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { IoIosArrowBack } from 'react-icons/io';
 import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
-import timeFormatConverter from '../(utils)/time_format_converter/route';
-import { call_fetch_meeting_requests_for_student } from '../(utils)/call_fetch_meeting_requests_for_student/route';
+import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
+import { call_fetch_meeting_requests_for_student } from '../(utils)/call_fetch_meeting_requests_for_student/call_fetch_meeting_requests_for_student';
 
 // Meeting details type
 type MeetingDetails = {

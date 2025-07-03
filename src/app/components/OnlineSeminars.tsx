@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { call_fetch_all_experts_seminars } from '../(utils)/call_fetch_all_experts_seminars/route';
+import { call_fetch_all_experts_seminars } from '../(utils)/call_fetch_all_experts_seminars/call_fetch_all_experts_seminars';
 import { IoIosArrowBack } from 'react-icons/io';
 import Seminar_Registration_Modal from './Seminar_Registration_Modal';
 import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
-import timeFormatConverter from '../(utils)/time_format_converter/route';
+import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
 
 // New seminar details type
 type seminarDetails = {

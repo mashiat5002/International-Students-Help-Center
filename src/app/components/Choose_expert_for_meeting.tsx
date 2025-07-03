@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IoCheckmarkDoneCircleOutline } from "react-icons/io5";
-import { call_fetch_all_experts } from '../(utils)/call_fetch_all_experts/route';
+import { call_fetch_all_experts } from '../(utils)/call_fetch_all_experts/call_fetch_all_experts';
 import { MdOutlineClose } from 'react-icons/md';
 import LoadingSpinner from './common/LoadingSpinner';
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { call_deepseek } from "../(utils)/call_deepseek/route";
+import { call_deepseek } from "../(utils)/call_deepseek/call_deepseek";
 import SplineLoader from "./common/SplineLoader";
 import RecommendedProgramCard from "./RecommendedProgramCard";
 

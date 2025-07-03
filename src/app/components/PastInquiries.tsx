@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ResultsSection from './ResultSection';
-import timeFormatConverter from '../(utils)/time_format_converter/route';
+import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
 
 interface Inquiry {
   id: string;

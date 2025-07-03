@@ -1,7 +1,7 @@
 'use client';
-import { call_login_authentication } from '@/app/(utils)/call_login_auth/route';
-import { call_update_password } from '@/app/(utils)/call_update_password/route';
-import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
+import { call_login_authentication } from '@/app/(utils)/call_login_auth/call_login_auth';
+import { call_update_password } from '@/app/(utils)/call_update_password/call_update_password';
+import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/call_update_varification_key_db';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';

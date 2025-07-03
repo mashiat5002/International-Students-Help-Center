@@ -1,5 +1,4 @@
-
-import { call_push_application_links } from '@/app/(utils)/call_push_application_links/route';
+import { call_push_application_links } from '@/app/(utils)/call_push_application_links/call_push_application_links';
 import extractFullJsonBlock from '@/app/(utils)/extract_obj/extract_obj';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -69,7 +68,8 @@ in this given format, {
  
     if(obj==null){
       console.log("error in parsing the json object")
-   return null}
+      return NextResponse.json({message: "Error in parsing the JSON object"}, {status: 400});
+    }
       try{
 
         const resp=await call_push_application_links(obj)

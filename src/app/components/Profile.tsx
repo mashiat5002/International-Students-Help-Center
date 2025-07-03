@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { call_push_edited_profile } from '../(utils)/call_push_edited_profile/route';
-import { call_fetch_student_profile_info } from '../(utils)/call_fetch_student_profile_info/route';
+import { call_push_edited_profile } from '../(utils)/call_push_edited_profile/call_push_edited_profile';
+import { call_fetch_student_profile_info } from '../(utils)/call_fetch_student_profile_info/call_fetch_student_profile_info';
 import LoadingSpinner from './common/LoadingSpinner';
 
 interface UserProfile {

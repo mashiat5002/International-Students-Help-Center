@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/(utils)/connect_mongodb/route";
+import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
 import extractFullJsonBlock from "@/app/(utils)/extract_obj/extract_obj";
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import Journey from "@/app/models/journey";
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     if (obj == null) {
       console.log("error in parsing the json object");
-      return null;
+      return NextResponse.json({ message: "Error in parsing the JSON object" }, { status: 400 });
     }
     try {
       // fetching email of logged in user

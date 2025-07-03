@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Toast from './common/Toast';
-import { call_schedule_seminar } from '../(utils)/call_schedule_seminar/route';
+import { call_schedule_seminar } from '../(utils)/call_schedule_seminar/call_schedule_seminar';
 
 
 type details={

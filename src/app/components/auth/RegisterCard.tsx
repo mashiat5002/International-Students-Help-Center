@@ -1,10 +1,10 @@
 'use client';
-import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/route';
-import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/route';
+import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/call_activate_user_db';
+import { call_update_varification_key_db } from '@/app/(utils)/call_update_varification_key_db/call_update_varification_key_db';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';
-import { call_register } from '@/app/(utils)/call_register/route';
+import { call_register } from '@/app/(utils)/call_register/call_register';
 
 interface RegisterCardProps {
   isOpen: boolean;

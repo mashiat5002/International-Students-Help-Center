@@ -1,11 +1,11 @@
 'use client';
-import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/route';
+import { call_activate_user_db } from '@/app/(utils)/call_activate_user_db/call_activate_user_db';
 import { signIn } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Toast from '../common/Toast';
-import { call_register_expert } from '@/app/(utils)/call_register_expert/route';
-import { call_expert_update_varification_key_db } from '@/app/(utils)/call_expert_update_varification_key_db/route';
-import { call_activate_expert_db } from '@/app/(utils)/call_activate_expert_db/route';
+import { call_register_expert } from '@/app/(utils)/call_register_expert/call_register_expert';
+import { call_expert_update_varification_key_db } from '@/app/(utils)/call_expert_update_varification_key_db/call_expert_update_varification_key_db';
+import { call_activate_expert_db } from '@/app/(utils)/call_activate_expert_db/call_activate_expert_db';
 
 interface RegisterCardProps {
   isOpen: boolean;

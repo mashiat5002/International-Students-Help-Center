@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { call_register_to_seminar } from "../(utils)/call_register_to_seminar/route";
+import { call_register_to_seminar } from "../(utils)/call_register_to_seminar/call_register_to_seminar";
 import Toast from "./common/Toast";
 type seminarDetails = {
   _id: string;

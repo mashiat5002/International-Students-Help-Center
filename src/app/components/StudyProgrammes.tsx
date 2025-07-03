@@ -6,7 +6,7 @@ import RecommendedProgramCard from "./RecommendedProgramCard";
 import React from "react";
 import SplineLoader from "@/app/components/common/SplineLoader";
 import ResultsSection from "./ResultSection";
-import { call_deepseek_single_followup_question } from "../(utils)/call_deepseek_single_followup_question/route";
+import { call_deepseek_single_followup_question } from "../(utils)/call_deepseek_single_followup_question/call_deepseek_single_followup_question";
 
 // Add new interface for program type
 interface Program {

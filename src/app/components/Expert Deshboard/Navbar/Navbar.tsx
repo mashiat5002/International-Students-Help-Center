@@ -9,7 +9,7 @@ import ApplicationLinks from '@/app/components/ApplicationLinks';
 import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
 import PastInquiries from '@/app/components/PastInquiries';
-import { call_logout } from '@/app/(utils)/call_logout/route';
+import { call_logout } from '@/app/(utils)/call_logout/call_logout';
 import ProfileCardList from '@/app/components/ExpertsProfilesCardsList';
 
 import Link from 'next/link';
@@ -43,6 +43,8 @@ export default function HomePage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const pathname = usePathname();
+      const [details, setDetails] = useState({});
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -188,7 +190,8 @@ export default function HomePage() {
           w-full`}
         >
           { showProfile ? (
-            <Profile />
+            // you added it as demo props , may need to change it later
+            <Profile details={details} setDetails={setDetails}/>
           ) : (
             <>
               {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}

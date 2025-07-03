@@ -1,12 +1,12 @@
-import { call_decline_meetingReq  } from '@/app/(utils)/call_setDateTimeMeeting/route';
+import { call_decline_meetingReq } from '@/app/(utils)/call_decline_meetingReq/call_decline_meetingReq';
 import { ObjectId } from 'mongoose';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Toast from '../common/Toast';
-import { call_setDateTimeMeeting } from '@/app/(utils)/call_decline_meetingReq/route';
+import { call_setDateTimeMeeting } from '@/app/(utils)/call_setDateTimeMeeting/call_setDateTimeMeeting';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { call_fetch_meeting_requests_for_expert } from '@/app/(utils)/call_fetch_meeting_requests_for_expert/route';
+import { call_fetch_meeting_requests_for_expert } from '@/app/(utils)/call_fetch_meeting_requests_for_expert/call_fetch_meeting_requests_for_expert';
 
 
 type details={

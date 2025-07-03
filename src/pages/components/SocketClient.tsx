@@ -1,7 +1,7 @@
 'use client';
 
 
-import { startMedia } from '@/app/(utils)/start_media/route';
+import { startMedia } from '@/app/(utils)/start_media/start_media';
 import { useEffect, useRef } from 'react';
 import io from 'socket.io-client'; // Default import of io
 import { Socket } from 'socket.io-client'; // Importing the Socket class

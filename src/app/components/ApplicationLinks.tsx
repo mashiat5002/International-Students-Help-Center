@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { call_fetch_application_links } from '../(utils)/call_fetch_application_links/route';
+import { call_fetch_application_links } from '../(utils)/call_fetch_application_links/call_fetch_application_links';
 import LoadingSpinner from './common/LoadingSpinner';
 
 interface ApplicationInfo {
