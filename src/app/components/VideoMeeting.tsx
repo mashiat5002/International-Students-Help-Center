@@ -68,7 +68,7 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
     socket.emit('join-room', roomId);
     console.log('[VideoMeeting] join-room emitted:', roomId);
 
-    socket.on('room-info', ({ isOfferer }) => {
+    socket.on('room-info', ({ isOfferer }: { isOfferer: boolean }) => {
       console.log('[VideoMeeting] Received room-info, isOfferer:', isOfferer);
       startMedia({
         videoRef,
