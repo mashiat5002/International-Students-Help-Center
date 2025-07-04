@@ -56,9 +56,10 @@ const VideoMeeting = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
     useEffect(() => {
-    const isOfferer = window.location.hash === '#offerer';
-    const socket = io({ path: '/api/socket' });
-    
+    const callfun=async()=>{
+      const isOfferer = window.location.hash === '#offerer';
+const socket = io("https://ishc-socketio-server-production.up.railway.app");
+console.log(socket);
     socketRef.current = socket;
     
     startMedia({
@@ -71,6 +72,8 @@ const VideoMeeting = () => {
     return () => {
       socket.disconnect();
     };
+    }
+    callfun()
     }, []);
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">

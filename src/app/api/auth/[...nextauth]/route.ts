@@ -105,7 +105,7 @@ const authOptions = {
     },
     async redirect({ url, baseUrl }: any) {
       const registering_as = cookies().get("registering_as")?.value;
-  return registering_as=="student"? `${baseUrl}/homepage`:`${baseUrl}/expert-dashboard`;
+  return registering_as=="student"? `${process.env.NEXT_PUBLIC_Base_Url}/homepage`:`${process.env.NEXT_PUBLIC_Base_Url}/expert-dashboard`;
 }
   }
 };
