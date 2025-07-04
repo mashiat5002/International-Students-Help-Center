@@ -54,27 +54,39 @@ const VideoMeeting = () => {
 
     const socketRef = useRef<typeof Socket | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+
     useEffect(() => {
+    console.log('[VideoMeeting] useEffect triggered');
     const callfun=async()=>{
-      const isOfferer = window.location.hash === '#offerer';
-const socket = io("https://ishc-socketio-server-production.up.railway.app");
-console.log(socket);
-    socketRef.current = socket;
-    
-    startMedia({
-      videoRef,
-      peerConnectionRef,
-      isOfferer,
-      socket,
-    });
-    
-    return () => {
-      socket.disconnect();
-    };
+      try {
+        console.log('[VideoMeeting] window.location.hash:', window.location.hash);
+        const isOfferer = window.location.hash === '#offerer';
+        console.log('[VideoMeeting] isOfferer:', isOfferer);
+        const socket = io("https://ishc-socketio-server-production.up.railway.app");
+        console.log('[VideoMeeting] Socket connected:', socket);
+        socketRef.current = socket;
+        
+        startMedia({
+          videoRef,
+          remoteVideoRef,
+          peerConnectionRef,
+          isOfferer,
+          socket,
+        });
+        
+        return () => {
+          console.log('[VideoMeeting] Disconnecting socket');
+          socket.disconnect();
+        };
+      } catch (err) {
+        console.error('[VideoMeeting] Error in callfun:', err);
+      }
     }
     callfun()
     }, []);
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -136,8 +148,8 @@ console.log(socket);
             </div>
             {/* Self View Window */}
             <div className="absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white">
-            <video id="remoteVideo" autoPlay playsInline style={{ width: '300px', border: '1px solid #ccc', marginLeft: '10px' }} />
-            <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{selfView.name}</span>
+            <video ref={remoteVideoRef} autoPlay playsInline style={{ width: '100%', height: '100%', border: '1px solid #ccc', marginLeft: '0' }} />
+            <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">Remote</span>
             </div>
           </div>
           {/* Participants */}
