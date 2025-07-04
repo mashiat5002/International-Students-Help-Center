@@ -48,9 +48,11 @@ const chatMessages = [
   { name: 'You', message: 'Hi Oliver!' },
 ];
 
+interface VideoMeetingProps {
+  roomId: string;
+}
 
-
-const VideoMeeting = () => {
+const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
 
     const socketRef = useRef<typeof Socket | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -59,34 +61,30 @@ const VideoMeeting = () => {
 
     useEffect(() => {
     console.log('[VideoMeeting] useEffect triggered');
-    const callfun=async()=>{
-      try {
-        console.log('[VideoMeeting] window.location.hash:', window.location.hash);
-        const isOfferer = window.location.hash === '#offerer';
-        console.log('[VideoMeeting] isOfferer:', isOfferer);
-        const socket = io("https://ishc-socketio-server-production.up.railway.app");
-                      
-        console.log('[VideoMeeting] Socket connected:', socket);
-        socketRef.current = socket;
-        
-        startMedia({
-          videoRef,
-          remoteVideoRef,
-          peerConnectionRef,
-          isOfferer,
-          socket,
-        });
-        
-        return () => {
-          console.log('[VideoMeeting] Disconnecting socket');
-          socket.disconnect();
-        };
-      } catch (err) {
-        console.error('[VideoMeeting] Error in callfun:', err);
-      }
-    }
-    callfun()
-    }, []);
+    const socket = io("https://ishc-socketio-server-production.up.railway.app");
+    socketRef.current = socket;
+    console.log('[VideoMeeting] Socket connected:', socket);
+    
+    socket.emit('join-room', roomId);
+    console.log('[VideoMeeting] join-room emitted:', roomId);
+
+    socket.on('room-info', ({ isOfferer }) => {
+      console.log('[VideoMeeting] Received room-info, isOfferer:', isOfferer);
+      startMedia({
+        videoRef,
+        remoteVideoRef,
+        peerConnectionRef,
+        isOfferer,
+        socket,
+        roomId,
+      });
+    });
+
+    return () => {
+      console.log('[VideoMeeting] Disconnecting socket');
+      socket.disconnect();
+    };
+    }, [roomId]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">

@@ -5,14 +5,16 @@ export async function startMedia({
   peerConnectionRef,
   isOfferer,
   socket,
+  roomId,
 }: {
   videoRef: React.RefObject<HTMLVideoElement>;
   remoteVideoRef: React.RefObject<HTMLVideoElement>;
   peerConnectionRef: React.MutableRefObject<RTCPeerConnection | null>;
   isOfferer: boolean;
   socket: any;
+  roomId: string;
 }) {
-  console.log('[startMedia] Called with isOfferer:', isOfferer);
+  console.log('[startMedia] Called with isOfferer:', isOfferer, 'roomId:', roomId);
   try {
     console.log('[startMedia] Requesting local media...');
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -57,7 +59,7 @@ export async function startMedia({
     peer.onicecandidate = (event) => {
       if (event.candidate) {
         console.log('[startMedia] Sending ICE candidate');
-        socket.emit('webrtc-ice-candidate', event.candidate);
+        socket.emit('webrtc-ice-candidate', { roomId, candidate: event.candidate });
       }
     };
 
@@ -78,7 +80,7 @@ export async function startMedia({
     }
 
     // ICE candidate reception
-    socket.on('webrtc-ice-candidate', (candidate: any) => {
+    socket.on('webrtc-ice-candidate', ({ candidate }: { candidate: RTCIceCandidateInit }) => {
       if (candidate) {
         if (peer.remoteDescription && peer.remoteDescription.type) {
           peer.addIceCandidate(new RTCIceCandidate(candidate)).then(() => {
@@ -100,18 +102,18 @@ export async function startMedia({
         const offer = await peer.createOffer();
         await peer.setLocalDescription(offer);
         console.log('[startMedia] Created and set local offer');
-        socket.emit('webrtc-offer', offer);
+        socket.emit('webrtc-offer', { roomId, offer });
       } catch (err) {
         console.error('[startMedia] Failed to create/set offer:', err);
       }
 
-      socket.once('webrtc-answer', async (answer: any) => {
+      socket.once('webrtc-answer', ({ answer }: { answer: RTCSessionDescriptionInit }) => {
         console.log('[startMedia][Offerer] Received answer, signalingState:', peer.signalingState);
         if (peer.signalingState === 'have-local-offer') {
           try {
-            await peer.setRemoteDescription(new RTCSessionDescription(answer));
+            peer.setRemoteDescription(new RTCSessionDescription(answer));
             console.log('[startMedia][Offerer] Set remote answer');
-            await handleRemoteDescriptionSet();
+            handleRemoteDescriptionSet();
           } catch (err) {
             console.error('[startMedia][Offerer] Failed to set remote answer:', err);
           }
@@ -123,17 +125,18 @@ export async function startMedia({
 
     // Answerer logic
     if (!isOfferer) {
-      socket.once('webrtc-offer', async (offer: RTCSessionDescriptionInit) => {
+      socket.once('webrtc-offer', ({ offer }: { offer: RTCSessionDescriptionInit }) => {
         console.log('[startMedia][Answerer] Received offer, signalingState:', peer.signalingState);
         if (peer.signalingState === 'stable') {
           try {
-            await peer.setRemoteDescription(new RTCSessionDescription(offer));
+            peer.setRemoteDescription(new RTCSessionDescription(offer));
             console.log('[startMedia][Answerer] Set remote offer');
-            await handleRemoteDescriptionSet();
-            const answer = await peer.createAnswer();
-            await peer.setLocalDescription(answer);
-            console.log('[startMedia][Answerer] Created and set local answer');
-            socket.emit('webrtc-answer', answer);
+            handleRemoteDescriptionSet();
+            peer.createAnswer().then(async (answer: RTCSessionDescriptionInit) => {
+              await peer.setLocalDescription(answer);
+              console.log('[startMedia][Answerer] Created and set local answer');
+              socket.emit('webrtc-answer', { roomId, answer });
+            });
           } catch (err) {
             console.error('[startMedia][Answerer] Failed to handle offer/answer:', err);
           }
