@@ -12,6 +12,7 @@ export default function SocketClient() {
   
   const socketRef = useRef<typeof Socket | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
  useEffect(() => {
@@ -22,6 +23,7 @@ export default function SocketClient() {
 
   startMedia({
     videoRef,
+    remoteVideoRef,
     peerConnectionRef,
     isOfferer,
     socket,
@@ -38,7 +40,7 @@ export default function SocketClient() {
       <p >🎥 Local Camera Preview</p>
 <video ref={videoRef} autoPlay playsInline muted style={{ width: '300px', border: '1px solid #ccc' }} />
       <p >🎥 Remote Camera Preview</p>
-<video id="remoteVideo" autoPlay playsInline style={{ width: '300px', border: '1px solid #ccc', marginLeft: '10px' }} />
+<video ref={remoteVideoRef} autoPlay playsInline style={{ width: '300px', border: '1px solid #ccc', marginLeft: '10px' }} />
    
     </div>
   );

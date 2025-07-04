@@ -65,6 +65,7 @@ const VideoMeeting = () => {
         const isOfferer = window.location.hash === '#offerer';
         console.log('[VideoMeeting] isOfferer:', isOfferer);
         const socket = io("https://ishc-socketio-server-production.up.railway.app");
+                      
         console.log('[VideoMeeting] Socket connected:', socket);
         socketRef.current = socket;
         
