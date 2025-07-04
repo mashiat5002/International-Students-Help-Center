@@ -21,12 +21,17 @@ export default function SocketClient() {
 
   socketRef.current = socket;
 
+  // Extract roomId from the URL path (e.g., /video-room/roomId)
+  const pathParts = window.location.pathname.split('/');
+  const roomId = pathParts[pathParts.length - 1] || 'default-room';
+
   startMedia({
     videoRef,
     remoteVideoRef,
     peerConnectionRef,
     isOfferer,
     socket,
+    roomId,
   });
 
   return () => {
