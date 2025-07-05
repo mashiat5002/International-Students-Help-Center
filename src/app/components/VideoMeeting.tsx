@@ -57,11 +57,10 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
     const socketRef = useRef<typeof Socket | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
-    const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+const peerConnectionRef = useRef<{ [userId: string]: RTCPeerConnection }>({});
 
-  useEffect(() => {
+   useEffect(() => {
   console.log('[VideoMeeting] useEffect triggered');
-
   const socket = io("https://ishc-socketio-server-production.up.railway.app");
   socketRef.current = socket;
   console.log('[VideoMeeting] Socket connected:', socket);
@@ -70,16 +69,13 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
   console.log('[VideoMeeting] join-room emitted:', roomId);
 
   socket.on('room-info', ({ existingUsers }: { existingUsers: string[] }) => {
-    const isOfferer = existingUsers.length > 0;
-    console.log('[VideoMeeting] Received room-info. Existing users:', existingUsers, '=> isOfferer:', isOfferer);
-
     startMedia({
       videoRef,
       remoteVideoRef,
       peerConnectionRef,
       socket,
       roomId,
-      isOfferer,
+      existingUsers
     });
   });
 
