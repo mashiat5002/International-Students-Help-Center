@@ -59,32 +59,36 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
-    useEffect(() => {
-    console.log('[VideoMeeting] useEffect triggered');
-    const socket = io("https://ishc-socketio-server-production.up.railway.app");
-    socketRef.current = socket;
-    console.log('[VideoMeeting] Socket connected:', socket);
-    
-    socket.emit('join-room', roomId);
-    console.log('[VideoMeeting] join-room emitted:', roomId);
+  useEffect(() => {
+  console.log('[VideoMeeting] useEffect triggered');
 
-    socket.on('room-info', ({ isOfferer }: { isOfferer: boolean }) => {
-      console.log('[VideoMeeting] Received room-info, isOfferer:', isOfferer);
-      startMedia({
-        videoRef,
-        remoteVideoRef,
-        peerConnectionRef,
-        isOfferer,
-        socket,
-        roomId,
-      });
+  const socket = io("https://ishc-socketio-server-production.up.railway.app");
+  socketRef.current = socket;
+  console.log('[VideoMeeting] Socket connected:', socket);
+
+  socket.emit('join-room', roomId);
+  console.log('[VideoMeeting] join-room emitted:', roomId);
+
+  socket.on('room-info', ({ existingUsers }: { existingUsers: string[] }) => {
+    const isOfferer = existingUsers.length > 0;
+    console.log('[VideoMeeting] Received room-info. Existing users:', existingUsers, '=> isOfferer:', isOfferer);
+
+    startMedia({
+      videoRef,
+      remoteVideoRef,
+      peerConnectionRef,
+      socket,
+      roomId,
+      isOfferer,
     });
+  });
 
-    return () => {
-      console.log('[VideoMeeting] Disconnecting socket');
-      socket.disconnect();
-    };
-    }, [roomId]);
+  return () => {
+    console.log('[VideoMeeting] Disconnecting socket');
+    socket.disconnect();
+  };
+}, [roomId]);
+
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">

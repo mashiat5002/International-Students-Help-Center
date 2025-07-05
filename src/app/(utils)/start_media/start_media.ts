@@ -1,4 +1,4 @@
-// start_media.ts
+// startMedia.ts
 export async function startMedia({
   videoRef,
   remoteVideoRef,
@@ -97,7 +97,9 @@ export async function startMedia({
     });
 
     // Offerer logic
+    console.log("is offerer-----------------------------------------", isOfferer)
     if (isOfferer) {
+      console.log("is offerer-------------entered----------------------------")
       try {
         const offer = await peer.createOffer();
         await peer.setLocalDescription(offer);
@@ -125,6 +127,7 @@ export async function startMedia({
 
     // Answerer logic
     if (!isOfferer) {
+      console.log("not offerer-------------entered----------------------------")
       socket.once('webrtc-offer', ({ offer }: { offer: RTCSessionDescriptionInit }) => {
         console.log('[startMedia][Answerer] Received offer, signalingState:', peer.signalingState);
         if (peer.signalingState === 'stable') {
