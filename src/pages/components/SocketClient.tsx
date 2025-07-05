@@ -13,25 +13,27 @@ export default function SocketClient() {
   const socketRef = useRef<typeof Socket | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const peerConnectionRef = useRef<{ [key: string]: RTCPeerConnection }>({});
 
  useEffect(() => {
-  const isOfferer = window.location.hash === '#offerer';
   const socket = io({ path: '/api/socket' });
-
   socketRef.current = socket;
 
   // Extract roomId from the URL path (e.g., /video-room/roomId)
   const pathParts = window.location.pathname.split('/');
   const roomId = pathParts[pathParts.length - 1] || 'default-room';
 
-  startMedia({
-    videoRef,
-    remoteVideoRef,
-    peerConnectionRef,
-    isOfferer,
-    socket,
-    roomId,
+  socket.emit('join-room', roomId);
+
+  socket.on('room-info', ({ isOfferer, existingUsers }: { isOfferer: boolean, existingUsers: string[] }) => {
+    startMedia({
+      videoRef,
+      remoteVideoRef,
+      peerConnectionRef,
+      socket,
+      roomId,
+      existingUsers,
+    });
   });
 
   return () => {
