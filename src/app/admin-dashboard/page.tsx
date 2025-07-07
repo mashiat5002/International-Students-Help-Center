@@ -154,7 +154,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded shadow-lg animate-fadeIn">
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
       {/* Sidebar Drawer for small screens */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 flex lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-30" onClick={() => setSidebarOpen(false)}></div>
+          <div className="fixed inset-0 bg-white bg-opacity-30" onClick={() => setSidebarOpen(false)}></div>
           <aside className="relative w-64 bg-white border-r flex flex-col justify-between min-h-screen z-50 fade-in-sidebar">
             <div>
               <div className="flex flex-col px-6 py-6 ">
@@ -308,8 +308,8 @@ export default function AdminDashboard() {
                             <td className="py-2 px-2 text-center">{student.journeys}</td>
                             <td className="py-2 px-2">
                               <select className="border rounded px-2 py-1 text-xs focus:outline-none" onChange={e => handleStudentStatusChange(idx, e.target.value)} value={student.status}>
-                                <option value="Unblocked">Unblocked</option>
-                                <option value="Blocked">Blocked</option>
+                                <option value="Unblocked">🔓</option>
+                                <option value="Blocked">🚫</option>
                               </select>
                             </td>
                           </tr>
