@@ -31,7 +31,14 @@ export async function POST(request: Request) {
 
     
  
-    result= await Expert.find({email: details.Email},{ password:0});
+    result= await Expert.find({email: details.Email},{ 
+    password:0, 
+    varification_key: 0,
+    varify_timeout: 0,
+    active_status: 0,
+     status: 0,
+ 
+    });
     
    
   if(!result){

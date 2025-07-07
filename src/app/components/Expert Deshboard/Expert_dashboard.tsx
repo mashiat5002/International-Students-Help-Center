@@ -21,13 +21,16 @@ const Expert_dashboard=()=> {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loading_profile_info, setLoadingProfileInfo] = useState(false);
 
     const [details, setDetails] = useState({});
   useEffect(() => {
         const fetchData = async () => {
           try {
+            setLoadingProfileInfo(true);
             const response = await call_fetch_expert_logged_id_info()
             setDetails(response)
+            setLoadingProfileInfo(false);
             console.log("response");
             console.log(response);
           } catch (error) {
@@ -183,7 +186,7 @@ const Expert_dashboard=()=> {
           w-full`}
         >
           { showProfile ? (
-            <Profile details={details} setDetails={setDetails}/>
+            <Profile details={details} setDetails={setDetails} loading_profile_info={loading_profile_info}/>
           ) : (
             <>
               {activeItem === 'Meeting Requests' && <MeetingRequests />}

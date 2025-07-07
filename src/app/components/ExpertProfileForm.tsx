@@ -15,20 +15,20 @@ const initialState = {
  
 };
 type details={
-  email: string;
+      email: string;
     full_name: string;
     about: string;
     img: string;
-    password: string;
     social_media_link1: string;
     social_media_link2: string;
     social_media_link3: string;
     profession: string;
     institution: string;
     country: string;
-    varification_key: string;
-    varify_timeout: string;
-    active_status: string;
+    joined: string;
+    rating: string;
+    
+
 }
 const ExpertProfileForm = ({ details,setDetails }: { details: any,setDetails:Dispatch<SetStateAction<details>> }) => {
   const [isloading, setisloading] = useState(false);
