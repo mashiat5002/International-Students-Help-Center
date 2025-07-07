@@ -3,28 +3,52 @@ import { useState, useEffect } from 'react';
 
 import ExpertRegisterCard from '../auth/ExpertRegisterCard';
 import ExpertLoginCard from '../auth/ExpertLoginCard';
+import { call_fetch_slider_images } from '@/app/(utils)/call_fetch_slider_images/call_fetch_slider_images';
 
-const backgroundImages = [
-  '/students.jpg',  // You'll need to add these images to your public folder
-  '/students_2.jpg',
-  '/students_3.jpg',
-  '/students_4.jpg',
-];
+type ImageTable = {
+  img: String,
+  img_name: String,
+  __v: Number,
+  _id: String,
+}
 
 export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRegisterCard, setShowRegisterCard] = useState(false);
   const [showLoginCard, setShowLoginCard] = useState(false);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [images, setImages] = useState<ImageTable[]>([]);
+  const [loadingImage, setLoadingImage] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
-        prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1
+      setCurrentImageIndex((prevIndex) =>
+        images.length === 0
+          ? 0
+          : prevIndex === images.length - 1
+          ? 0
+          : prevIndex + 1
       );
-    }, 5000); // Change image every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
+  }, [images.length]);
+
+  useEffect(() => {
+    const fun = async () => {
+      setLoadingImage(true);
+      try {
+        // Fetch images from the server
+      const res = await call_fetch_slider_images();
+
+      setLoadingImage(false);
+      setImages(res.data);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        setLoadingImage(false);
+      }
+    };
+    fun();
   }, []);
 
   const handleRegisterClick = () => {
@@ -68,13 +92,13 @@ export default function Hero() {
       />
 
       {/* Background Images */}
-      {backgroundImages.map((image, index) => (
+      {(images.length > 0 ? images : [{ img: '/students.jpg' }]).map((image, index) => (
         <div
-          key={image}
+          key={ index}
           className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out
             ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            backgroundImage: `url(${image})`,
+            backgroundImage: `url(${image.img})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -117,7 +141,7 @@ export default function Hero() {
 
       {/* Slider Navigation Dots */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-        {backgroundImages.map((_, index) => (
+        {(loadingImage ? images : []).map((_, index) => (
           <button
             key={index}
             className={`w-3 h-3 rounded-full transition-all duration-300 
