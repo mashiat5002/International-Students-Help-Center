@@ -38,7 +38,7 @@ const Profile = ({ details,setDetails, loading_profile_info }: { details: any ,s
   }
 
   return (
-    <div className="max-w-3xl mt-16 mx-auto bg-pink-200 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
+    <div className="max-w-3xl mt-16 mx-auto bg-[#FFFCFB] rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
       {/* Left Side */}
       {loading_profile_info?<div className='h-full w-full'><LoadingSpinner/></div>:<div className="flex-1 w-full">
        

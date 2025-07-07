@@ -12,10 +12,13 @@ import MeetingRequests from './MeetingRequests';
 import UpcomingMeetings from './UpcomingMeetings';
 import UpcomingSeminars from './UpcomingSeminars';
 import HeroSection from './HeroSection';
+import { call_logout_expert } from '@/app/(utils)/call_logout_expert/call_logout';
+import { useRouter } from 'next/navigation';
 
 
 const Expert_dashboard=()=> {
-  const [activeItem, setActiveItem] = useState('');
+    const router = useRouter();
+  const [activeItem, setActiveItem] = useState('Home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -59,11 +62,11 @@ const Expert_dashboard=()=> {
 
   const Buttons = [
    
+    { name: 'Home' },
     { name: 'Meeting Requests' },
     { name: 'Schedule Seminar' },
     { name: 'Upcoming Meetings' },
     { name: 'Upcoming Seminars' },
-    { name: 'Home' },
   ];
 
   const isActive = (item: string) => {
@@ -74,9 +77,9 @@ const Expert_dashboard=()=> {
 
 
   return (
-    <div className="min-h-screen bg-black ">
+    <div className="min-h-screen bg-[#DFD0B8] ">
       {/* Top Navigation Bar */}
-      <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+      <nav className={`fixed w-full top-0 z-50 transition-all duration-300 bg-[#948979] ${
         isScrolled ? 'bg-[#000033]' : 'bg-transparent'
       } `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,12 +108,12 @@ const Expert_dashboard=()=> {
             <div className="flex items-center space-x-6">
               <button 
                 onClick={() => {setShowProfile(true), setActiveItem('Profile')}}
-                className={ ` ${isActive('Profile')?"text-blue-500 ":"text-white/90 hover:text-blue-500 "}  font-bold  transition-colors duration-300`}
+                className={ ` ${isActive('Profile')?"text-[#FCD8CD] ":"text-white/90 hover:text-[#FCD8CD] "}  font-bold  transition-colors duration-300`}
               >
                 Profile
               </button>
               <button 
-                onClick={() => setIsLoginOpen(true)}
+                onClick={() => {call_logout_expert(), router.push('/')}}
                 className="text-white px-6 py-2.5 rounded-lg font-medium
                   border-2 border-white bg-transparent
                   transform hover:scale-105 transition-all duration-300
@@ -154,13 +157,28 @@ const Expert_dashboard=()=> {
               {Buttons.map((link) => (
                 <button
                   key={link.name}
-                 
-                  className={`text-white/90 hover:text-white px-3 py-2 rounded-md transition-all duration-300 text-white bg-white/10`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-white/90 px-3 py-2 rounded-md transition-all duration-300 text-white 
+                    ${activeItem === link.name ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+                  onClick={() => {
+                    setActiveItem(link.name);
+                    setShowProfile(false);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   {link.name}
                 </button>
               ))}
+              <button
+                className={`text-white/90 px-3 py-2 rounded-md transition-all duration-300 text-white 
+                  ${activeItem === 'Profile' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+                onClick={() => {
+                  setShowProfile(true);
+                  setActiveItem('Profile');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Profile
+              </button>
             </div>
           </div>
         </div>
@@ -181,6 +199,7 @@ const Expert_dashboard=()=> {
 
         {/* Main Content */}
         <main className={`flex-1 transition-all duration-300 
+        
        
           ml-0
           w-full`}
@@ -193,9 +212,7 @@ const Expert_dashboard=()=> {
               {activeItem === 'Schedule Seminar' && <SeminarSchedulingForm/>}
               {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}
               {activeItem === 'Upcoming Seminars' && <UpcomingSeminars />}
-              {activeItem === 'Home' && <HeroSection />}
-          
-              
+              {activeItem === 'Home' && <HeroSection setActiveItem={setActiveItem} />}
             </>
           )}
         </main>

@@ -111,7 +111,7 @@ const MeetingRequests = () => {
 
   return (
     <>
-    <div className={`h-[600px]  custom-scrollbar  w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md`}>
+    <div className={`h-[600px]  custom-scrollbar  w-full max-w-2xl mx-auto mt-10 p-6 bg-[#393E46] rounded-2xl shadow-lg backdrop-blur-md`}>
       <h2 className="text-2xl font-bold text-white mb-6">Meeting Requests</h2>
         {isLoading?<LoadingSpinner />:details.length==0?
         <div className='h-full w-full flex items-center justify-center text-white mt-10'>No Meetings Upcoming</div>:<>     

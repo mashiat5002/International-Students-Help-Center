@@ -187,7 +187,7 @@ export default function HomePage() {
                 <span>Profile</span>
               </button>
               <button 
-                onClick={() => {call_logout(),router.push('/')}}
+                onClick={() => {call_logout(), router.push('/')}}
                 className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -107,7 +107,7 @@ const SeminarSchedulingForm = () => {
 
   return (
     <>
-    <div className="h-full   w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md">
+    <div className="h-full   w-full max-w-2xl mx-auto mt-10 p-6 bg-[#393E46] rounded-2xl shadow-lg backdrop-blur-md">
       <h2 className="text-2xl font-bold text-white mb-6">Schedule Seminar</h2>
       
       <ul className="space-y-4">
