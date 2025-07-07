@@ -7,11 +7,12 @@ import { startMedia } from '../(utils)/start_media/start_media';
 
 
 const tasks = [
-  'Opening',
-  'Performance Evaluation of the Party',
-  'Planning Party Programs and Activities',
-  'Internal Party Consolidation',
-  'Party Financial Plan',
+  'SOP Review and Submission',
+  'Scholarship Application Review',
+  'Application for Financial Aid',
+  'Prepare for Interview',
+  'Submit Required Documents',
+  'Follow Up with Scholarship Provider',
 ];
 
 
@@ -19,9 +20,9 @@ const tasks = [
 
 
 const documents = [
-  { title: 'Meeting Minutes.pdf', reason: 'Weekly Review', url: '#' }, 
-  { title: 'Financial Report.xlsx', reason: 'Budget Analysis', url: '#' },
-  { title: 'Party Program.docx', reason: 'Event Planning', url: '#' },
+  { title: 'sop.pdf', reason: 'SOP', url: '#' }, 
+  { title: 'IELTS.pdf', reason: 'Language Proficiency', url: '#' },
+  { title: 'Recommendations.pdf', reason: 'Rec. Letters', url: '#' },
 ];
 
 
@@ -240,8 +241,8 @@ const handleMsgSend = () => {
             <button className="mr-2 sm:mr-4 p-2 bg-gray-200 rounded-full">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <span className="font-semibold text-base sm:text-lg">Partai Banteng Weekly Meeting</span>
-            <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length} Participants</span>
+            <span className="font-semibold text-base sm:text-lg">University of Otago MSC Application</span>
+            <span className="ml-2 text-gray-500 text-xs sm:text-sm">5 Participants</span>
           </div>
           <button className="bg-red-100 text-red-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
         </div>
@@ -302,8 +303,8 @@ const handleMsgSend = () => {
             {chatMessages?.map((msg, i) => (
   msg && msg.name && msg.message ? (
     <div key={i} className="flex items-center space-x-2">
-      <span className={`font-semibold text-xs ${msg.name === 'You' ? 'text-blue-600' : 'text-gray-800'}`}>{msg.name}:</span>
-      <span className="text-sm text-gray-700">{msg.message}</span>
+      <span className={`font-semibold text-xs ${msg.name === 'You' ? 'text-blue-600' : 'text-gray-800'}`}>Mashiat Islam:</span>
+      <span className="text-sm text-gray-700">Are you there!!</span>
     </div>
   ) : null
 ))}

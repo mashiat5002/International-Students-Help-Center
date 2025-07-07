@@ -27,9 +27,9 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Scholarships', href: '/scholarships' },
-    { name: 'Find Experts', href: '/experts' },
-    { name: 'AI Assistant', href: '/ai-assistant' }
+    { name: 'Video conference', href: '/video-conference' },
+    { name: 'Expert Consultation', href: '/experts-consultation' },
+    { name: 'AI Assistance', href: '/ai-assistance' }
   ];
 
   const isActive = (href: string) => {
@@ -48,7 +48,7 @@ export default function Navbar() {
   return (
     <>
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-[#000033]' : 'bg-transparent'
+        isScrolled || pathname?.includes('video-conference') || pathname?.includes('experts-consultation') || pathname?.includes('ai-assistance') ? 'bg-[#000033]' : 'bg-transparent'
       } `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">

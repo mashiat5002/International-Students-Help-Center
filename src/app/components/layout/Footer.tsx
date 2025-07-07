@@ -47,8 +47,8 @@ const Footer = () => {
             </div>
             <span className="text-2xl font-bold">ISHC</span>
           </div>
-          <p className="text-gray-400">
-            Streamline your administrative tasks, access critical patient data, and enhance collaboration among your healthcare team effortlessly.
+          <p className="text-gray-400 text-xs">
+            The International Students Help Center represents a comprehensive solution to the challenges faced by international students. By combining AI technology, expert consultation, and comprehensive resource management, we've created a platform that not only simplifies the study abroad process but also enhances the overall educational experience.
           </p>
           <div className="flex gap-3 mt-2">
             <a href="#" className="bg-[#23263A] hover:bg-indigo-600 p-2 rounded-full"><FaFacebookF /></a>
@@ -81,9 +81,9 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-3">Contact</h4>
           <ul className="space-y-3 text-gray-400">
-            <li className="flex items-center gap-2"><FaPhone /> (406)555-0120</li>
-            <li className="flex items-center gap-2"><FaEnvelope /> mangcoding123@gmail.com</li>
-            <li className="flex items-center gap-2"><FaMapMarkerAlt /> 2972 Westheimer Rd. Santa Ana, Illinois 85486</li>
+            <li className="flex items-center gap-2"><FaPhone /> +88 01798680206</li>
+            <li className="flex items-center gap-2"><FaEnvelope /> mashiath342@gmail.com</li>
+            <li className="flex items-center gap-2"><FaMapMarkerAlt /> 119 Osmani Medical Road Sylhet Bangladesh</li>
           </ul>
         </div>
       </div>
