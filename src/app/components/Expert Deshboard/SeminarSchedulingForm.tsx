@@ -2,8 +2,9 @@ import { ObjectId } from 'mongoose';
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Toast from './common/Toast';
-import { call_schedule_seminar } from '../(utils)/call_schedule_seminar/call_schedule_seminar';
+import Toast from '../common/Toast';
+import { call_schedule_seminar } from '../../(utils)/call_schedule_seminar/call_schedule_seminar';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 
 type details={
@@ -75,6 +76,7 @@ const SeminarSchedulingForm = () => {
       maxParticipants: maxParticipants,
       topics: filteredTopics
     };
+    setIsLoading(true);
     const res = await call_schedule_seminar(seminarData);
     console.log('Seminar data:', seminarData);
     
@@ -105,7 +107,7 @@ const SeminarSchedulingForm = () => {
 
   return (
     <>
-    <div className="h-fit custom-scrollbar    w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md">
+    <div className="h-full   w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md">
       <h2 className="text-2xl font-bold text-white mb-6">Schedule Seminar</h2>
       
       <ul className="space-y-4">
@@ -228,12 +230,12 @@ const SeminarSchedulingForm = () => {
             
 
               
-              <button
+              {isLoading?<div className='text-blue-500 font-bold mr-8'>Loading...</div>:<button
                 className={ ` mt-2 ml-4 px-5 py-2  text-white rounded-full bg-blue-800 font-medium shadow hover:bg-blue-700 transition`}
                 onClick={() => {handleConfirm(String("item._id"))}}
               >
                 Confirm
-              </button>
+              </button>}
              
             </div>
           </li>

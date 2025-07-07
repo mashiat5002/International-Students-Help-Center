@@ -111,12 +111,13 @@ const UpcomingMeetings = () => {
 
   return (
     <>
-    <div className={`max-h-[600px] min-h-[600px] custom-scrollbar overflow-scroll overflow-x-hidden ${details.length<5?"overflow-y-hidden":""} w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md`}>
+    <div className={`h-[600px]  custom-scrollbar  w-full max-w-2xl mx-auto mt-10 p-6 bg-white/10 rounded-2xl shadow-lg backdrop-blur-md`}>
       <h2 className="text-2xl font-bold text-white mb-6">Upcoming Meetings</h2>
-      {isLoading?<LoadingSpinner />:details.length==0?<div className='h-full w-full flex items-center justify-center text-white mt-10'>No Meetings Upcoming</div>:<>
-      <ul className="space-y-4">
+      {isLoading?<LoadingSpinner />:details.length==0?
+      <div className='h-full w-full flex items-center justify-center text-white mt-10'>No Meetings Upcoming</div>:<>
+      <ul className={`space-y-4  h-[500px] overflow-x-hidden mb-16`}>
         {details.map((item,k) => (
-          <li key={k} className="flex flex-col md:flex-row md:items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
+          <li key={k} className=" flex flex-col  md:flex-row md:items-center justify-between bg-white/5 rounded-xl p-4 border border-white/10">
             <div className="flex-1">
               <div className="text-lg font-semibold text-white mb-1">{item.student_full_name}</div>
               <div className="text-white/80 text-sm mb-1">Applying To: {item.Institution} {item.fieldOfStudy} </div>

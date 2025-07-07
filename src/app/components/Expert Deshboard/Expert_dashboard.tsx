@@ -1,20 +1,17 @@
 'use client';
 // import { useEffect } from 'react';
-import FavoriteProgrammes from '@/app/components/FavoriteProgrammes';
-import JourneyProgress from '@/app/components/JourneyProgress';
-import Documents from '@/app/components/Documents';
-import ApplicationLinks from '@/app/components/ApplicationLinks';
+
 import OnlineSeminars from '@/app/components/OnlineSeminars';
 import ScheduledMeetings from '@/app/components/ScheduledMeetings';
-import PastInquiries from '@/app/components/PastInquiries';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import Profile from '../Profile';
+import Profile from './Profile';
 import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info';
-import SeminarSchedulingForm from '../../SeminarSchedulingForm';
-import MeetingRequests from '../MeetingRequests';
-import UpcomingMeetings from '../UpcomingMeetings';
-import UpcomingSeminars from '../UpcomingSeminars';
+import SeminarSchedulingForm from './SeminarSchedulingForm';
+import MeetingRequests from './MeetingRequests';
+import UpcomingMeetings from './UpcomingMeetings';
+import UpcomingSeminars from './UpcomingSeminars';
+import HeroSection from './HeroSection';
 
 
 const Expert_dashboard=()=> {
@@ -58,11 +55,12 @@ const Expert_dashboard=()=> {
   }, []);
 
   const Buttons = [
-    { name: 'Your Blogs', href: '/experts' },
-    { name: 'Meeting Requests', href: '/experts' },
-    { name: 'Schedule Seminar', href: '/ai-assistant' },
-    { name: 'Upcoming Meetings', href: '/ai-assistant' },
-    { name: 'Upcoming Seminars', href: '/ai-assistant' }
+   
+    { name: 'Meeting Requests' },
+    { name: 'Schedule Seminar' },
+    { name: 'Upcoming Meetings' },
+    { name: 'Upcoming Seminars' },
+    { name: 'Home' },
   ];
 
   const isActive = (item: string) => {
@@ -104,7 +102,7 @@ const Expert_dashboard=()=> {
             <div className="flex items-center space-x-6">
               <button 
                 onClick={() => {setShowProfile(true), setActiveItem('Profile')}}
-                className="text-white/90 hover:text-white transition-colors duration-300"
+                className={ ` ${isActive('Profile')?"text-blue-500 ":"text-white/90 hover:text-blue-500 "}  font-bold  transition-colors duration-300`}
               >
                 Profile
               </button>
@@ -154,11 +152,7 @@ const Expert_dashboard=()=> {
                 <button
                   key={link.name}
                  
-                  className={`text-white/90 hover:text-white px-3 py-2 rounded-md transition-all duration-300 ${
-                    isActive(link.href) 
-                      ? 'text-white bg-white/10' 
-                      : 'hover:bg-white/10'
-                  }`}
+                  className={`text-white/90 hover:text-white px-3 py-2 rounded-md transition-all duration-300 text-white bg-white/10`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
@@ -196,10 +190,8 @@ const Expert_dashboard=()=> {
               {activeItem === 'Schedule Seminar' && <SeminarSchedulingForm/>}
               {activeItem === 'Upcoming Meetings' && <UpcomingMeetings />}
               {activeItem === 'Upcoming Seminars' && <UpcomingSeminars />}
-              {activeItem === 'Application Links' && <ApplicationLinks />}
-              {activeItem === 'Online Seminars' && <OnlineSeminars />}
-              {activeItem === 'Scheduled Meetings' && <ScheduledMeetings />}
-              {activeItem === 'Past Inquiries' && <PastInquiries />}
+              {activeItem === 'Home' && <HeroSection />}
+          
               
             </>
           )}

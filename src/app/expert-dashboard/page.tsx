@@ -1,5 +1,5 @@
 "use client"
-import Expert_dashboard from '../components/Expert Deshboard/Navbar/Expert_dashboard';
+import Expert_dashboard from '../components/Expert Deshboard/Expert_dashboard';
 
 export default function HomePage() {
   
