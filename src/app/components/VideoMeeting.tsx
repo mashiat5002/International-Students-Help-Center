@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client'; // Default import of io
 import { Socket } from 'socket.io-client'; // Importing the Socket class
 import { startMedia } from '../(utils)/start_media/start_media';
+import { call_send_msg_through_socket } from '../../../lib/auth/call_send_msg_through_socket';
+import { call_join_room_to_socket } from '../../../lib/auth/join_room_to_socket';
 
 
 const tasks = [
@@ -36,10 +38,19 @@ interface ChatMessage {
   name: string;
   message: string;
 }
+type UserInfo = {
+  name: string;
+  roomId: string;
+};
+
+type UsersMap = {
+  [socketId: string]: UserInfo;
+};
 const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
 
 
-    const [NewMessage,setNewMessage] = useState<ChatMessage>({name: '', message: ''})
+    const [mysocketId,setmysocketId] = useState<string>('')
+    const [NewMessage,setNewMessage] = useState<string>('')
     const [chatMessages,setchatMessages] = useState<ChatMessage[]>([])
     const socketRef = useRef<typeof Socket | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -51,7 +62,7 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
     const [remoteUserIds, setRemoteUserIds] = useState<string[]>([]);
     const remoteVideoRefs = useRef<{ [id: string]: React.RefObject<HTMLVideoElement> }>({});
     const [mainVideoRef, setMainVideoRef] = useState<React.RefObject<HTMLVideoElement>>(localVideoRef);
-    const [mainscreenId , setMainscreenId] = useState<string | null>(null);
+    const [UserInforDetails , setUserInforDetails] = useState<UsersMap >({});
     const allStreamsRef = useRef<{ [userId: string]: MediaStream }>({});
 
     
@@ -59,15 +70,30 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
 
 
 useEffect(() => {
-  // console.log('[VideoMeeting] useEffect triggered');
+  
   const socket = io("https://ishc-socketio-server-production.up.railway.app");
   socketRef.current = socket;
-  // console.log('[VideoMeeting] Socket connected:', socket);
+  
 
-
-  socket.emit('join-room', roomId);
-  // console.log('[VideoMeeting] join-room emitted:', roomId);
  
+  
+  socket.on("connect", () => {
+    setmysocketId(socket.id)
+    const calling_join_room = async () => {
+      console.log("socket id in join room", socket.id);
+      await call_join_room_to_socket(roomId, socket.id)
+      socket.emit('join-room', roomId);
+    }
+  calling_join_room()
+});
+ 
+
+  socket.on("add-new-userDetails",({updatedUserDetails}: {updatedUserDetails: UsersMap}) => {
+    console.log('on new user entry:', updatedUserDetails);
+    setUserInforDetails(updatedUserDetails);
+  });
+
+
   socket.on("send-previous-chats",({msg}: {msg: ChatMessage[]}) => {
     // console.log('[VideoMeeting] Received chat messages:', msg);
     setchatMessages(prevMessages => [...prevMessages, ...msg]);
@@ -78,7 +104,7 @@ useEffect(() => {
   });
 
 socket.on("user-disconnected", ({userId}:{userId: string}) => {
-  console.log('[VideoMeeting] User disconnected:', userId);
+  // console.log('[VideoMeeting] User disconnected:', userId);
   if (remoteVideoRefs.current[userId]?.current) {
   remoteVideoRefs.current[userId].current.srcObject = null;
   delete remoteVideoRefs.current[userId];
@@ -103,11 +129,13 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 
 
-  socket.on('room-info', ({ existingUsers, existingChats }: { existingUsers: string[], existingChats: ChatMessage[] }) => {
+  socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: any }) => {
   
 
-    
-    
+    console.log("Existing User Details:", existingUserDetails)
+    console.log("my Details:", mysocketId)
+    setUserInforDetails(existingUserDetails);
+
     existingUsers.forEach(id => {
       if (!remoteVideoRefs.current[id]) {
         remoteVideoRefs.current[id] = React.createRef<HTMLVideoElement>();
@@ -151,6 +179,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
        console.log([...usersExceptMe, userId])
         
         setRemoteUserIds(usersExceptMe => [...usersExceptMe, userId]);
+
       }
      
        
@@ -200,14 +229,13 @@ const handlePlay = () => {
 
 
 
-const handleMsgSend = () => {
+const handleMsgSend = async() => {
  
-  if (!NewMessage.name || !NewMessage.message) return; // Ensure both fields are filled
- 
-  setNewMessage({name: '', message: ''})
-  // console.log("trying to send message", NewMessage, roomId);
-  socketRef?.current?.emit('send-chat', { msg: NewMessage , roomId });
-  setchatMessages(prevMessages => [...prevMessages, NewMessage]);
+  if (NewMessage=="") return; 
+ await call_send_msg_through_socket(NewMessage, roomId);
+
+
+setNewMessage('')
 
 
 }
@@ -242,7 +270,7 @@ const handleMsgSend = () => {
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
             </button>
             <span className="font-semibold text-base sm:text-lg">University of Otago MSC Application</span>
-            <span className="ml-2 text-gray-500 text-xs sm:text-sm">5 Participants</span>
+            <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length} Participants</span>
           </div>
           <button className="bg-red-100 text-red-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
         </div>
@@ -291,7 +319,8 @@ const handleMsgSend = () => {
             >
               {/* Small video (always rendered) */}
               <video ref={localVideoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', border: '1px solid #ccc', marginLeft: '0' }} />
-              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">You</span>
+              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{mysocketId} </span> 
+              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails[mysocketId]?.name} </span> 
             </div>
           </div>
           {/* Participants */}
@@ -303,14 +332,14 @@ const handleMsgSend = () => {
             {chatMessages?.map((msg, i) => (
   msg && msg.name && msg.message ? (
     <div key={i} className="flex items-center space-x-2">
-      <span className={`font-semibold text-xs ${msg.name === 'You' ? 'text-blue-600' : 'text-gray-800'}`}>Mashiat Islam:</span>
-      <span className="text-sm text-gray-700">Are you there!!</span>
+      <span className={`font-semibold text-xs ${msg.name === 'You' ? 'text-blue-600' : 'text-gray-800'}`}>{msg.name}:</span>
+      <span className="text-sm text-gray-700">{msg.message}</span>
     </div>
   ) : null
 ))}
           </div>
           <div className="flex items-center space-x-2 pt-2 border-t">
-            <input value={NewMessage?.message} onChange={(e) => setNewMessage({"name":"Socket.id", "message": e.target.value})} type="text" placeholder="Type a message..." className="flex-1 border rounded-full px-4 py-2 text-sm" />
+            <input value={NewMessage} onChange={(e) => setNewMessage( e.target.value)} type="text" placeholder="Type a message..." className="flex-1 border rounded-full px-4 py-2 text-sm" />
             <button onClick={()=>{handleMsgSend()}} className="bg-gray-900 text-white px-4 py-2 rounded-full">Send</button>
           </div>
         </div>
@@ -375,7 +404,7 @@ const handleMsgSend = () => {
 
           }} className="relative rounded-lg border-2 border-gray-300 bg-gray-100 cursor-pointer" style={{ aspectRatio: '1/1' }}>
             <video ref={remoteVideoRefs.current[id]} autoPlay playsInline className="w-full h-full object-cover rounded-lg" style={{ background: '#222' }} />
-            <span className="absolute bottom-1 left-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded text-center truncate">User {id.substring(0, 5)}</span>
+            <span className="absolute bottom-1 left-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded text-center truncate">{UserInforDetails ? UserInforDetails[id]?.name : `User ${id.substring(0, 5)}`}</span>
           </div>
         ))}
       </aside>

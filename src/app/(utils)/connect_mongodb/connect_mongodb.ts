@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-console.log("📦 MONGODB_URI in Vercel:", process.env.MONGODB_URI);
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/myDatabase";
 

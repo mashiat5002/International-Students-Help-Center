@@ -365,8 +365,8 @@ export default function AdminDashboard() {
                             <td className="py-2 px-2 text-center">{expert.meetings}</td>
                             <td className="py-2 px-2">
                               <select className="border rounded px-2 py-1 text-xs focus:outline-none" onChange={e => handleExpertStatusChange(idx, e.target.value)} value={expert.status}>
-                                <option value="Unblocked">Unblocked</option>
-                                <option value="Blocked">Blocked</option>
+                                <option value="Unblocked">🔓</option>
+                                <option value="Blocked">🚫</option>
                               </select>
                             </td>
                           </tr>

@@ -10,8 +10,7 @@ export async function middleware(request: NextRequest) {
   // restricting access to admin login page
   if( request.nextUrl.pathname.startsWith("/admin-login")){
     const access_code= request.nextUrl.searchParams.get("secret-key");
-    console.log(access_code)
-    console.log(access_code=="5002")
+ 
     if(access_code!="5002"){
 
       return NextResponse.redirect(new URL("/admin-unauthorized", request.url));
@@ -30,8 +29,18 @@ export async function middleware(request: NextRequest) {
   const session_expert = cookies().get("expert-session")?.value;
   const session_admin = cookies().get("admin-session")?.value;
   const session =
-    request.nextUrl.pathname == "/homepage" ? session_user :request.nextUrl.pathname =="/expert-dashboard" ? session_expert:request.nextUrl.pathname =="/admin-dashboard" ? session_admin:null;
-  if (request.nextUrl.pathname =="/admin-dashboard" && !session) {
+request.nextUrl.pathname.startsWith("/homepage")
+  ? session_user
+  : request.nextUrl.pathname.startsWith("/expert-dashboard")
+  ? session_expert
+  : request.nextUrl.pathname.startsWith("/admin-dashboard")
+  ? session_admin
+  : null;
+
+
+
+  
+  if (request.nextUrl.pathname.startsWith("/admin-dashboard") && !session) {
      return NextResponse.redirect(new URL("/admin-unauthorized", request.url));
   }
   else if (!session) {
@@ -48,11 +57,14 @@ export async function middleware(request: NextRequest) {
     exp: number;
   };
   var res;
-  if(request.nextUrl.pathname == "/homepage")
-   res= await call_is_student_email_existing(decrypted.Email);
-  else if(request.nextUrl.pathname == "/expert-dashboard")
+  
+  if(request.nextUrl.pathname.startsWith("/homepage")){
+    console.log("Decrypted Email: ", decrypted.Email);
+    res= await call_is_student_email_existing(decrypted.Email);
+  }
+  else if(request.nextUrl.pathname.startsWith("/expert-dashboard"))
    res= await call_is_expert_email_existing(decrypted.Email);
-  else if(request.nextUrl.pathname == "/admin-dashboard")
+  else if(request.nextUrl.pathname.startsWith("/admin-dashboard"))
    res= await call_is_admin_email_existing(decrypted.Email);
  
  
