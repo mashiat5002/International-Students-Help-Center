@@ -27,9 +27,6 @@ export async function startMedia({
   onRemoteStream?: (userId: string, stream: MediaStream) => void;
 }) {
 
-  
-  console.log(existingUsers, "existingUsers in startMedia");
-  console.log(socket.id, "self id");
   const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   if (videoRef.current) videoRef.current.srcObject = localStream;
   if (onLocalStream) onLocalStream(localStream);
@@ -43,7 +40,7 @@ export async function startMedia({
     const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
 
 
-    // Add local stream
+    // continuing local stream to remote
     localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
 
 
@@ -56,13 +53,13 @@ export async function startMedia({
       if (onRemoteStream) onRemoteStream(userId, remoteStream);
     }
 
-    console.log(peer, "peer in createPeerConnection");
+    
     peer.ontrack = (event) => {
-        console.log("Received ontrack from", userId, event.streams);
+           // continuing remote stream to local
         if (event.streams[0]) {
           event.streams[0].getTracks().forEach(track => {
             remoteStream.addTrack(track);
-            console.log("Added track", track.kind, "from", userId);
+          
           });
         } else {
           console.warn("No stream received in ontrack from", userId);
@@ -154,6 +151,10 @@ export async function startMedia({
       pendingCandidates[from].push(candidate!);
     }
   });
+
+  // Allow external access to control audio/video tracks
+;(socket as any)._localStream = localStream;
+
 }
 
 

@@ -6,8 +6,11 @@ import { Socket } from 'socket.io-client'; // Importing the Socket class
 import { startMedia } from '../(utils)/start_media/start_media';
 import { call_send_msg_through_socket } from '../../../lib/auth/call_send_msg_through_socket';
 import { call_join_room_to_socket } from '../../../lib/auth/join_room_to_socket';
-
-
+import { FiMic } from "react-icons/fi";
+import { FiMicOff } from "react-icons/fi";
+import { FiVideo } from "react-icons/fi";
+import { FiVideoOff } from "react-icons/fi";
+import { IoCloseSharp } from "react-icons/io5";
 const tasks = [
   'SOP Review and Submission',
   'Scholarship Application Review',
@@ -49,6 +52,9 @@ type UsersMap = {
 const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
 
 
+    const [viewingSelf,setviewingSelf] = useState<boolean>(true)
+    const [vdoPausedself,setvdoPausedself] = useState<boolean>(false)
+    const [mutedself,setmutedself] = useState<boolean>(false)
     const [mysocketId,setmysocketId] = useState<string>('')
     const [NewMessage,setNewMessage] = useState<string>('')
     const [chatMessages,setchatMessages] = useState<ChatMessage[]>([])
@@ -75,6 +81,7 @@ useEffect(() => {
   socketRef.current = socket;
   
 
+  
  
   
   socket.on("connect", () => {
@@ -132,8 +139,6 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
   socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: any }) => {
   
 
-    console.log("Existing User Details:", existingUserDetails)
-    console.log("my Details:", mysocketId)
     setUserInforDetails(existingUserDetails);
 
     existingUsers.forEach(id => {
@@ -170,13 +175,13 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
       },
       onRemoteStream: (userId: string, stream: MediaStream) => {
         allStreamsRef.current[userId] = stream;
-        console.log("streaming----------------------------------------------------------")
+       
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
 
 
         remoteVideoRefs.current[userId] = React.createRef<HTMLVideoElement>();
-        console.log(socket.id, "self id in onRemoteStream");
-       console.log([...usersExceptMe, userId])
+       
+      
         
         setRemoteUserIds(usersExceptMe => [...usersExceptMe, userId]);
 
@@ -185,9 +190,8 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
        
           
       setTimeout(() => {
-        console.log("inside settimeout---------------------------------------------------------------")
+     
         if (remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current) {
-          console.log("inside ---------------------------------------------------------------")
           
           remoteVideoRefs.current[userId].current!.srcObject = stream;
         }
@@ -199,7 +203,6 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 
   return () => {
-    // console.log('[VideoMeeting] Disconnecting socket');
     socket.disconnect();
   };
 }, [roomId]);
@@ -209,6 +212,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 // Pause local video track
 const handlePause = () => {
+  console.log("called handle pause")
   const stream = localStreamRef.current;
   if (stream) {
     stream.getVideoTracks().forEach(track => track.enabled = false);
@@ -219,10 +223,28 @@ const handlePause = () => {
 
 // Play/resume local video track
 const handlePlay = () => {
+  console.log("called handle play")
   const stream = localStreamRef.current;
   if (stream) {
     stream.getVideoTracks().forEach(track => track.enabled = true);
     setVideoPaused(false);
+  }
+};
+// Mute local audio track
+const handleMute = () => {
+  const stream = localStreamRef.current;
+  if (stream) {
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+    setmutedself(true);
+  }
+};
+
+// Unmute local audio track
+const handleUnmute = () => {
+  const stream = localStreamRef.current;
+  if (stream) {
+    stream.getAudioTracks().forEach(track => track.enabled = true);
+    setmutedself(false);
   }
 };
 
@@ -282,35 +304,41 @@ setNewMessage('')
           <div className="flex-1  rounded-2xl p-2 sm:p-4 lg:p-6 relative shadow-md min-w-0">
             <div className="w-full h-80 sm:h-[26rem] object-cover rounded-xl relative">
               {/* Local video in main area */}
+              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
               <video
                 ref={remoteVideoRefs.current[remoteUserIds[0]]}
                 autoPlay
                 playsInline
                 className={`w-full h-full object-cover rounded-xl border border-gray-300 `}
-                muted
+                
               />
              
            
             </div>
+
+
             {/* Controls only on main video */}
-            {mainVideoRef === localVideoRef ? (
+           
+              {viewingSelf?<div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
+                {/* Pause/Play Button */}
+               {vdoPausedself?<button onClick={()=>{handlePlay(),setvdoPausedself(false)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{handlePause(),setvdoPausedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
+                {mutedself?<button onClick={()=>{handleUnmute(),setmutedself(false)}}  className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{handleMute(),setmutedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
+                 <button className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>             
+              </div>:
               <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
                 {/* Pause/Play Button */}
-                {videoPaused ? (
-                  <button onClick={handlePlay} className="bg-white p-2 sm:p-3 rounded-full shadow" title="Play">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
-                  </button>
-                ) : (
-                  <button onClick={handlePause} className="bg-white p-2 sm:p-3 rounded-full shadow" title="Pause">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-                  </button>
-                )}
-                <button className="bg-white p-2 sm:p-3 rounded-full shadow"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" /><rect x="3" y="6" width="12" height="12" rx="2" /></svg></button>
-                <button className="bg-white p-2 sm:p-3 rounded-full shadow"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 18v-6m0 0V6m0 6h6m-6 0H6" /></svg></button>
-                <button className="bg-red-600 text-white p-2 sm:p-3 rounded-full shadow"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+               {vdoPausedself?<button className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
+                {mutedself?<button className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
               </div>
-            ) : null}
+              
+              }
+           
+
+
+
+
+
             {/* Self View Window (small) */}
             <div
               className="absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer"
