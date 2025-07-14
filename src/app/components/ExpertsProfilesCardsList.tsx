@@ -134,7 +134,7 @@ useEffect(()=>{
                   {/* Stats */}
                   <div className="flex items-center justify-center space-x-4 text-sm text-gray-700 mt-auto">
                     <div>
-                      Ratingg <span className="font-bold">{profile.rating}</span>{" "}
+                      Rating <span className="font-bold">{profile.rating}</span>{" "}
                     </div>
                     <div className="text-gray-400">Joined {profile.joined}</div>
                   </div>

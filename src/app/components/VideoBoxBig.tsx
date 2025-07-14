@@ -1,21 +1,19 @@
 import { useEffect, useRef } from "react";
 
-export const VideoBox = ({ stream,  big }: { stream: MediaStream,  big: boolean }) => {
+export const VideoBoxBig = ({ stream ,rerender}: { stream: MediaStream |null,rerender:boolean }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
 
-  return (
+  return  (
     <video
       ref={videoRef}
       autoPlay
       playsInline
-      muted={false}
-    className={big ? "w-full h-full object-cover rounded-xl border border-gray-300" : "w-full h-full object-cover rounded-lg"}
+       className={`w-full  h-full object-cover rounded-xl border border-gray-300 `}
     />
   );
 };

@@ -65,15 +65,15 @@ const Footer = () => {
           <ul className="space-y-5 mt-7 text-gray-400">
             <li><a className='cursor-pointer ' onClick={() => setIsRegisterOpen(true)}>Register</a></li>
             <li><a className='cursor-pointer' onClick={() => setIsLoginOpen(true)}>Sign in</a></li>
-            <li><a href="http://localhost:3000/scholarships">Scholarships</a></li>
+            <li><a href="http://localhost:3000/video-conference">Video Conference</a></li>
           </ul>
         </div>
         <div>
           <ul className="space-y-5 mt-7 text-gray-400">
-            <li><a href="http://localhost:3000/ai-assistant">AI Assistant</a></li>
-            <li><a href="http://localhost:3000/experts">Find Experts</a></li>
+            <li><a href="http://localhost:3000/ai-assistance">AI Assistance</a></li>
+            <li><a href="http://localhost:3000/experts-consultation">Expert Consultation</a></li>
 
-            <li><a href="#">Join Experts Using Video Call</a></li>
+            {/* <li><a href="#">Join Experts Using Video Call</a></li> */}
            
           </ul>
         </div>

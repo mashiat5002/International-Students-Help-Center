@@ -8,7 +8,7 @@ import Navbar from '../components/layout/Navbar';
 const features = [
   {
     title: 'Instant AI Q&A',
-    description: 'Ask any study-related question and get instant, accurate answers from our AI assistant.',
+    description: 'Answer any study-destination related questions and get instant, accurate programme suggestions from our AI assistant.',
     image: '/ai-robot.png',
     iconBg: 'bg-purple-100',
     icon: '🤖',

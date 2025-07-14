@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 const StepSchema = new mongoose.Schema({
   title: String,
+  note: String,
   description: String,
   status: {
     type: String,
