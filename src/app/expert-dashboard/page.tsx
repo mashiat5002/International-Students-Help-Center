@@ -1,12 +1,10 @@
-"use client"
-import Expert_dashboard from '../components/Expert Deshboard/Expert_dashboard';
+import React from 'react'
+import Expert_dashboard from '../components/Expert Deshboard/Expert_dashboard'
 
-export default function HomePage() {
-  
+export default function page() {
   return (
-    <div className='bg-black ' >
-      <Expert_dashboard />
-     
+    <div>
+      <Expert_dashboard/>
     </div>
-  );
+  )
 }

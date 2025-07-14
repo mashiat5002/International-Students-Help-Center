@@ -37,10 +37,11 @@ type UsersMap = {
 
 
 
-const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
+const Meeting_room = ({ roomId }: VideoMeetingProps) => {
 
     const [newComer,setnewComer]= useState("")
     const [rerender,setRerender] = useState<boolean>(true)
+    const [meetingTopic,setmeetingTopic] = useState<string>('')
     const [btnrerender,setbtnRerender] = useState<boolean>(true)
     const [viewingSelf,setviewingSelf] = useState<boolean>(true)
     const [vdoPausedself,setvdoPausedself] = useState<boolean>(false)
@@ -62,6 +63,9 @@ const VideoMeeting = ({ roomId }: VideoMeetingProps) => {
     const allStreamsRef = useRef<{ [userId: string]: MediaStream }>({});
     const [myObject, setMyObject] = useState({});
     const router = useRouter();
+    const [showSidePanels, setShowSidePanels] = useState(true);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const videoAreaRef = useRef<HTMLDivElement>(null);
     
   
 
@@ -322,23 +326,55 @@ useEffect(() => {
   // (window as any).mysocketId = mysocketId;
 }, [viewingOnbigscreen]);
 
-
+  // Fullscreen effect for video area
+  useEffect(() => {
+    if (isFullscreen && videoAreaRef.current) {
+      const el = videoAreaRef.current;
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if ((el as any).webkitRequestFullscreen) {
+        (el as any).webkitRequestFullscreen();
+      } else if ((el as any).msRequestFullscreen) {
+        (el as any).msRequestFullscreen();
+      }
+    } else if (!isFullscreen && document.fullscreenElement) {
+      document.exitFullscreen?.();
+    }
+    // Clean up: exit fullscreen if component unmounts
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      }
+    };
+  }, [isFullscreen]);
 
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-full lg:w-20 bg-gray-900 text-white flex flex-row lg:flex-col items-center py-3 lg:py-6 space-x-6 lg:space-x-0 lg:space-y-6 rounded-xl m-2 lg:m-4">
+      <aside
+        className={`w-full lg:w-20 bg-gray-900 text-white flex flex-row lg:flex-col items-center py-3 lg:py-6 space-x-6 lg:space-x-0 lg:space-y-6 rounded-xl m-2 lg:m-4${isFullscreen ? ' fixed top-4 left-4 z-[100] w-auto lg:w-20 m-0' : ''}`}
+        style={isFullscreen ? { borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.25)' } : {}}
+      >
         <div className="flex flex-row lg:flex-col items-center space-x-6 lg:space-x-0 lg:space-y-6 flex-1">
-          <button className="p-2 hover:bg-gray-800 rounded-lg">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /></svg>
+          <button
+            className={`p-2 rounded-lg transition-colors duration-150 ${!showSidePanels ? 'bg-red-100 text-black' : 'hover:bg-gray-800 text-gray-300'}`}
+            onClick={() => setShowSidePanels((prev) => !prev)}
+            title={showSidePanels ? 'Hide side panels' : 'Show side panels'}
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
           </button>
-          <button className="p-2 hover:bg-gray-800 rounded-lg">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /></svg>
+          <button
+            className={`p-2 rounded-lg transition-colors duration-150 ${isFullscreen ? 'bg-red-100 text-black' : 'hover:bg-gray-800 text-gray-300'}`}
+            onClick={() => setIsFullscreen((prev) => !prev)}
+            title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6">
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+            </svg>
           </button>
-          <button className="p-2 hover:bg-gray-800 rounded-lg">
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
-          </button> 
         </div>
         </aside>
 
@@ -348,21 +384,25 @@ useEffect(() => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center">
-            <button className="mr-2 sm:mr-4 p-2 bg-gray-200 rounded-full">
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <span className="font-semibold text-base sm:text-lg">University of Otago MSC Application</span>
+         
+            <span className="ml-8 font-semibold text-base sm:text-lg">{meetingTopic}</span>
             <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length} Participants</span>
           </div>
-          <button className="bg-red-100 text-red-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
+          <button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
         </div>
 
 
         {/* Video Area */}
-        <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-6">
+        <div
+          ref={videoAreaRef}
+          className={`${!showSidePanels ? "h-[40rem]" : ""} flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-6${isFullscreen ? ' fixed inset-0 z-50 w-screen h-screen !m-0 !rounded-none !p-0' : ''}`}
+          style={isFullscreen ? { width: '100vw', height: '100vh', margin: 0, borderRadius: 0, padding: 0 } : {}}
+        >
           {/* Main Speaker */}
           <div className="flex-1  rounded-2xl p-2 sm:p-4 lg:p-6 relative shadow-md min-w-0">
-            <div  className="w-full h-80 sm:h-[26rem] object-cover rounded-xl relative">
+            <div
+              className={`w-full ${(isFullscreen || !showSidePanels) ? 'h-full' : 'h-80 sm:h-[26rem]'} object-cover rounded-xl relative`}
+            >
               {/* Local video in main area */}
               <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
@@ -382,7 +422,7 @@ useEffect(() => {
                 {/* Pause/Play Button */}
                {vdoPausedself?<button onClick={()=>{handlePlay(),setvdoPausedself(false)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{handlePause(),setvdoPausedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
                 {mutedself?<button onClick={()=>{handleUnmute(),setmutedself(false)}}  className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{handleMute(),setmutedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
-                 <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>             
+                 {/* <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>              */}
               </div>:
               btnrerender?<div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
                 {/* Pause/Play Button */}
@@ -439,43 +479,19 @@ useEffect(() => {
 
 
       {/* Right Panel */}
-      <aside className="w-full  lg:w-[40rem] flex flex-col space-y-4 lg:space-y-6 p-2 sm:p-4 lg:p-6">
+      {showSidePanels?<aside className="w-full  lg:w-[40rem] flex flex-col space-y-4 lg:space-y-6 p-2 sm:p-4 lg:p-6">
         {/* Meeting Task List */}
         
         {/* Document List */}
-        <Video_call_Documets_review roomId= {roomId} send_note= {send_note} myObject={myObject} setMyObject={setMyObject}/>
-      </aside>
+        <Video_call_Documets_review setmeetingTopic={setmeetingTopic} roomId= {roomId} send_note= {send_note} myObject={myObject} setMyObject={setMyObject}/>
+      </aside>:null}
 
 
-      {/* Vertical Participants Sidebar */}
-      <aside className="flex flex-col gap-3 overflow-y-auto max-h-[80vh] w-28 sm:w-36 p-2 bg-white rounded-xl shadow-md">
      
-        {/* Remote videos */}
-        {remoteUserIds.slice(1).map(id => (
-          
-          <div onClick={()=>{
-            console.log("clickeddddd",id)
-            // setviewingOnbigscreen(id)
-
-            const temp= remoteUserIds;
-            const targetIdx= temp.indexOf(id)
-            const prevOntarget= temp[0];
-            temp[0]= id;
-            temp[targetIdx]= prevOntarget;
-            setRemoteUserIds(temp)
-           setRerender(!rerender)
-           setviewingSelf(true)
-
-
-          }}  className= {`relative rounded-lg   border-2 border-gray-300 bg-gray-100 cursor-pointer`} style={{ aspectRatio: '1/1' }}>
-            <VideoBoxSmall stream={allStreamsRef.current[id]}  rerender={rerender}/>
-            <span className="absolute bottom-1 left-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded text-center truncate">{UserInforDetails ? UserInforDetails[id]?.name : `User ${id.substring(0, 5)}`}</span>
-          </div>
-        ))}
-      </aside>
+     
     </div>
   );
 };
 
 
-export default VideoMeeting;
+export default Meeting_room;

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { call_fetch_specific_doc } from "../../../lib/auth/fetch_specific_doc";
 import prepare_and_view from "../(utils)/prepare_and_view/prepare_and_view";
 import { call_push_note_on_journey_step } from "../../../lib/auth/call_push_note_on_journey_step";
+import LoadingSpinner from "./common/LoadingSpinner";
 
 // Define types for the fetched data
  type Step = {
@@ -69,18 +70,21 @@ const NoteModal = ({
   );
 };
 
-export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObject}: { roomId: string, send_note: (note: string, idx: string) => void ,myObject:any,setMyObject:React.Dispatch<React.SetStateAction<{}>>}) => {
+export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObject,setmeetingTopic}: { roomId: string, send_note: (note: string, idx: string) => void,setmeetingTopic:React.Dispatch<React.SetStateAction<string>> ,myObject:any,setMyObject:React.Dispatch<React.SetStateAction<{}>>}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [meetingTasks, setMeetingTasks] = useState<MeetingTask[]>([]);
   // Modal state
+  const [loadingdocDetails, setloadingdocDetails] = useState(false);
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [noteInput, setNoteInput] = useState("");
   const [noteStepIndex, setNoteStepIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const callfun = async () => {
+      setloadingdocDetails(true)
       const res = await call_fetch_specific_doc("685e6f2d0ff9cb5151eff4c3");
+      setloadingdocDetails(false)
       
       
       const result = res?.data?.[0]?.steps
@@ -108,6 +112,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
       }
       if (res?.data2) {
         setMeetingTasks(res.data2);
+        setmeetingTopic(res.data2[0].meeting_topic)
       }
     };
     callfun();
@@ -146,7 +151,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
 
       {/* Meeting Task List section */}
       <div className="bg-gray-900 rounded-2xl p-4 text-white shadow mb-6">
-        <h3 className="font-semibold mb-2">Meeting Task List</h3>
+        <h3 className="font-semibold mb-2">Meeting Task List  {loadingdocDetails?"(Loading...)":null}</h3>
         <ul className="space-y-3">
           {meetingTasks.map((task, i) => (
             <li key={task._id} className="flex flex-col gap-1 bg-gray-800 rounded-lg p-3">
@@ -167,7 +172,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
       {/* Documents To Review section */}
       <div className="bg-white rounded-2xl p-4 shadow flex flex-col flex-1">
         <h3 className="font-semibold mb-2">Documents To Review</h3>
-        <div className="flex-1 space-y-3 overflow-x-auto">
+        {loadingdocDetails?<LoadingSpinner/>:<div className="flex-1 space-y-3 overflow-x-auto">
           {steps.map((step, idx) => (
             <div
               key={step._id}
@@ -236,7 +241,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
               </div>
             </div>
           ))}
-        </div>
+        </div>}
       </div>
     </>
   );

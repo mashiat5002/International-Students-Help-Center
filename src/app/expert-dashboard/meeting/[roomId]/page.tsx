@@ -1,10 +1,10 @@
-import VideoMeeting from '@/app/components/VideoMeeting';
 import React from 'react';
+import Meeting_room from '@/app/components/Meeting_room';
 
 export default function Page({ params }: { params: { roomId: string } }) {
   return (
     <div>
-      <VideoMeeting roomId={params.roomId} />
+      <Meeting_room roomId={params.roomId} />
     </div>
   );
 } 

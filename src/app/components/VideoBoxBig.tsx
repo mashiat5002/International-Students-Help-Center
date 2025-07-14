@@ -12,7 +12,7 @@ export const VideoBoxBig = ({ stream ,rerender}: { stream: MediaStream |null,rer
     <video
       ref={videoRef}
       autoPlay
-      playsInline
+      // playsInline
        className={`w-full  h-full object-cover rounded-xl border border-gray-300 `}
     />
   );
