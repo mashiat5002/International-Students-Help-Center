@@ -1,6 +1,8 @@
-import { call_push_application_links } from '@/app/(utils)/call_push_application_links/call_push_application_links';
 import extractFullJsonBlock from '@/app/(utils)/extract_obj/extract_obj';
+import { decrypt } from '@/app/(utils)/jwt_encrypt_decrypt';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { call_push_application_links } from '../../../../lib/auth/call_push_application_links';
 
 
 
@@ -12,7 +14,8 @@ export  async function POST(req: NextRequest) {
     return NextResponse.json({message:"Method Not Allowed"}, {status: 405});
 
   const body= await req.json();
-  
+  console.log("body")
+  console.log(body)
   var message;
 
   if(body.type=="Application_Links"){
@@ -62,7 +65,8 @@ in this given format, {
 
     const data = await response.json();
  
-    
+    console.log("data")
+    console.log(data)
    
     const obj=extractFullJsonBlock(data.choices[0].message.content)
  
@@ -72,17 +76,38 @@ in this given format, {
     }
       try{
 
-        const resp=await call_push_application_links(obj)
+        // fetching email of logged in user 
+          const session = cookies().get("student-session")?.value;
+          if (!session) {
+            console.log("Session not found");
+            return NextResponse.json(
+              { message: "Session not found" },
+              { status: 404 }
+            );
+          }
+    
+    
+          // decrypting the session to get user details cannot be done in the server side as it is not secure
+          const details = (await decrypt(session)) as {
+            Email: string;
+            expires: string;
+            Password: string;
+            iat: number;
+            exp: number;
+          };
+
+        const resp=await call_push_application_links(obj,details.Email)
         return NextResponse.json({message:resp}, {status: 201});
         
       }catch(e){
-        console.log("error in pushing the data to mongodb",e)}
+        console.log("error in pushing the data to mongodb",e)
+      }
 
 
 
     return NextResponse.json({message:data+"But not saved to db"}, {status: 201});
   } catch (error) {
-   
+   console.log("error in pushing the data to mongodb",error)
     return NextResponse.json({message:"Failed to contact DeepSeek"}, {status: 500});
   }
 }

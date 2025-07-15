@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ResultsSection from './ResultSection';
 import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 
 interface Inquiry {
   id: string;
@@ -172,12 +173,23 @@ const PastInquiries = () => {
 
     useEffect(() => {
       if (favorites.length > 0) {
-        localStorage.setItem('studyProgramFavorites', JSON.stringify(favorites));
+        const call_fun=async()=>{
+          const userInfo= await call_fetch_logged_id_info()
+          localStorage.setItem('studyProgramFavorites'+userInfo.email, JSON.stringify(favorites));
+        }
+        call_fun()
       }
     }, [favorites]);
+
+
+
+
   useEffect(() => {
-    // Load inquiries from localStorage
-    const storedInquiries = localStorage.getItem('pastInquiries');
+    const call_fun=async()=>{
+       // Load inquiries from localStorage
+    const userInfo= await call_fetch_logged_id_info()
+    console.log(userInfo)
+    const storedInquiries = localStorage.getItem('pastInquiries'+userInfo.email);
     
     if (storedInquiries) {
       console.log(JSON.parse(storedInquiries));
@@ -186,6 +198,9 @@ const PastInquiries = () => {
     
       setInquiries([]);
     }
+
+    }
+   call_fun()
   }, []);
 
 
@@ -210,7 +225,12 @@ const PastInquiries = () => {
     );
 
     // Update localStorage
-    localStorage.setItem('pastInquiries', JSON.stringify(inquiries));
+    const call_fun=async()=>{
+      const userInfo= await call_fetch_logged_id_info()
+      localStorage.setItem('pastInquiries'+userInfo.email, JSON.stringify(inquiries));
+
+    }
+    call_fun()
   };
 
   const handleShowResults = () => {

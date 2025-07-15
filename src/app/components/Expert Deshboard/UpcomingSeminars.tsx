@@ -7,6 +7,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import { call_fetch_scheduled_seminars } from '@/app/(utils)/call_fetch_scheduled_seminars/call_fetch_scheduled_seminars';
 import { call_setDateTimeSeminar } from '@/app/(utils)/call_setDateTimeSeminar/call_setDateTimeSeminar';
 import { call_decline_seminar } from '@/app/(utils)/call_decline_seminar/call_decline_seminar';
+import { FaVideo } from 'react-icons/fa';
 
 
 type details={
@@ -163,17 +164,33 @@ const UpcomingSeminars = () => {
               >
                 Cancel Meeting
               </button>
-              {item.status=="cancelled"?<div></div>:(isChangeTimeClicked&&keyClicked==k)?<button
-                className={ ` mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
-                onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
-              >
-                Confirm
-              </button>:<button
-                className={`${item.status=="cancelled"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
-                onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}
-              >
-                Change Time
-              </button>}
+              {item.status=="cancelled" ? <div></div> : (isChangeTimeClicked&&keyClicked==k) ? (
+                <button
+                  className={ ` mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                  onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
+                >
+                  Confirm
+                </button>
+              ) : (
+                new Date(item.Scheduled_time) <= new Date() ? (
+                  <a
+                    href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/seminar/${item._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 mt-2 ml-4 px-5 py-2 bg-blue-600 text-white rounded-full font-medium shadow hover:bg-blue-700 transition text-base"
+                  >
+                    <FaVideo className="text-xl" />
+                    <span>Join Seminar</span>
+                  </a>
+                ) : (
+                  <button
+                    className={`${item.status=="cancelled"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.status=="cancelled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                    onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}
+                  >
+                    Change Time
+                  </button>
+                )
+              )}
               </div>
             </div>
           </li>

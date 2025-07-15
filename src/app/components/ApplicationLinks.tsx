@@ -231,7 +231,7 @@ const ApplicationLinks = () => {
   useEffect(() => {
     const call_fun = async () => {
       setisloading(true);
-      const res=await call_fetch_application_links("empty");
+      const res=await call_fetch_application_links();
       setisloading(false);
       console.log(res.data);
       setApplications(res.data);
@@ -249,7 +249,11 @@ const ApplicationLinks = () => {
           </div>
           <div className="p-4 h-[calc(100%-4rem)] overflow-y-auto custom-scrollbar">
             <div className="space-y-4">
-              {isloading?<LoadingSpinner/>:applications.map(app => (
+              {isloading?<LoadingSpinner/>:applications?.length==0?
+              <div className="h-full mt-5 flex items-center justify-center text-gray-500">
+                <p>You Have No Application Links to view</p>
+              </div>:
+              applications.map(app => (
                 <ApplicationCard
                   key={app.journeyId}
                   application={app}

@@ -6,9 +6,17 @@ export async function POST(request: Request) {
 
   try{
     const body = await request.json();
+    console.log("body.Email")
+    console.log(body.Email)
     const object = typeof body.object === "string" ? JSON.parse(body.object) : body.object
     
     await connectToDatabase()
+
+
+    
+
+    object.student_email = body.Email;
+   console.log(object)
     const newApplication_Links= new Application_Links(object)
           const saved = await newApplication_Links.save();
   

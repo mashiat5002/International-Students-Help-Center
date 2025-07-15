@@ -103,7 +103,7 @@ const JourneyProgress = () => {
   const handleUpdateStatus = (stepIndex: number, newStatus: 'completed' | 'in-progress' | 'not-started') => {
     if (!selectedJourney) return;
 
-    const updatedJourneys = journeys.map(journey => {
+    const updatedJourneys = journeys?.map(journey => {
       if (journey._id === selectedJourney._id) {
         const updatedSteps = journey.steps.map((step, idx) => 
           idx === stepIndex ? { ...step, status: newStatus } : step
@@ -160,7 +160,7 @@ const JourneyProgress = () => {
 
             {loading ? null : (
               <div className="bg-blue-100 text-blue-900 px-4 py-1 rounded-full font-medium text-sm md:text-base">
-                {journeys.length} Journeys
+                {journeys?.length} Journeys
               </div>
             )}
           </div>
@@ -170,8 +170,8 @@ const JourneyProgress = () => {
             <div className="flex flex-col gap-4">
               {loading ? (
                 <LoadingSpinner />
-              ) : journeys.length > 0 ? (
-                journeys.map((journey) => (
+              ) : journeys?.length > 0 ? (
+                journeys?.map((journey) => (
                   <JourneyCard
                     key={journey._id}
                     journey={journey}

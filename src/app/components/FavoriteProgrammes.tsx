@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import RecommendedProgramCard from './RecommendedProgramCard';
 import Toast from '@/app/components/common/Toast';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 
 interface Program {
   title: string;
@@ -68,8 +69,9 @@ const FavoriteProgrammes = () => {
 
   // Load favorites from localStorage on component mount
   useEffect(() => {
-    const loadFavorites = () => {
-      const savedFavorites = localStorage.getItem('studyProgramFavorites');
+    const loadFavorites = async() => {
+      const userDetails= await call_fetch_logged_id_info()
+      const savedFavorites = localStorage.getItem('studyProgramFavorites'+userDetails.email);
       if (savedFavorites) {
         const parsedFavorites = JSON.parse(savedFavorites);
         // Ensure all favorites have a deadline
@@ -94,7 +96,11 @@ const FavoriteProgrammes = () => {
       setTimeout(() => setShowToast(false), 10000);
       
       // Update localStorage with deadline included
-      localStorage.setItem('studyProgramFavorites', JSON.stringify(newFavorites));
+      const call_fun=async()=>{
+        const userDetails= await call_fetch_logged_id_info()
+        localStorage.setItem('studyProgramFavorites'+userDetails.email, JSON.stringify(newFavorites));
+      }
+      call_fun()
       return newFavorites;
     });
   }, []);

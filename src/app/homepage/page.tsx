@@ -14,11 +14,20 @@ import Profile from '@/app/components/Profile';
 import { call_logout } from '@/app/(utils)/call_logout/call_logout';
 import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 import ExpertsProfilesCardsList from '@/app/components/ExpertsProfilesCardsList';
+interface parameterprops {
+  parameter: string;
+}
+function formatTitle(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/-/g, ' ')                       // Replace hyphens with spaces
+    .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize first letter of each word
+}
 
 
-export default function HomePage() {
+const HomePage= ({ parameter }: parameterprops)=> {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('Find Study Programmes');
+  const [activeItem, setActiveItem] = useState(parameter);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -28,13 +37,28 @@ export default function HomePage() {
       full_name: '',
       img: ''
     });
-  // Remove or modify the authentication check for now
-  // useEffect(() => {
-  //   const isAuthenticated = false; // This was causing the redirect
-  //   if (!isAuthenticated) {
-  //     router.push('/');
-  //   }
-  // }, [router]);
+
+useEffect(() => {
+  if (!parameter) {
+    console.log("parameter1");
+    setActiveItem("Find Study Programmes");
+    return; // No need to proceed if no parameter
+  }
+
+  const formatted = formatTitle(parameter);
+  console.log("parameter2");
+  setActiveItem(formatted);
+
+  const matched = menuItems.some(item => item.name === formatted);
+  if (!matched) {
+    console.log("parameter3");
+    setActiveItem("Find Study Programmes");
+    const formattedRoute = `/homepage`;
+    window.history.replaceState(null, "", formattedRoute);
+  }
+}, []);
+
+
 
   const menuItems = [
     { name: 'Find Study Programmes', icon: (
@@ -163,8 +187,9 @@ export default function HomePage() {
             <div className="flex items-center space-x-6">
               <button 
                 onClick={() => {
-                  setShowExperts(true);
-                  setActiveItem('');   // Clear active menu item when showing profile
+              const formattedRoute = `/homepage/experts`;
+                window.history.replaceState(null, "", formattedRoute);
+                setActiveItem("Experts")
                 }} 
                 className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
               >
@@ -175,9 +200,9 @@ export default function HomePage() {
               </button>
               <button 
                 onClick={() => {
-                  setShowExperts(false);
-                  setShowProfile(true);
-                  setActiveItem('');  // Clear active menu item when showing profile
+                const formattedRoute = `/homepage/profile`;
+                window.history.replaceState(null, "", formattedRoute);
+                setActiveItem("Profile")
                 }} 
                 className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
               >
@@ -246,9 +271,10 @@ export default function HomePage() {
               <button
                 key={item.name}
                 onClick={() => {
-                  setActiveItem(item.name);
-                  setShowProfile(false);
-                  setShowExperts(false);
+                const formattedRoute = `/homepage/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
+                window.history.replaceState(null, "", formattedRoute);
+                setActiveItem(item.name);
+
                 }}
                 className={`flex items-center w-full p-2.5 rounded-xl transition-all duration-300
                   ${activeItem === item.name
@@ -274,9 +300,12 @@ export default function HomePage() {
           <div className="p-6 border-t border-white/10 shrink-0">
             <div 
               onClick={() => {
-                setShowExperts(false);
-                setShowProfile(true);
-                setActiveItem('');  // Clear active menu item when showing profile
+                // setShowExperts(false);
+                // setShowProfile(true);
+                const formattedRoute = `/homepage/profile`;
+                window.history.replaceState(null, "", formattedRoute);
+                setActiveItem("Profile")
+                
               }}
               className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
             >
@@ -305,10 +334,10 @@ export default function HomePage() {
           ml-0
           w-full`}
         >
-          {showExperts? <ExpertsProfilesCardsList/>: showProfile ? (
-            <Profile details={details}/>
-          ) : (
+          
             <>
+              {activeItem === 'Experts' && <ExpertsProfilesCardsList/>}
+              {activeItem === 'Profile' && <Profile details={details}/>}
               {activeItem === 'Find Study Programmes' && <StudyProgrammes />}
               {activeItem === 'Favorite Programmes' && <FavoriteProgrammes />}
               {activeItem === 'Journey Progress' && <JourneyProgress />}
@@ -319,9 +348,10 @@ export default function HomePage() {
               {activeItem === 'Past Inquiries' && <PastInquiries />}
               
             </>
-          )}
+          
         </main>
       </div>
     </div>
   );
 }
+export default HomePage

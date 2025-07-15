@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { call_deepseek } from "../(utils)/call_deepseek/call_deepseek";
 import SplineLoader from "./common/SplineLoader";
 import RecommendedProgramCard from "./RecommendedProgramCard";
+import { call_fetch_logged_id_info } from "../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info";
 
 interface Program {
   title: string;
@@ -37,7 +38,8 @@ const ResultsSection = React.memo(({
       try {
         const res = await call_deepseek("answers", questions, answers);
         setSpinner(false); // Stop spinner
-        const past_inquiries= JSON.parse(localStorage.getItem("pastInquiries") || "[]");
+        const userDetails= await call_fetch_logged_id_info()
+        const past_inquiries= JSON.parse(localStorage.getItem("pastInquiries"+userDetails.email) || "[]");
 
 
         const newInquiry=
@@ -48,7 +50,7 @@ const ResultsSection = React.memo(({
             answers: answers
           }
         past_inquiries.push(newInquiry);
-        localStorage.setItem("pastInquiries", JSON.stringify(past_inquiries));
+        localStorage.setItem("pastInquiries"+userDetails.email, JSON.stringify(past_inquiries));
 
 
         

@@ -249,7 +249,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 useEffect(() => {
    const callfun =async()=>{
-    const res= await call_fetch_seminar_details_using_roomid("68373d3fddeb98c5aebce162")
+    const res= await call_fetch_seminar_details_using_roomid(roomId)
     console.log(res.data[0])
      setSeminarDetails(res.data[0]);
   }

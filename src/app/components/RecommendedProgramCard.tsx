@@ -32,7 +32,8 @@ const RecommendedProgramCard = React.memo(({
   onLearnMore,
  
 }: ProgramProps) => {
-  const [loading,setloading]=React.useState(false)
+  const [loadingjourney,setloadingjourney]=React.useState(false)
+  const [loadingApplicationLinks,setloadingApplicationLinks]=React.useState(false)
   
   const [showToast, setShowToast] = useState(false);
   const [toastType, settoastType] = useState("");
@@ -56,7 +57,7 @@ const RecommendedProgramCard = React.memo(({
     return daysUntilDeadline <= 30 && daysUntilDeadline > 0;
   };
   const onStartJourney=async()=>{
-       setloading(true)
+       setloadingjourney(true)
      
       const res= await call_deepseek_for_roadmap("journey",university, title, deadline)
      console.log(res)
@@ -66,15 +67,23 @@ const RecommendedProgramCard = React.memo(({
         setToastMessage('Journey saved successfully');
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
-      } else if(res.message=="Internal Server Error") {
+         setloadingjourney(false)
+      } else  {
         
         settoastType("failed")
         setToastMessage('Failed to process');
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
+          setloadingjourney(false)
       }
 
-      const res2= await call_deepseek_for_application_links("Application_Links",university, title, deadline)
+     
+    
+
+  }
+  const call_application_links=async()=>{
+    setloadingApplicationLinks(true)
+     const res2= await call_deepseek_for_application_links("Application_Links",university, title, deadline)
 
       if(res2.message=="Application_Links saved successfully"){
 
@@ -82,16 +91,14 @@ const RecommendedProgramCard = React.memo(({
         setToastMessage('Application_Links saved successfully');
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
-      } else if(res2.message=="Internal Server Error") {
+      } else {
 
         settoastType("failed")
         setToastMessage('Failed to process');
         setShowToast(true);
         setTimeout(() => {setShowToast(false);}, 3000);
       }
-      setloading(false)
-    
-
+      setloadingApplicationLinks(false)
   }
   return (
     <>
@@ -189,19 +196,19 @@ const RecommendedProgramCard = React.memo(({
             <p className="text-sm text-gray-600 md:max-w-[60%]">{description}</p>
             <div className="mt-4 flex gap-4">
               <button
-                onClick={() => onLearnMore()}
+                onClick={() => call_application_links()}
                 className="flex-1 bg-blue-900 text-white px-4 py-2 rounded-lg
                   hover:bg-blue-800 transition-colors duration-300
                   font-medium text-xs md:text-xs"
               >
-                Learn More
+                  {loadingApplicationLinks ? 'Processing...' : 'Application Links'}
               </button>
               
               {/* Start Journey Button with Tooltip */}
               <div className="flex-1 relative group/tooltip">
                 <button
                   onClick={() => onStartJourney()}
-                  disabled={loading || isDeadlinePassed()}
+                  disabled={loadingjourney || isDeadlinePassed()}
                   className={`w-full px-4 py-2 rounded-lg font-medium text-xs md:text-xs flex items-center justify-center gap-2
                     transition-all duration-300
                     ${isDeadlinePassed()
@@ -210,7 +217,7 @@ const RecommendedProgramCard = React.memo(({
                     }`}
                 >
                   
-                  {loading ? 'Processing Action...' : 'Start Journey'}
+                  {loadingjourney ? 'Processing...' : 'Start Journey'}
                 </button>
                 
                 {/* Tooltip */}

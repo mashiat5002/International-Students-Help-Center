@@ -7,6 +7,7 @@ import Toast from '../common/Toast';
 import { call_setDateTimeMeeting } from '@/app/(utils)/call_setDateTimeMeeting/call_setDateTimeMeeting';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { call_fetch_meeting_requests_for_expert } from '@/app/(utils)/call_fetch_meeting_requests_for_expert/call_fetch_meeting_requests_for_expert';
+import { FaVideo } from 'react-icons/fa';
 
 
 type details={
@@ -159,17 +160,33 @@ const UpcomingMeetings = () => {
               >
                 Cancel Meeting
               </button>
-              {item.Scheduled_time=="Not Scheduled"||(isChangeTimeClicked&&keyClicked==k)?<button
-                className={ ` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
-                onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
-              >
-                Confirm
-              </button>:<button
-                className={` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
-                onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}
-              >
-                Change Time
-              </button>}
+              {item.Scheduled_time=="Not Scheduled"||(isChangeTimeClicked&&keyClicked==k)?(
+                <button
+                  className={ ` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                  onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
+                >
+                  Confirm
+                </button>
+              ) : (
+                new Date(item.Scheduled_time) <= new Date() && item.Scheduled_time !== 'declined' ? (
+                  <a
+                    href={`${process.env.NEXT_PUBLIC_Base_Url}/expert-dashboard/meeting/${item._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 mt-2 ml-4 px-5 py-2 bg-blue-600 text-white rounded-full font-medium shadow hover:bg-blue-700 transition text-base"
+                  >
+                    <FaVideo className="text-xl" />
+                    <span>Join Meeting</span>
+                  </a>
+                ) : (
+                  <button
+                    className={` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                    onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}
+                  >
+                    Change Time
+                  </button>
+                )
+              )}
               </div>
             </div>
           </li>

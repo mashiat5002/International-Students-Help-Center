@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { IoIosArrowBack } from 'react-icons/io';
+import { FaVideo } from 'react-icons/fa';
 import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
 import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
@@ -120,10 +121,22 @@ const MeetingDetailsPanel = ({
         <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Scheduled Time</h4>
         <p className="font-medium text-blue-900 text-sm sm:text-base">{meeting.Scheduled_time=="Not Scheduled"?"Not Scheduled":timeFormatConverter(meeting.Scheduled_time)}</p>
       </div>
-      <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
-        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Meeting ID</h4>
-        <p className="font-medium text-blue-900 text-sm sm:text-base">{meeting._id}</p>
-      </div>
+      {meeting.status === 'ongoing' && (
+        <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
+          <div className="flex flex-col items-center justify-center">
+            <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Join Meeting</h4>
+            <a
+              href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/meeting/${meeting._id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-lg font-semibold"
+            >
+              <FaVideo className="text-2xl" />
+              <span>Join Now</span>
+            </a>
+          </div>
+        </div>
+      )}
       <div onClick={() => settoggleHeading_Details(!toggleHeading_Details)} className='lg:hidden absolute right-5 top-5 h-8 w-8 ring-2 flex items-center justify-center ring-black cursor-pointer hover:ring-blue-500 rounded-xl'>
         <IoIosArrowBack color='black' />
       </div>

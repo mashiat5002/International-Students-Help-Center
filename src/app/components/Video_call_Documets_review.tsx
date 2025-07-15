@@ -83,7 +83,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
   useEffect(() => {
     const callfun = async () => {
       setloadingdocDetails(true)
-      const res = await call_fetch_specific_doc("685e6f2d0ff9cb5151eff4c3");
+      const res = await call_fetch_specific_doc(roomId);
       setloadingdocDetails(false)
       
       
@@ -132,7 +132,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
     }
 
 
-    const res= call_push_note_on_journey_step("685e6f2d0ff9cb5151eff4c3",noteStepIndex?.toString(), noteInput )
+    const res= call_push_note_on_journey_step(roomId,noteStepIndex?.toString(), noteInput )
 
 
 

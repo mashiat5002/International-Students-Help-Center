@@ -32,7 +32,7 @@ export  async function POST(req: NextRequest) {
     message="Generate exactly 1 question to understand my ideal study destination. Return the result strictly as a JSON array of strings, with each question properly quoted. Do not include any extra text, formatting, markdown, or explanation. The output must be a valid JSON string.";
   }else if(body.type=="answers"){
 
-    message=current_date+" is today ,suggest only programmes that has deadline not crossed, make sure the title you give to the programme is provided by the study institution ,do web search, don't give any extra text as it will be a problem to convert the string to an object, so dont give ```json at the start and ``` at the end not even \boxed at the beginning, try to give as much programmes as possible,provide an array of objects with all the study destinations you can suggest based on conversation: :"+combined+" To give response "+prompt;
+    message=current_date+" is today ,suggest only programmes that has deadline not crossed, should be in 2026, make sure the title you give to the programme is provided by the study institution ,do web search, don't give any extra text as it will be a problem to convert the string to an object, so dont give ```json at the start and ``` at the end not even \boxed at the beginning, try to give as much programmes as possible,provide an array of objects with all the study destinations you can suggest based on conversation: :"+combined+" To give response "+prompt;
   }
 
 

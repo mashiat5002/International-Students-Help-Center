@@ -1,11 +1,33 @@
 
+import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import Application_Links from "@/app/models/application_links";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
 
   try{
-  const res= await Application_Links.find({});
+
+  // fetching email of logged in user
+            const session = cookies().get("student-session")?.value;
+            if (!session) {
+              console.log("Session not found");
+              return NextResponse.json(
+                { message: "Session not found" },
+                { status: 404 }
+              );
+            }
+      
+      
+            // decrypting the session to get user details cannot be done in the server side as it is not secure
+            const details = (await decrypt(session)) as {
+              Email: string;
+              expires: string;
+              Password: string;
+              iat: number;
+              exp: number;
+            };
+  const res= await Application_Links.find({student_email:details.Email});
   if(!res){
     console.log("No data found")
     return NextResponse.json({ message: "No data found" }, { status: 404 });}

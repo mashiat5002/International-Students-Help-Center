@@ -2,6 +2,8 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IApplication_Links extends Document {
   journeyId: string;
+  creation_time: {type:Date };
+  student_email: string;
   title: string;
   institution: string;
   program: string;
@@ -25,6 +27,8 @@ export interface IApplication_Links extends Document {
 const IApplication_LinksSchema = new Schema<IApplication_Links>({
     journeyId: { type: String},
   title: { type: String},
+  student_email: { type: String},
+  creation_time: {type:Date , default: Date.now},
   institution: { type: String},
   program: { type: String},
   deadline: { type: String},

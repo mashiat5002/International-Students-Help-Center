@@ -7,6 +7,7 @@ import React from "react";
 import SplineLoader from "@/app/components/common/SplineLoader";
 import ResultsSection from "./ResultSection";
 import { call_deepseek_single_followup_question } from "../(utils)/call_deepseek_single_followup_question/call_deepseek_single_followup_question";
+import { call_fetch_logged_id_info } from "../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info";
 
 // Add new interface for program type
 interface Program {
@@ -111,7 +112,7 @@ const StudyProgrammes = () => {
         setQs((prev) => [...prev, single_Q[0]]);
       
 
-      if (currentQuestionIndex < 7) {
+      if (currentQuestionIndex < 3) {
         setCurrentQuestionIndex((prev) => prev + 1);
       
         setIsAnimating(false);
@@ -197,17 +198,29 @@ const StudyProgrammes = () => {
 
   // Optional: Save favorites to localStorage whenever it changes
   useEffect(() => {
-    if (favorites.length > 0) {
-      localStorage.setItem("studyProgramFavorites", JSON.stringify(favorites));
+    const call_fun=async()=>{
+      if (favorites.length > 0) {
+      const userDetails= await call_fetch_logged_id_info()
+      localStorage.setItem("studyProgramFavorites"+userDetails.email, JSON.stringify(favorites));
     }
+    call_fun()
+
+    }
+    
   }, [favorites]);
 
   // Optional: Load favorites from localStorage on component mount
   useEffect(() => {
-    const savedFavorites = localStorage.getItem("studyProgramFavorites");
+    const call_fun=async()=>{
+      const userDetails= await call_fetch_logged_id_info()
+      const savedFavorites = localStorage.getItem("studyProgramFavorites"+userDetails.email);
     if (savedFavorites) {
       setFavorites(JSON.parse(savedFavorites));
     }
+
+    }
+    call_fun()
+    
   }, []);
 
   // Add Toast component
