@@ -43,76 +43,79 @@ The platform centralizes resources, streamlines processes, and enhances the educ
 ## Images
 
 Below are some images from the `public/` folder used in the platform:
+
+Landing Page overview:
+
+<img src="/public/landing-page.png" alt="Landing Page" width="350" />
+*The main landing page of ISHC, welcoming users and providing quick access to core features like AI assistance, expert consultation, and scholarship search.*
+
 Full Student Dashboard overview:
 
-
-![Student Dashboard](/public/full-student-dashboard.png)
+<img src="/public/full-student-dashboard.png" alt="Student Dashboard" width="350" />
 *Comprehensive student dashboard displaying all available features, including expert consultations, document management, and progress tracking.*
 
 Expert Dashboard preview:
-![Expert Dashboard](/public/expert-landing-page.png)
+<img src="/public/expert-landing-page.png" alt="Expert Dashboard" width="350" />
 *The main dashboard for education experts, allowing them to manage student requests, view schedules, and provide guidance.*
 
 Admin Dashboard overview:
-![Admin Dashboard](/public/admin-dashboard.png)
+<img src="/public/admin-dashboard.png" alt="Admin Dashboard" width="350" />
 *The admin dashboard interface, where administrators can manage users, experts, platform content, and view platform analytics.*
 
 Video Conference room UI:
-![Video Conference](/public/video-room.png)
+<img src="/public/video-room.png" alt="Video Conference" width="350" />
 *The video conference interface where students and experts can join real-time video meetings for consultations and support.*
 
-
 AI Assistant interface:
-![AI Assistant](/public/ai-robot.png)
+<img src="/public/ai-robot.png" alt="AI Assistant" width="350" />
 *The main AI assistant interface, where students can ask questions and receive instant, AI-powered answers about study destinations, programs, and more.*
 
 AI Assistant providing suggestions:
-![AI Suggestions](/public/ai-suggestions.png)
+<img src="/public/ai-suggestions.png" alt="AI Suggestions" width="350" />
 *The AI assistant offers smart, personalized suggestions and resources tailored to the student's academic profile and interests.*
 
 AI Assistant answering questions:
-![AI Asking](/public/ai-asking.png)
+<img src="/public/ai-asking.png" alt="AI Asking" width="350" />
 *The AI robot is shown actively engaging with the user, ready to answer queries and guide them through their study journey.*
 
 Application Links dashboard:
-![Application Links](/public/application-links.png)
+<img src="/public/application-links.png" alt="Application Links" width="350" />
 *Centralized dashboard where students can access and manage all their important application links, deadlines, and related resources in one place.*
 
 Journey Progress tracker:
-![Journey Progress](/public/journey-progress.png)
+<img src="/public/journey-progress.png" alt="Journey Progress" width="350" />
 *Visual tracker for students to monitor their application journey, progress through required steps, and stay on top of deadlines.*
 
-
 Live Chat during video meeting:
-![Live Chat](/public/live-chat.png)
+<img src="/public/live-chat.png" alt="Live Chat" width="350" />
 *Integrated live chat feature within the video conference, enabling instant messaging between participants during meetings.*
 
 Documents to be reviewed during video meeting:
-![Documents Review](/public/documents-to-be-reviewed-during-vdo-meeting.png)
+<img src="/public/documents-to-be-reviewed-during-vdo-meeting.png" alt="Documents Review" width="350" />
 *Collaborative document review interface, allowing users to share and discuss important documents live during video meetings.*
 
 Meeting topics displayed on top:
-![Meeting Topics](/public/meeting-topics-displayed-on-top.png)
+<img src="/public/meeting-topics-displayed-on-top.png" alt="Meeting Topics" width="350" />
 *Clear display of meeting topics and agendas at the top of the video conference, helping participants stay focused and organized.*
 
 Meeting request form:
-![Meeting Request Form](/public/meeting-request-form.png)
+<img src="/public/meeting-request-form.png" alt="Meeting Request Form" width="350" />
 *Form interface for students to request meetings with education experts, specifying topics and preferred times.*
 
 Student clicking to open request form:
-![Student Clicking Request](/public/student-clicking-to-open-request-form.png)
+<img src="/public/student-clicking-to-open-request-form.png" alt="Student Clicking Request" width="350" />
 *Visual showing a student initiating the process to connect with an expert by opening the meeting request form.*
 
 Meeting requests list:
-![Meeting Requests List](/public/meeting-requests-list.png)
+<img src="/public/meeting-requests-list.png" alt="Meeting Requests List" width="350" />
 *List view of all meeting requests, allowing students to track the status of their expert consultations.*
 
 Seminar scheduling form:
-![Seminar Scheduling](/public/seminar-scheduing-form.png)
+<img src="/public/seminar-scheduing-form.png" alt="Seminar Scheduling" width="350" />
 *Form for organizing or registering for online seminars, including details like topic, date, and participant limits.*
 
 Upcoming seminars list:
-![Upcoming Seminars](/public/seminar-upcoming-list.png)
+<img src="/public/seminar-upcoming-list.png" alt="Upcoming Seminars" width="350" />
 *Overview of all upcoming seminars, enabling students and experts to browse, register, and join scheduled events.*
 
 ---
