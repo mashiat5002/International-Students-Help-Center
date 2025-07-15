@@ -18,7 +18,7 @@ import ExpertsProfilesCardsList from '@/app/components/ExpertsProfilesCardsList'
 
 export default function HomePage() {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('Journey Progress');
+  const [activeItem, setActiveItem] = useState('Find Study Programmes');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);

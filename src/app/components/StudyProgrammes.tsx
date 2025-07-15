@@ -56,6 +56,26 @@ const StudyProgrammes = () => {
       }, 500);
     }
   };
+
+   const handle_autho_Start = () => {
+    const country_selected= localStorage.getItem("selectedCountry");
+      setQs(["Do you have any preferred country to apply to?"])
+      
+      country_selected && setInputValue(country_selected)
+
+      // removing to reset local storage
+      localStorage.removeItem("selectedCountry");
+      
+      setIsAnimating(true);
+      setTimeout(() => {
+        setShowBlur(true);
+        setShowQuestion(true);
+        setIsAnimating(false);
+      }, 500);
+   
+  };
+
+
   
   const handleNextQuestion = () => {
     var ans = [];
@@ -143,7 +163,13 @@ const StudyProgrammes = () => {
   );
 
   useEffect(() => {
-    // Add initial delay of 3 seconds
+    // starting with a selected country
+    if(localStorage.getItem("selectedCountry") && localStorage.getItem("selectedCountry")!=""){
+      setTimeout(() => {handle_autho_Start()}, 3000);
+
+    }else{
+      // starting without a selected country
+       // Add initial delay of 3 seconds
     const initialDelay = setTimeout(() => {
       setShowBlur(true);
       let currentIndex = 0;
@@ -164,6 +190,9 @@ const StudyProgrammes = () => {
     }, 3000);
 
     return () => clearTimeout(initialDelay);
+
+    }
+
   }, []);
 
   // Optional: Save favorites to localStorage whenever it changes
@@ -211,6 +240,8 @@ const StudyProgrammes = () => {
   useEffect(() => {
     startedRef.current = started;
   }, [started]);
+
+
   useEffect(() => {
     q_fetchedRef.current = q_fetched;
   }, [q_fetched]);
