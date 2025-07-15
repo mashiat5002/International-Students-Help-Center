@@ -32,6 +32,8 @@ interface ChatMessage {
 type UserInfo = {
   name: string;
   roomId: string;
+  muted: boolean;
+  video_paused: boolean;
 };
 
 type UsersMap = {
@@ -81,6 +83,9 @@ const Seminar_room = ({ roomId }: VideoMeetingProps) => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const videoAreaRef = useRef<HTMLDivElement>(null);
 
+useEffect(() => {
+  (window as any).UserInforDetails = UserInforDetails;
+}, [UserInforDetails]);
 
 useEffect(() => {
   
@@ -103,11 +108,19 @@ useEffect(() => {
 
 
   socket.on("add-new-userDetails",({updatedUserDetails,existingUsers}: {updatedUserDetails: UsersMap,existingUsers: string[]}) => {
-    console.log('on new user entry1:', updatedUserDetails);
-    console.log('on new user entry2:', existingUsers);
+   
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
+    const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
     
     setUserInforDetails(updatedUserDetails);
+
+
+   remoteUsersTemp.map((item)=>{
+    updatedUserDetails[item].muted=false;
+    updatedUserDetails[item].video_paused=false;
+   })
+   setUserInforDetails(updatedUserDetails)
+   
   });
 
 
@@ -140,9 +153,14 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 
 
-  socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: any }) => {
+  socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: UsersMap }) => {
   
+    const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
 
+    remoteUsersTemp.map((item)=>{
+    existingUserDetails[item].muted=false;
+    existingUserDetails[item].video_paused=false;
+   })
     setUserInforDetails(existingUserDetails);
 
     existingUsers.forEach(id => {
@@ -418,7 +436,7 @@ useEffect(() => {
               className={`w-full ${(isFullscreen || !showSidePanels) ? 'h-full' : 'h-80 sm:h-[26rem]'} object-cover rounded-xl relative`}
             >
               {/* Local video in main area */}
-              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
+              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
              
          
@@ -436,7 +454,7 @@ useEffect(() => {
                 {/* Pause/Play Button */}
                {vdoPausedself?<button onClick={()=>{handlePlay(),setvdoPausedself(false)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{handlePause(),setvdoPausedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
                 {mutedself?<button onClick={()=>{handleUnmute(),setmutedself(false)}}  className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{handleMute(),setmutedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
-                 {/* <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>              */}
+                 <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>             
               </div>:
               btnrerender?<div className="mb-2 absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
                 {/* Pause/Play Button */}
@@ -464,7 +482,7 @@ useEffect(() => {
             >
               {/* Small video (always rendered) */}
               <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
-              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[mysocketId]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
+              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
 
 
             </div>
