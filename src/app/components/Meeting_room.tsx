@@ -29,6 +29,8 @@ interface ChatMessage {
 type UserInfo = {
   name: string;
   roomId: string;
+  muted: boolean;
+  video_paused: boolean;
 };
 
 type UsersMap = {
@@ -66,6 +68,7 @@ const Meeting_room = ({ roomId }: VideoMeetingProps) => {
     const [showSidePanels, setShowSidePanels] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const videoAreaRef = useRef<HTMLDivElement>(null);
+    const [isloadingmsgSend, setisloadingmsgSend] = useState(false);
     
   
 
@@ -102,8 +105,15 @@ useEffect(() => {
     console.log('on new user entry1:', updatedUserDetails);
     console.log('on new user entry2:', existingUsers);
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
+    const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
+
     
     setUserInforDetails(updatedUserDetails);
+    remoteUsersTemp.map((item)=>{
+    updatedUserDetails[item].muted=false;
+    updatedUserDetails[item].video_paused=false;
+   })
+   setUserInforDetails(updatedUserDetails)
   });
 
 
@@ -129,7 +139,11 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
   setRemoteUserIds(prevIds => prevIds.filter(id => id !== userId));
   console.log("viewing", remoteUserIds[0])
   setviewingOnbigscreen(remoteUserIds[0])
+  const remoteUsersTemp= Array.from(new Set(remoteUserIds.filter((id)=> id != userId)));
 
+  if(remoteUsersTemp.length==0){
+      setviewingSelf(false)
+    }
 
 });
 
@@ -137,7 +151,16 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 
   socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: any }) => {
-  
+
+     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
+    console.log("remoteUsersTemp",remoteUsersTemp)
+    if(remoteUsersTemp.length==0){
+      setviewingSelf(false)
+    }
+    remoteUsersTemp.map((item)=>{
+    existingUserDetails[item].muted=false;
+    existingUserDetails[item].video_paused=false;
+   })
 
     setUserInforDetails(existingUserDetails);
 
@@ -174,9 +197,16 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
       existingUsers,
       onLocalStream: (stream: MediaStream) => {
         localStreamRef.current = stream;
+        setRerender(!rerender)
       },
       onRemoteStream: (userId: string, stream: MediaStream) => {
         allStreamsRef.current[userId] = stream;
+          if(remoteUsersTemp.length==0){
+      setviewingSelf(true)
+      setviewingOnbigscreen(userId)
+     
+      
+    }
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
 
 
@@ -214,29 +244,37 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
     });
   }
 
-const isVDOStreamEnabled = (stream: MediaStream | undefined) => {
-  return stream?.getVideoTracks().some(track => track.enabled) ?? false;
-};
-
-const isAudioStreamEnabled = (stream: MediaStream | undefined) => {
-  return stream?.getAudioTracks().some(track => track.enabled) ?? false;
-};
-
 const pauseRemoteVideo = (userId: string) => {
-  console.log(userId,"is given for pausing remote vdo")
+  console.log("try to pause vdo ",userId)
+  
   const stream = allStreamsRef.current[userId];
   if (stream) {
     stream.getVideoTracks().forEach(track => (track.enabled = false));
   }
+   setUserInforDetails((prev) => ({
+    ...prev,
+    [userId]: {
+      ...prev[userId],   // preserve existing data
+      "video_paused":true,          // apply updates
+    },
+  }));
  setbtnRerender(!btnrerender)};
 
 const resumeRemoteVideo = (userId: string) => {
-  console.log(userId,"is given for resuming remote vdo")
+  console.log("try to play vdo ",userId)
   const stream = allStreamsRef.current[userId];
   if (stream) {
     stream.getVideoTracks().forEach(track => (track.enabled = true));
   }
- setbtnRerender(!btnrerender)};
+    setUserInforDetails((prev) => ({
+    ...prev,
+    [userId]: {
+      ...prev[userId],   // preserve existing data
+      "video_paused":false,          // apply updates
+    },
+  }));
+ setbtnRerender(!btnrerender)
+};
 
 const muteRemoteAudio = (userId: string) => {
   const stream = allStreamsRef.current[userId];
@@ -244,6 +282,13 @@ const muteRemoteAudio = (userId: string) => {
     console.log("given for muting",userId)
     stream.getAudioTracks().forEach(track => (track.enabled = false));
   }
+    setUserInforDetails((prev) => ({
+    ...prev,
+    [userId]: {
+      ...prev[userId],   // preserve existing data
+      "muted":true,          // apply updates
+    },
+  }));
   setbtnRerender(!btnrerender)
 };
 
@@ -253,6 +298,13 @@ const unmuteRemoteAudio = (userId: string) => {
   if (stream) {
     stream.getAudioTracks().forEach(track => (track.enabled = true));
   }
+   setUserInforDetails((prev) => ({
+    ...prev,
+    [userId]: {
+      ...prev[userId],   // preserve existing data
+      "muted":false,          // apply updates
+    },
+  }));
   setbtnRerender(!btnrerender)
 };
 
@@ -313,7 +365,9 @@ const handlegetOut = () => {
 const handleMsgSend = async() => {
  
   if (NewMessage=="") return; 
- await call_send_msg_through_socket(NewMessage, roomId);
+  setisloadingmsgSend(true)
+  await call_send_msg_through_socket(NewMessage, roomId);
+ setisloadingmsgSend(false)
 
 
 setNewMessage('')
@@ -386,7 +440,7 @@ useEffect(() => {
           <div className="flex items-center">
          
             <span className="ml-8 font-semibold text-base sm:text-lg">{meetingTopic}</span>
-            <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length} Participants</span>
+            <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length+1} Participants</span>
           </div>
           <button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
         </div>
@@ -404,7 +458,7 @@ useEffect(() => {
               className={`w-full ${(isFullscreen || !showSidePanels) ? 'h-full' : 'h-80 sm:h-[26rem]'} object-cover rounded-xl relative`}
             >
               {/* Local video in main area */}
-              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
+              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
          
             <VideoBoxBig stream={!viewingSelf?localStreamRef.current:allStreamsRef.current[remoteUserIds[0]] }   rerender={rerender}   />
@@ -418,42 +472,47 @@ useEffect(() => {
             {/* Controls only on main video */}
            
               {!viewingSelf
-              ?<div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
-                {/* Pause/Play Button */}
-               {vdoPausedself?<button onClick={()=>{handlePlay(),setvdoPausedself(false)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{handlePause(),setvdoPausedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
-                {mutedself?<button onClick={()=>{handleUnmute(),setmutedself(false)}}  className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{handleMute(),setmutedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
-                 {/* <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>              */}
-              </div>:
-              btnrerender?<div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
-                {/* Pause/Play Button */}
-               {isVDOStreamEnabled(allStreamsRef.current[viewingOnbigscreen])?<button onClick={()=>{pauseRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{resumeRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
-                {isAudioStreamEnabled(allStreamsRef.current[viewingOnbigscreen])?<button onClick={()=>{muteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{unmuteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
-              </div>:
-              <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
-                {/* Pause/Play Button */}
-               {isVDOStreamEnabled(allStreamsRef.current[viewingOnbigscreen])?<button onClick={()=>{pauseRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideo /></button>:<button onClick={()=>{resumeRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideoOff /></button>}
-                {isAudioStreamEnabled(allStreamsRef.current[viewingOnbigscreen])?<button onClick={()=>{muteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>:<button onClick={()=>{unmuteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>}
-              </div>
-              
-              }
+                            ?<div className="mb-2 absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
+                              {/* Pause/Play Button */}
+                             {vdoPausedself?<button onClick={()=>{handlePlay(),setvdoPausedself(false)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideoOff /></button>:<button onClick={()=>{handlePause(),setvdoPausedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideo /></button>}
+                              {mutedself?<button onClick={()=>{handleUnmute(),setmutedself(false)}}  className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>:<button onClick={()=>{handleMute(),setmutedself(true)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>}
+                               <button onClick={()=>{handlegetOut()}} className="bg-red-500 hover:bg-red-600 p-2 sm:p-3 rounded-full shadow text-white"><IoCloseSharp  className="w-full h-full" /></button>             
+                            </div>:
+                            btnrerender?<div className="mb-2 absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
+                              {/* Pause/Play Button */}
+                             {UserInforDetails[viewingOnbigscreen]?.video_paused?<button onClick={()=>{resumeRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideoOff /></button>:<button onClick={()=>{pauseRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideo /></button>}
+                              {UserInforDetails[viewingOnbigscreen]?.muted?<button onClick={()=>{unmuteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>:<button onClick={()=>{muteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>}
+                            </div>:
+                            <div className="mb-2 absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4">
+                              {/* Pause/Play Button */}
+                             {UserInforDetails[viewingOnbigscreen]?.video_paused?<button onClick={()=>{resumeRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400  p-2 sm:p-3 rounded-full shadow'><FiVideoOff /></button>:<button onClick={()=>{pauseRemoteVideo(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow '><FiVideo /></button>}
+                              {UserInforDetails[viewingOnbigscreen]?.muted?<button onClick={()=>{unmuteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMicOff /></button>:<button onClick={()=>{muteRemoteAudio(viewingOnbigscreen)}} className='bg-white hover:bg-slate-400 p-2 sm:p-3 rounded-full shadow'><FiMic /></button>}
+                            </div>
+                            
+                            }
            
 
 
 
 
 
-            {/* Self View Window (small) */}
-            <div onClick={()=>setviewingSelf(!viewingSelf)}
-              className="absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer"
-              // onClick={() => setMainVideoRef(localVideoRef)}
+{/* Self View Window (small) */}
+            {rerender?<div onClick={()=>{setviewingSelf(!viewingSelf)}}
+              className={`${remoteUserIds.length==0?"hidden":""}  absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
               title="Click to swap videos"
             >
               {/* Small video (always rendered) */}
               <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
-              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[mysocketId]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
-
-
-            </div>
+              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
+            </div>:
+            <div onClick={()=>{setviewingSelf(!viewingSelf)}}
+              className={`${remoteUserIds.length==0?"hidden":""}  absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
+              title="Click to swap videos"
+            >
+              {/* Small video (always rendered) */}
+              <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
+              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
+            </div>}
           </div>
           {/* Participants */}
        
@@ -472,7 +531,7 @@ useEffect(() => {
           </div>
           <div className="flex items-center space-x-2 pt-2 border-t">
             <input value={NewMessage} onChange={(e) => setNewMessage( e.target.value)} type="text" placeholder="Type a message..." className="flex-1 border rounded-full px-4 py-2 text-sm" />
-            <button onClick={()=>{handleMsgSend()}} className="bg-gray-900 text-white px-4 py-2 rounded-full">Send</button>
+            <button disabled={isloadingmsgSend} onClick={()=>{handleMsgSend()}} className="bg-gray-900 text-white px-4 py-2 rounded-full">{isloadingmsgSend?"Sending..":"Send"}</button>
           </div>
         </div>
       </main>

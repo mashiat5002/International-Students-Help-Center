@@ -75,6 +75,7 @@ const Seminar_room = ({ roomId }: VideoMeetingProps) => {
     const [mainVideoRef, setMainVideoRef] = useState<React.RefObject<HTMLVideoElement>>(localVideoRef);
     const [UserInforDetails , setUserInforDetails] = useState<UsersMap >({});
     const allStreamsRef = useRef<{ [userId: string]: MediaStream }>({});
+    const [isloadingmsgSend, setisloadingmsgSend] = useState(false);
     const router = useRouter();
     
     // Seminar details state
@@ -108,7 +109,7 @@ useEffect(() => {
 
 
   socket.on("add-new-userDetails",({updatedUserDetails,existingUsers}: {updatedUserDetails: UsersMap,existingUsers: string[]}) => {
-   
+    console.log("new user entered1")
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
     
@@ -160,7 +161,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
 
 
   socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: UsersMap }) => {
-  
+   
     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
     console.log("remoteUsersTemp",remoteUsersTemp)
     if(remoteUsersTemp.length==0){
@@ -209,6 +210,12 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
       },
       onRemoteStream: (userId: string, stream: MediaStream) => {
         allStreamsRef.current[userId] = stream;
+       if(remoteUsersTemp.length==0){
+      setviewingSelf(true)
+      setviewingOnbigscreen(userId)
+     
+      
+    }
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
 
 
@@ -226,6 +233,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
         if (remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current) {
           
           remoteVideoRefs.current[userId].current!.srcObject = stream;
+  
         }
         
       }, 5000);
@@ -374,8 +382,9 @@ const handlegetOut = () => {
 const handleMsgSend = async() => {
  
   if (NewMessage=="") return; 
+  setisloadingmsgSend(true)
  await call_send_msg_through_socket(NewMessage, roomId);
-
+setisloadingmsgSend(false)
 
 setNewMessage('')
 
@@ -469,7 +478,7 @@ useEffect(() => {
               className={`w-full ${(isFullscreen || !showSidePanels) ? 'h-full' : 'h-80 sm:h-[26rem]'} object-cover rounded-xl relative`}
             >
               {/* Local video in main area */}
-              <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
+              <p className='absolute m-4 bg-transparent font-bold text-white'>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
              
          
@@ -542,7 +551,7 @@ useEffect(() => {
           </div>
           <div className="flex items-center space-x-2 pt-2 border-t">
             <input value={NewMessage} onChange={(e) => setNewMessage( e.target.value)} type="text" placeholder="Type a message..." className="flex-1 border rounded-full px-4 py-2 text-sm" />
-            <button onClick={()=>{handleMsgSend()}} className="bg-gray-900 text-white px-4 py-2 rounded-full">Send</button>
+            <button disabled={isloadingmsgSend} onClick={()=>{handleMsgSend()}} className="bg-gray-900 text-white px-4 py-2 rounded-full">{isloadingmsgSend?"Sending..":"Send"}</button>
           </div>
         </div>
       </main>

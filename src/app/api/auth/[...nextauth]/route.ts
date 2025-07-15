@@ -5,10 +5,11 @@ import User from "@/app/models/user";
 import NextAuth, { Account } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
-const set_session= async(email:string,registering_as:string)=>{
-  const expires = new Date(Date.now() + 1 * 60 * 60 * 1000);
+const set_session= async(email:string,registering_as:string,full_name:string)=>{
   
-  const session= await encrypt({Email:email,expires});
+  const expires = new Date(Date.now() + 1 * 60 * 60 * 1000);
+
+  const session= await encrypt({Email:email,expires,full_name});
 
    cookies().set(registering_as+'-session',session,{expires, httpOnly:true})
 }
@@ -49,7 +50,7 @@ const authOptions = {
 
 
         if (res != null){
-          await set_session(email,registering_as);
+          await set_session(email,registering_as,res.full_name);
           //already registered
           return true;
         }
@@ -64,7 +65,7 @@ const authOptions = {
             isExpert: account?.params?.isExpert,
           }).save();
           if (result) {
-            await set_session(email,registering_as);
+            await set_session(email,registering_as,name);
             return true;
           }
         }
@@ -76,7 +77,7 @@ const authOptions = {
 
 
         if (res != null){
-          await set_session(email,registering_as)
+          await set_session(email,registering_as,res.full_name)
           //already registered
           return true;
         }
@@ -91,7 +92,7 @@ const authOptions = {
            
           }).save();
           if (result) {
-            await set_session(email,registering_as)
+            await set_session(email,registering_as,name)
 
             return true;
           }

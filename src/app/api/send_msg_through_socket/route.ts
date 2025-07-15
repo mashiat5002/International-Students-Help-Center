@@ -28,26 +28,27 @@ export async function POST(request: NextRequest) {
             // decrypting the session to get user details cannot be done in the server side as it is not secure
             const details = (await decrypt(session)) as {
               Email: string;
+              full_name:string;
               expires: string;
               Password: string;
               iat: number;
               exp: number;
             };
             // getting more details of the user from the database
-            var final_details= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 })
+    //         var final_details= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 })
 
-            console.log("Final details:", final_details);
+    //         console.log("Final details:", final_details);
 
-    if(final_details== null){
-        return NextResponse.json({"status":"You are not logged in"})
-    }
-
+    // if(final_details== null){
+    //     return NextResponse.json({"status":"You are not logged in"})
+    // }
     const detailed_Message ={
-        name: final_details[0].full_name,
-        message: body.message,
+      name: details.full_name,
+      message: body.message,
     }
-
-
+    console.log("->>",detailed_Message) 
+    
+    
     
      const response = await fetch("https://ishc-socketio-server-production.up.railway.app/emit", {
     method: "POST",

@@ -1,7 +1,7 @@
 import {jwtVerify, SignJWT} from 'jose';
 const key="secret";
 const secret_key= new TextEncoder().encode(key);
-export const encrypt= (payload:{Email:string,expires:Date})=>{
+export const encrypt= (payload:{Email:string,expires:Date,full_name:string})=>{
     return new SignJWT(payload)
     .setProtectedHeader({alg:"HS256"})
     .setIssuedAt()

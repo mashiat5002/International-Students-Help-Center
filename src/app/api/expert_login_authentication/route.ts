@@ -23,7 +23,7 @@ export  async function POST(request:NextRequest){
     if (rows) {
         const expires = new Date(Date.now() + 1 * 60 * 60 * 1000);
        
-        const session= await encrypt({Email:email,expires});
+        const session= await encrypt({Email:email,expires,full_name:rows.full_name});
         cookies().set('expert-session',session,{expires, httpOnly:true})
         
 
