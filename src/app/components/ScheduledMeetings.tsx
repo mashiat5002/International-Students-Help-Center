@@ -122,7 +122,7 @@ const MeetingDetailsPanel = ({
         <p className="font-medium text-blue-900 text-sm sm:text-base">{meeting.Scheduled_time=="Not Scheduled"?"Not Scheduled":timeFormatConverter(meeting.Scheduled_time)}</p>
       </div>
       {meeting.status === 'ongoing' && (
-        <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
+      <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
           <div className="flex flex-col items-center justify-center">
             <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Join Meeting</h4>
             <a
@@ -135,7 +135,7 @@ const MeetingDetailsPanel = ({
               <span>Join Now</span>
             </a>
           </div>
-        </div>
+      </div>
       )}
       <div onClick={() => settoggleHeading_Details(!toggleHeading_Details)} className='lg:hidden absolute right-5 top-5 h-8 w-8 ring-2 flex items-center justify-center ring-black cursor-pointer hover:ring-blue-500 rounded-xl'>
         <IoIosArrowBack color='black' />

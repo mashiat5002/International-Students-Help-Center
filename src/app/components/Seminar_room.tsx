@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { VideoBoxBig } from './VideoBoxBig';
 import { VideoBoxSmall } from './VideoBoxSmall';
 import { call_fetch_seminar_details_using_roomid } from '../(utils)/call_fetch_seminar_details_using_roomid/call_fetch_seminar_details_using_roomid';
+import Toast from './common/Toast';
 
 // Add fetch utility for seminar by ID
 
@@ -83,6 +84,9 @@ const Seminar_room = ({ roomId }: VideoMeetingProps) => {
     const [showSidePanels, setShowSidePanels] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const videoAreaRef = useRef<HTMLDivElement>(null);
+    const [showToast, setShowToast] = useState(false);
+    const [toastType, settoastType] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
 
 useEffect(() => {
   (window as any).UserInforDetails = UserInforDetails;
@@ -102,6 +106,12 @@ useEffect(() => {
     const calling_join_room = async () => {
       await call_join_room_to_socket(roomId, socket.id)
       socket.emit('join-room', roomId);
+
+      // notification
+       setToastMessage("You Entered The Seminar Room");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000);                                   
     }
   calling_join_room()
 });
@@ -109,7 +119,7 @@ useEffect(() => {
 
 
   socket.on("add-new-userDetails",({updatedUserDetails,existingUsers}: {updatedUserDetails: UsersMap,existingUsers: string[]}) => {
-    console.log("new user entered1")
+    
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
     
@@ -141,6 +151,12 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
   remoteVideoRefs.current[userId].current.srcObject = null;
   delete remoteVideoRefs.current[userId];
   delete allStreamsRef.current[userId]
+
+  //notification
+  setToastMessage(UserInforDetails[userId]?.name +" left the seminar");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000);   
 }
 
   
@@ -213,10 +229,16 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
        if(remoteUsersTemp.length==0){
       setviewingSelf(true)
       setviewingOnbigscreen(userId)
+       
      
       
     }
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
+        // notification
+        setToastMessage(UserInforDetails[userId]+" Joined");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 
 
         remoteVideoRefs.current[userId] = React.createRef<HTMLVideoElement>();
@@ -275,7 +297,16 @@ const pauseRemoteVideo = (userId: string) => {
       "video_paused":true,          // apply updates
     },
   }));
- setbtnRerender(!btnrerender)};
+ setbtnRerender(!btnrerender)
+
+
+//  notification
+ setToastMessage(UserInforDetails[userId]+"Camera is Paused");
+       settoastType("falure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
+
+};
 
 const resumeRemoteVideo = (userId: string) => {
   console.log("try to play vdo ",userId)
@@ -291,6 +322,12 @@ const resumeRemoteVideo = (userId: string) => {
     },
   }));
  setbtnRerender(!btnrerender)
+
+ //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Camera  is Resumed ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 const muteRemoteAudio = (userId: string) => {
@@ -307,6 +344,12 @@ const muteRemoteAudio = (userId: string) => {
     },
   }));
   setbtnRerender(!btnrerender)
+
+   //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Audio  is Muted ");
+       settoastType("falure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 const unmuteRemoteAudio = (userId: string) => {
@@ -323,6 +366,12 @@ const unmuteRemoteAudio = (userId: string) => {
     },
   }));
   setbtnRerender(!btnrerender)
+
+   //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Audio  is unmuted ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 
@@ -338,6 +387,12 @@ const handlePause = () => {
     stream.getVideoTracks().forEach(track => track.enabled = false);
     setVideoPaused(true);
   }
+
+     //  notification
+ setToastMessage("Your Camera  is turned Off ");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 
@@ -349,6 +404,13 @@ const handlePlay = () => {
     stream.getVideoTracks().forEach(track => track.enabled = true);
     setVideoPaused(false);
   }
+
+
+      //  notification
+ setToastMessage("Your Camera  is turned on ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 // Mute local audio track
 const handleMute = () => {
@@ -357,6 +419,12 @@ const handleMute = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     setmutedself(true);
   }
+
+      //  notification
+ setToastMessage("Your mic  is turned off ");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 // Unmute local audio track
@@ -366,6 +434,13 @@ const handleUnmute = () => {
     stream.getAudioTracks().forEach(track => track.enabled = true);
     setmutedself(false);
   }
+
+
+      //  notification
+ setToastMessage("Your speaker  is turned on ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 const handlegetOut = () => {
   const stream = localStreamRef.current;
@@ -639,6 +714,10 @@ useEffect(() => {
         </aside>
       )}
 
+{showToast&&<Toast
+      type={toastType}
+      message={toastMessage}
+    />}
       
     </div>
   );

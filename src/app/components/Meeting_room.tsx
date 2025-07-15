@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { VideoBoxBig } from './VideoBoxBig';
 import { Video_call_Documets_review } from './Video_call_Documets_review';
 import { VideoBoxSmall } from './VideoBoxSmall';
+import Toast from './common/Toast';
 
 
 
@@ -69,6 +70,9 @@ const Meeting_room = ({ roomId }: VideoMeetingProps) => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const videoAreaRef = useRef<HTMLDivElement>(null);
     const [isloadingmsgSend, setisloadingmsgSend] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastType, settoastType] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
     
   
 
@@ -87,6 +91,12 @@ useEffect(() => {
     const calling_join_room = async () => {
       await call_join_room_to_socket(roomId, socket.id)
       socket.emit('join-room', roomId);
+
+      // notification
+       setToastMessage("You Entered The Seminar Room");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000);  
     }
   calling_join_room()
 });
@@ -132,6 +142,12 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
   remoteVideoRefs.current[userId].current.srcObject = null;
   delete remoteVideoRefs.current[userId];
   delete allStreamsRef.current[userId]
+
+    //notification
+      setToastMessage(UserInforDetails[userId]?.name +" left the seminar");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 }
 
   
@@ -208,6 +224,11 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
       
     }
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
+         // notification
+        setToastMessage(UserInforDetails[userId]+" Joined");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 
 
         remoteVideoRefs.current[userId] = React.createRef<HTMLVideoElement>();
@@ -258,7 +279,14 @@ const pauseRemoteVideo = (userId: string) => {
       "video_paused":true,          // apply updates
     },
   }));
- setbtnRerender(!btnrerender)};
+ setbtnRerender(!btnrerender)
+
+ //  notification
+ setToastMessage(UserInforDetails[userId]+"Camera is Paused");
+       settoastType("falure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
+};
 
 const resumeRemoteVideo = (userId: string) => {
   console.log("try to play vdo ",userId)
@@ -274,6 +302,11 @@ const resumeRemoteVideo = (userId: string) => {
     },
   }));
  setbtnRerender(!btnrerender)
+  //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Camera  is Resumed ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 const muteRemoteAudio = (userId: string) => {
@@ -290,6 +323,12 @@ const muteRemoteAudio = (userId: string) => {
     },
   }));
   setbtnRerender(!btnrerender)
+
+     //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Audio  is Muted ");
+       settoastType("falure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 const unmuteRemoteAudio = (userId: string) => {
@@ -306,6 +345,12 @@ const unmuteRemoteAudio = (userId: string) => {
     },
   }));
   setbtnRerender(!btnrerender)
+
+     //  notification
+ setToastMessage(UserInforDetails[userId]+"'s Audio  is unmuted ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 
@@ -321,6 +366,12 @@ const handlePause = () => {
     stream.getVideoTracks().forEach(track => track.enabled = false);
     setVideoPaused(true);
   }
+  
+     //  notification
+ setToastMessage("Your Camera  is turned Off ");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 
@@ -332,6 +383,11 @@ const handlePlay = () => {
     stream.getVideoTracks().forEach(track => track.enabled = true);
     setVideoPaused(false);
   }
+        //  notification
+ setToastMessage("Your Camera  is turned on ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 // Mute local audio track
 const handleMute = () => {
@@ -340,6 +396,11 @@ const handleMute = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     setmutedself(true);
   }
+      //  notification
+ setToastMessage("Your mic  is turned off ");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 
 // Unmute local audio track
@@ -349,6 +410,13 @@ const handleUnmute = () => {
     stream.getAudioTracks().forEach(track => track.enabled = true);
     setmutedself(false);
   }
+
+
+      //  notification
+ setToastMessage("Your speaker  is turned on ");
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 const handlegetOut = () => {
   const stream = localStreamRef.current;
@@ -546,6 +614,10 @@ useEffect(() => {
       </aside>:null}
 
 
+    {showToast&&<Toast
+          type={toastType}
+          message={toastMessage}
+        />}
      
      
     </div>
