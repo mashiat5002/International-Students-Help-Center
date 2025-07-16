@@ -218,7 +218,7 @@ const JourneyProgress = () => {
                       ></div>
                     </div>
                   </div>
-                  {/* tooltip 2*/}
+                  {/* tooltip 2 */}
                   <div className="hidden h-20 w-28 md:w-36  z-50  absolute mr-16 right-0">
                     <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm shadow-lg">
                       <p className="mb-1">Note:</p>
@@ -235,9 +235,9 @@ const JourneyProgress = () => {
                   <h3 className="text-xl font-bold text-blue-900">
                     Progress Tracker
                   </h3>
-                  <div className="relative">
+                  <div className="relative ">
                     <button onClick={()=>setisMeetingFormDisplayed(true)}
-                      className="text-xl p-2 m-6 rounded-2xl border bottom-2 hover:border-blue-900 md:text-2xl font-bold text-black relative"
+                      className="text-xl   p-2 m-6 rounded-2xl border bottom-2 hover:border-blue-900 md:text-2xl font-bold text-black relative"
                       onMouseEnter={() => setShowExpertTooltip(true)}
                       onMouseLeave={() => setShowExpertTooltip(false)}
                     >
@@ -249,7 +249,7 @@ const JourneyProgress = () => {
                       )}
                     </button>
                   </div>
-                  <div className="relative">
+                  {/* <div className="relative">
                     <button
                       className="text-xl p-2 m-6 rounded-2xl border bottom-2 hover:border-blue-900 md:text-2xl font-bold text-black relative"
                       onMouseEnter={() => setShowAiTooltip(true)}
@@ -262,7 +262,7 @@ const JourneyProgress = () => {
                         </div>
                       )}
                     </button>
-                  </div>
+                  </div> */}
                   <div
                     className={`px-3 py-1.5 rounded-lg text-sm
                     ${
