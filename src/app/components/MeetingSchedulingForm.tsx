@@ -44,6 +44,7 @@ const MeetingSchedulingForm = (
 }
 
 ) => {
+  const [topicTyped, setIstopicTyped] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastType, settoastType] = useState("");
@@ -59,6 +60,7 @@ const MeetingSchedulingForm = (
     console.log(res.res)
     setIsLoading(false);
     if( res.res=="Request Sent Successfully"){
+      setIstopicTyped("")
       settoastType("success")
         setToastMessage(res.res);
         setShowToast(true);
@@ -113,7 +115,7 @@ const MeetingSchedulingForm = (
               <label className="block text-sm font-medium mb-1">Topic of Meeting</label>
               <div className={`flex items-center border ${MeetingRequestDetails.meeting_topic=="" && toastMessage=="Must provide meeting topic !!"?"border-red-500":"border-gray-300"}  rounded-lg px-3 py-2 bg-gray-50`}>
                 <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12l-4-4-4 4m8 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6" /></svg>
-                <input onChange={(e)=>setMeetingRequestDetails((prev)=>({...prev,meeting_topic:e.target.value}))} type="text"  className={`h-20 ${MeetingRequestDetails.meeting_topic=="" && toastMessage=="Must provide meeting topic !!"?"border-red-500":"border-gray-300"}  w-full bg-transparent focus:outline-none`} />
+                <input value={topicTyped} onChange={(e)=>{setMeetingRequestDetails((prev)=>({...prev,meeting_topic:e.target.value})),setIstopicTyped(e.target.value)}} type="text"  className={`h-20 ${MeetingRequestDetails.meeting_topic=="" && toastMessage=="Must provide meeting topic !!"?"border-red-500":"border-gray-300"}  w-full bg-transparent focus:outline-none`} />
               </div>
             </div>
             <div onClick={()=>{callSubmit(), setIsLoading(true)}} className="flex items-center justify-center cursor-pointer w-full bg-black text-white py-3 rounded-lg font-semibold text-lg mt-2 hover:bg-gray-900 transition">{isLoading?"Processing Request..":"Continue to Confirm"}</div>

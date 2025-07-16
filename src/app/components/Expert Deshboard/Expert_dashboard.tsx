@@ -94,21 +94,21 @@ const Expert_dashboard=()=> {
                 <button
                   key={item.name}
                   onClick={() => {setActiveItem(item.name); setShowProfile(false)}}
-                  className={`text-white/90 hover:text-white relative group px-1 py-2 rounded-md transition-colors duration-300 ${
+                  className={`text-white/90 font-semibold shadow-blue-400 hover:text-white relative group px-1 py-2 rounded-md transition-colors duration-300 ${
                     isActive(item.name) ? 'text-white' : ''
                   }`}
                 >
                   {item.name}
                   <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform ${
                     isActive(item.name) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                  } transition-transform duration-300`}></span>
+                  } transition-transform duration-300`}></span> 
                 </button>
               ))}
             </div>
             <div className="flex items-center space-x-6">
               <button 
                 onClick={() => {setShowProfile(true), setActiveItem('Profile')}}
-                className={ ` ${isActive('Profile')?"text-[#FCD8CD] ":"text-white/90 hover:text-[#FCD8CD] "}  font-bold  transition-colors duration-300`}
+                className={ ` ${isActive('Profile')?"text-[#FCD8CD] ":"text-white/90 hover:text-blue-400 "}  font-bold  transition-colors duration-300`}
               >
                 Profile
               </button>

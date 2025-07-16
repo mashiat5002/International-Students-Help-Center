@@ -5,17 +5,18 @@ import io from 'socket.io-client'; // Default import of io
 import { Socket } from 'socket.io-client'; // Importing the Socket class
 import { startMedia } from '../(utils)/start_media/start_media';
 import { call_send_msg_through_socket } from '../../../lib/auth/call_send_msg_through_socket';
-import { call_join_room_to_socket } from '../../../lib/auth/join_room_to_socket';
 import { FiMic } from "react-icons/fi";
 import { FiMicOff } from "react-icons/fi";
 import { FiVideo } from "react-icons/fi";
 import { FiVideoOff } from "react-icons/fi";
 import { IoCloseSharp } from "react-icons/io5";
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { VideoBoxBig } from './VideoBoxBig';
 import { VideoBoxSmall } from './VideoBoxSmall';
 import { call_fetch_seminar_details_using_roomid } from '../(utils)/call_fetch_seminar_details_using_roomid/call_fetch_seminar_details_using_roomid';
 import Toast from './common/Toast';
+import { call_join_room_to_socket_student } from '../../../lib/auth/join_room_to_socket_student';
+import { call_join_room_to_socket_expert } from '../../../lib/auth/call_join_room_to_socket_expert';
 
 // Add fetch utility for seminar by ID
 
@@ -23,9 +24,7 @@ import Toast from './common/Toast';
 
 
 
-interface VideoMeetingProps {
-  roomId: string;
-}
+
 interface ChatMessage {
   name: string;
   message: string;
@@ -53,7 +52,7 @@ type seminarDetails={
     topics: string[];
 }
 
-const Seminar_room = ({ roomId }: VideoMeetingProps) => {
+const Seminar_room = ({ roomId,pathname }: {roomId:string,pathname:string |null}) => {
 
     const [newComer,setnewComer]= useState("")
     const [rerender,setRerender] = useState<boolean>(true)
@@ -104,26 +103,36 @@ useEffect(() => {
   socket.on("connect", () => {
     setmysocketId(socket.id)
     const calling_join_room = async () => {
-      await call_join_room_to_socket(roomId, socket.id)
-      socket.emit('join-room', roomId);
+      
 
-      // notification
-       setToastMessage("You Entered The Seminar Room");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000);                                   
+      if(pathname?.includes("expert-dashboard")){
+        await call_join_room_to_socket_expert(roomId, socket.id)
+      }else if(pathname?.includes("homepage")){
+        await call_join_room_to_socket_student(roomId, socket.id)
+      }
+
+      socket.emit('join-room', roomId);
+                               
     }
   calling_join_room()
 });
  
 
 
-  socket.on("add-new-userDetails",({updatedUserDetails,existingUsers}: {updatedUserDetails: UsersMap,existingUsers: string[]}) => {
-    
+  socket.on("add-new-userDetails",({updatedUserDetails,existingUsers,new_userId}: {updatedUserDetails: UsersMap,existingUsers: string[],new_userId:string}) => {
+       
+
+     setToastMessage(updatedUserDetails[new_userId].name+" Joined"); 
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000);  
+
+
+
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
     
-    setUserInforDetails(updatedUserDetails);
+    // setUserInforDetails(updatedUserDetails);
 
 
    remoteUsersTemp.map((item)=>{
@@ -145,7 +154,7 @@ useEffect(() => {
     setchatMessages(prevMessages => [...prevMessages, msg]);
   });
 
-socket.on("user-disconnected", ({userId}:{userId: string}) => {
+socket.on("user-disconnected", ({userId,name}:{userId: string,name:string}) => {
   // console.log('[VideoMeeting] User disconnected:', userId);
   if (remoteVideoRefs.current[userId]?.current) {
   remoteVideoRefs.current[userId].current.srcObject = null;
@@ -153,7 +162,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
   delete allStreamsRef.current[userId]
 
   //notification
-  setToastMessage(UserInforDetails[userId]?.name +" left the seminar");
+  setToastMessage(name +" left the seminar");
        settoastType("failure");
       setShowToast(true);
        setTimeout(() => {setShowToast(false);}, 5000);   
@@ -537,7 +546,7 @@ useEffect(() => {
             <span className="ml-2 font-semibold text-base sm:text-lg mr-5">{seminarDetails?.meeting_topic}</span>
             <span className="ml-2 text-gray-500 text-xs sm:text-sm md:mt-2">{remoteUserIds.length+1} Joined</span>
           </div>
-          <button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
+          {pathname?.includes("expert-dashboard")?<button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">End Meeting</button>:null}
         </div>
  
 

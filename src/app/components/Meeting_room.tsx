@@ -5,7 +5,6 @@ import io from 'socket.io-client'; // Default import of io
 import { Socket } from 'socket.io-client'; // Importing the Socket class
 import { startMedia } from '../(utils)/start_media/start_media';
 import { call_send_msg_through_socket } from '../../../lib/auth/call_send_msg_through_socket';
-import { call_join_room_to_socket } from '../../../lib/auth/join_room_to_socket';
 import { FiMic } from "react-icons/fi";
 import { FiMicOff } from "react-icons/fi";
 import { FiVideo } from "react-icons/fi";
@@ -16,13 +15,13 @@ import { VideoBoxBig } from './VideoBoxBig';
 import { Video_call_Documets_review } from './Video_call_Documets_review';
 import { VideoBoxSmall } from './VideoBoxSmall';
 import Toast from './common/Toast';
+import { call_join_room_to_socket_student } from '../../../lib/auth/join_room_to_socket_student';
+import { call_join_room_to_socket_expert } from '../../../lib/auth/call_join_room_to_socket_expert';
 
 
 
 
-interface VideoMeetingProps {
-  roomId: string;
-}
+
 interface ChatMessage {
   name: string;
   message: string;
@@ -40,7 +39,7 @@ type UsersMap = {
 
 
 
-const Meeting_room = ({ roomId }: VideoMeetingProps) => {
+const Meeting_room = ({ roomId,pathname }: {roomId:string,pathname:string|null}) => {
 
     const [newComer,setnewComer]= useState("")
     const [rerender,setRerender] = useState<boolean>(true)
@@ -89,14 +88,13 @@ useEffect(() => {
   socket.on("connect", () => {
     setmysocketId(socket.id)
     const calling_join_room = async () => {
-      await call_join_room_to_socket(roomId, socket.id)
+        if(pathname?.includes("expert-dashboard")){
+              await call_join_room_to_socket_expert(roomId, socket.id)
+        }else if(pathname?.includes("homepage")){
+            await call_join_room_to_socket_student(roomId, socket.id)
+        
+          }
       socket.emit('join-room', roomId);
-
-      // notification
-       setToastMessage("You Entered The Seminar Room");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000);  
     }
   calling_join_room()
 });
@@ -111,9 +109,14 @@ useEffect(() => {
 
    
   });
-  socket.on("add-new-userDetails",({updatedUserDetails,existingUsers}: {updatedUserDetails: UsersMap,existingUsers: string[]}) => {
-    console.log('on new user entry1:', updatedUserDetails);
-    console.log('on new user entry2:', existingUsers);
+  socket.on("add-new-userDetails",({updatedUserDetails,existingUsers ,new_userId}: {updatedUserDetails: UsersMap,existingUsers: string[],new_userId:string}) => {
+    
+       setToastMessage(updatedUserDetails[new_userId].name+" Joined"); 
+       settoastType("success");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000);  
+
+
     setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
 
@@ -136,18 +139,23 @@ useEffect(() => {
     setchatMessages(prevMessages => [...prevMessages, msg]);
   });
 
-socket.on("user-disconnected", ({userId}:{userId: string}) => {
-  // console.log('[VideoMeeting] User disconnected:', userId);
+socket.on("user-disconnected", ({userId,name}:{userId: string,name:string}) => {
+  //notification
+  console.log(userId)
+  console.log("->"+UserInforDetails[userId])
+      setToastMessage(name +" left the seminar");
+       settoastType("failure");
+      setShowToast(true);
+       setTimeout(() => {setShowToast(false);}, 5000); 
+
+
+
   if (remoteVideoRefs.current[userId]?.current) {
   remoteVideoRefs.current[userId].current.srcObject = null;
   delete remoteVideoRefs.current[userId];
   delete allStreamsRef.current[userId]
 
-    //notification
-      setToastMessage(UserInforDetails[userId]?.name +" left the seminar");
-       settoastType("failure");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+    
 }
 
   
@@ -224,11 +232,7 @@ socket.on("user-disconnected", ({userId}:{userId: string}) => {
       
     }
       if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
-         // notification
-        setToastMessage(UserInforDetails[userId]+" Joined");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+         
 
 
         remoteVideoRefs.current[userId] = React.createRef<HTMLVideoElement>();
@@ -282,7 +286,7 @@ const pauseRemoteVideo = (userId: string) => {
  setbtnRerender(!btnrerender)
 
  //  notification
- setToastMessage(UserInforDetails[userId]+"Camera is Paused");
+ setToastMessage(UserInforDetails[userId]?.name+"'s Camera is Paused");
        settoastType("falure");
       setShowToast(true);
        setTimeout(() => {setShowToast(false);}, 5000); 
@@ -303,7 +307,7 @@ const resumeRemoteVideo = (userId: string) => {
   }));
  setbtnRerender(!btnrerender)
   //  notification
- setToastMessage(UserInforDetails[userId]+"'s Camera  is Resumed ");
+ setToastMessage(UserInforDetails[userId]?.name+"'s Camera  is Resumed ");
        settoastType("success");
       setShowToast(true);
        setTimeout(() => {setShowToast(false);}, 5000); 
@@ -325,7 +329,7 @@ const muteRemoteAudio = (userId: string) => {
   setbtnRerender(!btnrerender)
 
      //  notification
- setToastMessage(UserInforDetails[userId]+"'s Audio  is Muted ");
+ setToastMessage(UserInforDetails[userId]?.name+"'s Audio  is Muted ");
        settoastType("falure");
       setShowToast(true);
        setTimeout(() => {setShowToast(false);}, 5000); 
@@ -347,7 +351,7 @@ const unmuteRemoteAudio = (userId: string) => {
   setbtnRerender(!btnrerender)
 
      //  notification
- setToastMessage(UserInforDetails[userId]+"'s Audio  is unmuted ");
+ setToastMessage(UserInforDetails[userId]?.name+"'s Audio  is unmuted ");
        settoastType("success");
       setShowToast(true);
        setTimeout(() => {setShowToast(false);}, 5000); 
@@ -447,6 +451,11 @@ useEffect(() => {
   (window as any).viewingOnbigscreen = viewingOnbigscreen;
   // (window as any).mysocketId = mysocketId;
 }, [viewingOnbigscreen]);
+useEffect(() => {
+  // (window as any).remoteUserIds = remoteUserIds;
+  (window as any).UserInforDetails = UserInforDetails;
+  // (window as any).mysocketId = mysocketId;
+}, [UserInforDetails]);
 
   // Fullscreen effect for video area
   useEffect(() => {
@@ -510,7 +519,7 @@ useEffect(() => {
             <span className="ml-8 font-semibold text-base sm:text-lg">{meetingTopic}</span>
             <span className="ml-2 text-gray-500 text-xs sm:text-sm">{remoteUserIds.length+1} Participants</span>
           </div>
-          <button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">Leave Meeting</button>
+          {pathname?.includes("expert-dashboard")?<button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">End Meeting</button>:null}
         </div>
 
 

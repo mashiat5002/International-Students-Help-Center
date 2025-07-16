@@ -26,6 +26,7 @@ type details={
 const MeetingRequests = () => {
   const [keyClicked, setkeyClicked] = useState(-1);
   const [isChangeTimeClicked, setisChangeTimeClicked] = useState(false);
+  const [issending, setIssending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rerender, setrerender] = useState(false);
   const [IsDate_Time_given, setIsDate_Time_given] = useState(true);
@@ -41,7 +42,6 @@ const MeetingRequests = () => {
       setisChangeTimeClicked(false)
       const response= await call_fetch_meeting_requests_for_expert();
       setIsLoading(false)
-      console.log("rendered")
       setDetails(response.data.reverse())
     }
     fetch_data()
@@ -63,7 +63,9 @@ const MeetingRequests = () => {
     }else{
       setIsDate_Time_given(true)
     }
+    setIssending(true)
     const res= await call_setDateTimeMeeting(id,selected);
+    setIssending(false)
     
     
     setIsLoading(false);
@@ -160,10 +162,10 @@ const MeetingRequests = () => {
                 Decline
               </button>
               {item.Scheduled_time=="Not Scheduled"||(isChangeTimeClicked&&keyClicked==k)?<button
-                className={ `${item.Scheduled_time=="declined"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
+                className={ `  ${item.Scheduled_time=="declined"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
                 onClick={() => {setkeyClicked(k),handleConfirm(String(item._id))}}
               >
-                Confirm
+                {issending?"Processing..":"Confirm"}
               </button>:<button
                 className={`${item.Scheduled_time=="declined"?"hidden":""} mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}
                 onClick={() => {setkeyClicked(k),setisChangeTimeClicked(true)}}

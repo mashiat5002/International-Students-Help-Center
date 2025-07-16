@@ -1,8 +1,8 @@
 
 
-export async function call_join_room_to_socket( roomId: string, socketId: string) {
+export async function call_join_room_to_socket_student( roomId: string, socketId: string) {
 
-    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/join_room_to_socket`,{
+    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/join_room_to_socket_student`,{
         method:"POST",
         headers:{
             "Content-Type": "application/json"

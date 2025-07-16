@@ -69,11 +69,31 @@ request.nextUrl.pathname.startsWith("/homepage")
  
  
   if (res.status == "email found") {
+// logic for checking if meetings has ended or not
+  if (request.nextUrl.pathname.startsWith("/expert-dashboard/seminar/") ||
+    request.nextUrl.pathname.startsWith("/homepage/seminar/"))
+     {
+    const segments = request.nextUrl.pathname.split("/");
+    const lastId = segments[segments.length - 1];
+    console.log("checking if seminar ended",lastId)
+  }else if(request.nextUrl.pathname.startsWith("/expert-dashboard/meeting/") ||
+    request.nextUrl.pathname.startsWith("/homepage/meeting/"))
+  {
+    const segments = request.nextUrl.pathname.split("/");
+    const lastId = segments[segments.length - 1];
+    console.log("checking if seminar ended",lastId)
+  }
+
+
+
+
     return NextResponse.next();
   } else {
     return NextResponse.redirect(new URL("/error-unauthorized", request.url));
     // Redirect to a custom error page
   }
+
+
 }
 
 

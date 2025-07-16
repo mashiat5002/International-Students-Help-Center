@@ -174,7 +174,7 @@ const UpcomingSeminars = () => {
               ) : (
                 new Date(item.Scheduled_time) <= new Date() ? (
                   <a
-                    href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/seminar/${item._id}`}
+                    href={`${process.env.NEXT_PUBLIC_Base_Url}/expert-dashboard/seminar/${item._id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 mt-2 ml-4 px-5 py-2 bg-blue-600 text-white rounded-full font-medium shadow hover:bg-blue-700 transition text-base"
