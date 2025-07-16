@@ -32,6 +32,8 @@ const HomePage= ({ parameter }: parameterprops)=> {
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showExperts, setShowExperts] = useState(false);
+  const [isTopNavOpen, setIsTopNavOpen] = useState(false); // controls mount
+  const [isTopNavFading, setIsTopNavFading] = useState(false); // controls fade-out
   const [details, setDetails] = useState({
       email: '',
       full_name: '',
@@ -117,6 +119,15 @@ useEffect(() => {
       fetchData();
     }
    ,[])
+
+  // Helper to close with fade-out
+  const closeTopNavWithFade = () => {
+    setIsTopNavFading(true);
+    setTimeout(() => {
+      setIsTopNavOpen(false);
+      setIsTopNavFading(false);
+    }, 200); // match transition duration
+  };
   return (
     <div className="min-h-screen bg-gray-100 ">
       {/* Top Navigation Bar */}
@@ -183,43 +194,106 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Right Section */}
-            <div className="flex items-center space-x-6">
-              <button 
-                onClick={() => {
-              const formattedRoute = `/homepage/experts`;
-                window.history.replaceState(null, "", formattedRoute);
-                setActiveItem("Experts")
-                }} 
-                className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+            {/* Right Section - Responsive Top Nav */}
+            <div className="flex items-center">
+              {/* Hamburger for Top Nav (small screens only) */}
+              <button
+                className="lg:hidden text-white/90 p-2 rounded-md hover:bg-white/10 transition-all duration-300 hover:text-white ml-2"
+                onClick={() => setIsTopNavOpen(!isTopNavOpen)}
+                aria-label="Open top nav menu"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 13v-2a4 4 0 00-3-3.87M9 20v-2a4 4 0 013-3.87" />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <span>Experts</span>
               </button>
-              <button 
-                onClick={() => {
-                const formattedRoute = `/homepage/profile`;
-                window.history.replaceState(null, "", formattedRoute);
-                setActiveItem("Profile")
-                }} 
-                className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>Profile</span>
-              </button>
-              <button 
-                onClick={() => {call_logout(), router.push('/')}}
-                className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Logout</span>
-              </button>
+
+              {/* Top Nav Items (large screens) */}
+              <div className="hidden lg:flex items-center space-x-6">
+                <button 
+                  onClick={() => {
+                    const formattedRoute = `/homepage/experts`;
+                    window.history.replaceState(null, "", formattedRoute);
+                    setActiveItem("Experts")
+                  }} 
+                  className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 13v-2a4 4 0 00-3-3.87M9 20v-2a4 4 0 013-3.87" />
+                  </svg>
+                  <span>Experts</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    const formattedRoute = `/homepage/profile`;
+                    window.history.replaceState(null, "", formattedRoute);
+                    setActiveItem("Profile")
+                  }} 
+                  className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Profile</span>
+                </button>
+                <button 
+                  onClick={() => {call_logout(), router.push('/')}}
+                  className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+
+              {/* Top Nav Items (mobile dropdown) */}
+              {isTopNavOpen && (
+                <div
+                  className={`absolute top-16 right-1 bg-[#000033] border border-white/10 rounded-lg shadow-lg flex flex-col w-48 z-50 lg:hidden transition-opacity duration-200 ${isTopNavFading ? 'opacity-0' : 'opacity-100'} animate-fade-in`}
+                >
+                  <button 
+                    onClick={() => {
+                      closeTopNavWithFade();
+                      const formattedRoute = `/homepage/experts`;
+                      window.history.replaceState(null, "", formattedRoute);
+                      setActiveItem("Experts")
+                    }} 
+                    className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-3 rounded-t-lg hover:bg-white/10 transition-all duration-300"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0zm6 13v-2a4 4 0 00-3-3.87M9 20v-2a4 4 0 013-3.87" />
+                    </svg>
+                    <span>Experts</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      closeTopNavWithFade();
+                      const formattedRoute = `/homepage/profile`;
+                      window.history.replaceState(null, "", formattedRoute);
+                      setActiveItem("Profile")
+                    }} 
+                    className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-3 hover:bg-white/10 transition-all duration-300"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      closeTopNavWithFade();
+                      call_logout();
+                      router.push('/');
+                    }}
+                    className="flex items-center space-x-2 text-white/90 hover:text-white px-4 py-3 rounded-b-lg hover:bg-white/10 transition-all duration-300"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
