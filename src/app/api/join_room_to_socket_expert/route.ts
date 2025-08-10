@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
 
     
-     const response = await fetch("https://ishc-socketio-server-production.up.railway.app/join", {
+     const response = await fetch("https://ishc-socket-io-server-1.onrender.com/join", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

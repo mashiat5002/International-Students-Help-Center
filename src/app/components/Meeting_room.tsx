@@ -78,7 +78,7 @@ const Meeting_room = ({ roomId,pathname }: {roomId:string,pathname:string|null})
 
 useEffect(() => {
   
-  const socket = io("https://ishc-socketio-server-production.up.railway.app");
+  const socket = io("https://ishc-socket-io-server-1.onrender.com");
   socketRef.current = socket;
   
  

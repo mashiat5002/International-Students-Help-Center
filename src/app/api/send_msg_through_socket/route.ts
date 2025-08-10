@@ -33,14 +33,7 @@ export async function POST(request: NextRequest) {
               iat: number;
               exp: number;
             };
-            // getting more details of the user from the database
-    //         var final_details= await User.find({email: details.Email},{ email: 1, _id:0, full_name: 1 })
 
-    //         console.log("Final details:", final_details);
-
-    // if(final_details== null){
-    //     return NextResponse.json({"status":"You are not logged in"})
-    // }
     const detailed_Message ={
       name: details.full_name,
       message: body.message,
