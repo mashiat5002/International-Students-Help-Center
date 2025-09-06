@@ -1,11 +1,48 @@
 import { connectToDatabase } from "@/app/(utils)/connect_mongodb/connect_mongodb";
+import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
 
   try{
-    const {seminarTopic,date_time,seminarDuration,maxParticipants,expert_id,expert_name,topics,description} = await request.json();
+    
+        const  session=  cookies().get("expert-session")?.value;
+        
+        if(!session){
+          console.log("Session not found")
+          return NextResponse.json({ message: "Session not found" }, { status: 404 });
+        }
+        
+        
+        const details = (await decrypt(session)) as {
+        id: string;
+        Email: string;
+        expires: string;
+        full_name: string;
+        img: string;
+        Password: string;
+        iat: number;
+        exp: number;
+      };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const {seminarTopic,date_time,seminarDuration,maxParticipants,topics,description} = await request.json();
     
     console.log(description.length)
     console.log(seminarTopic.length)
@@ -43,8 +80,8 @@ export async function POST(request: Request) {
     
     await connectToDatabase()
     const newScheduledSeminars = new ScheduledSeminars({
-      expert_id: expert_id,
-      speaker: expert_name,
+      expert_id: details.id,
+      speaker: details.full_name,
       meeting_topic: seminarTopic,
       description: description,
       Scheduled_time: date_time,

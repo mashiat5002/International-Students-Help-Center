@@ -8,6 +8,8 @@ import { call_setDateTimeMeeting } from '@/app/(utils)/call_setDateTimeMeeting/c
 import LoadingSpinner from '../common/LoadingSpinner';
 import { call_fetch_meeting_requests_for_expert } from '@/app/(utils)/call_fetch_meeting_requests_for_expert/call_fetch_meeting_requests_for_expert';
 import { FaVideo } from 'react-icons/fa';
+import { call_fetch_expert_logged_id_info } from '@/app/(utils)/call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info';
+import { encrypt } from '@/app/(utils)/jwt_encrypt_decrypt';
 
 
 type details={
@@ -34,16 +36,26 @@ const UpcomingMeetings = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [details,setDetails]= useState<details[]>([])
   const [selectedDateTimes, setSelectedDateTimes] = useState<{[key: string]: Date | null}>({});
+  const [params, setParams] = useState<{[key: string]: string | null}>({});
+
+
+   
+
 
   useEffect(()=>{
     const fetch_data= async()=>{
       setIsLoading(true)
       setisChangeTimeClicked(false)
+      const loggedInfo= await call_fetch_expert_logged_id_info()
       const response= await call_fetch_meeting_requests_for_expert();
       setIsLoading(false)
       const final_data= response.data.filter((item:details)=>item.Scheduled_time!="declined" && item.Scheduled_time!="Not Scheduled")
       setDetails(final_data.reverse())
-     
+
+      final_data.reverse().forEach(async (item: details) => {
+        const encryptedParam = await encrypt({meeting_id: item._id, id: loggedInfo.id ,full_name:loggedInfo.full_name});
+        setParams(prev => ({ ...prev, [item._id.toString()]: encryptedParam }));
+      });
     }
     fetch_data()
   },[rerender])
@@ -169,15 +181,21 @@ const UpcomingMeetings = () => {
                 </button>
               ) : (
                 new Date(item.Scheduled_time) <= new Date() && item.Scheduled_time !== 'declined' ? (
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_Base_Url}/expert-dashboard/meeting/${item._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 mt-2 ml-4 px-5 py-2 bg-blue-600 text-white rounded-full font-medium shadow hover:bg-blue-700 transition text-base"
-                  >
-                    <FaVideo className="text-xl" />
-                    <span>Join Meeting</span>
-                  </a>
+                  <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
+                            <div className="flex flex-col items-center justify-center">
+                              <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Join Meeting</h4>
+                              <a
+                                href={`${process.env.NEXT_PUBLIC_Base_Url}/expert-dashboard/meeting/${params[item._id.toString()]}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-lg font-semibold"
+                              >
+                                <FaVideo className="text-2xl" />
+                                <span>Join Now</span>
+                              </a>
+                            </div>
+                        </div>
+                  
                 ) : (
                   <button
                     className={` mt-2 ml-4 px-5 py-2 ${item.Scheduled_time=="Not Scheduled"?"bg-blue-600":"bg-orange-500"} text-white rounded-full font-medium shadow hover:bg-blue-700 transition`}

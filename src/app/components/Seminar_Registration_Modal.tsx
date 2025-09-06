@@ -42,9 +42,9 @@ const Seminar_Registration_Modal = ({ seminar, onClose,setrerender,rerender }: R
       settoastType("success")
         setToastMessage(res.message);
         setShowToast(true);
-        setTimeout(() => {setShowToast(false);}, 3000);
-        setrerender(!rerender)
-        onClose()
+        setTimeout(() => {setShowToast(false),setrerender(!rerender)
+        onClose();}, 3000);
+        
        
     }
     else {

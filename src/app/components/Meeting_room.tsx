@@ -17,6 +17,8 @@ import { VideoBoxSmall } from './VideoBoxSmall';
 import Toast from './common/Toast';
 import { call_join_room_to_socket_student } from '../../../lib/auth/join_room_to_socket_student';
 import { call_join_room_to_socket_expert } from '../../../lib/auth/call_join_room_to_socket_expert';
+import { decrypt } from '../(utils)/jwt_encrypt_decrypt';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 
 
 
@@ -28,7 +30,7 @@ interface ChatMessage {
 }
 type UserInfo = {
   name: string;
-  roomId: string;
+  decrypted_meeting_id: string;
   muted: boolean;
   video_paused: boolean;
 };
@@ -39,7 +41,7 @@ type UsersMap = {
 
 
 
-const Meeting_room = ({ roomId,pathname }: {roomId:string,pathname:string|null}) => {
+const Meeting_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:string|null}) => {
 
     const [newComer,setnewComer]= useState("")
     const [rerender,setRerender] = useState<boolean>(true)
@@ -72,31 +74,26 @@ const Meeting_room = ({ roomId,pathname }: {roomId:string,pathname:string|null})
     const [showToast, setShowToast] = useState(false);
     const [toastType, settoastType] = useState("");
     const [toastMessage, setToastMessage] = useState("");
-    
+    const [decrypted_id, setDecrypted_id] = React.useState<string>("");
+    const [decrypted_meeting_id, setDecrypted_meeting_id] = React.useState<string>("");
+  useEffect(() => {
+    const call_fun=async () => {
+      const str=  await decrypt(encodedTxt) as { id: string, meeting_id: string };
+      setDecrypted_id(str.id);
+      setDecrypted_meeting_id(str.meeting_id);
+    }
+    call_fun()
+  }, []);
   
 
 
 useEffect(() => {
   
-  const socket = io("https://ishc-socket-io-server-1.onrender.com");
+  const socket = io("http://localhost:3001/");
   socketRef.current = socket;
   
- 
-  
- 
-  
   socket.on("connect", () => {
-    setmysocketId(socket.id)
-    const calling_join_room = async () => {
-        if(pathname?.includes("expert-dashboard")){
-              await call_join_room_to_socket_expert(roomId, socket.id)
-        }else if(pathname?.includes("homepage")){
-            await call_join_room_to_socket_student(roomId, socket.id)
-        
-          }
-      socket.emit('join-room', roomId);
-    }
-  calling_join_room()
+   socket.emit('join-room', encodedTxt);
 });
  
 
@@ -111,22 +108,6 @@ useEffect(() => {
   });
   socket.on("add-new-userDetails",({updatedUserDetails,existingUsers ,new_userId}: {updatedUserDetails: UsersMap,existingUsers: string[],new_userId:string}) => {
     
-       setToastMessage(updatedUserDetails[new_userId].name+" Joined"); 
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000);  
-
-
-    setRemoteUserIds(Array.from(new Set(existingUsers.filter((id)=> id != socket.id))))
-    const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
-
-    
-    setUserInforDetails(updatedUserDetails);
-    remoteUsersTemp.map((item)=>{
-    updatedUserDetails[item].muted=false;
-    updatedUserDetails[item].video_paused=false;
-   })
-   setUserInforDetails(updatedUserDetails)
   });
 
 
@@ -139,119 +120,31 @@ useEffect(() => {
     setchatMessages(prevMessages => [...prevMessages, msg]);
   });
 
-socket.on("user-disconnected", ({userId,name}:{userId: string,name:string}) => {
-  //notification
-  console.log(userId)
-  console.log("->"+UserInforDetails[userId])
-      setToastMessage(name +" left the seminar");
-       settoastType("failure");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
-
-
-
-  if (remoteVideoRefs.current[userId]?.current) {
-  remoteVideoRefs.current[userId].current.srcObject = null;
-  delete remoteVideoRefs.current[userId];
-  delete allStreamsRef.current[userId]
-
-    
-}
-
-  
-
-  setRemoteUserIds(prevIds => prevIds.filter(id => id !== userId));
-  console.log("viewing", remoteUserIds[0])
-  setviewingOnbigscreen(remoteUserIds[0])
-  const remoteUsersTemp= Array.from(new Set(remoteUserIds.filter((id)=> id != userId)));
-
-  if(remoteUsersTemp.length==0){
-      setviewingSelf(false)
-    }
-
+socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
+  console.log("User disconnecting:", userId, name);
 });
 
 
 
 
-  socket.on('room-info', ({ existingUsers, existingUserDetails }: { existingUsers: string[], existingUserDetails: any }) => {
+  socket.on('room-info', ({ existingParticipants, socketId ,userId,full_name}: { existingParticipants: string[], socketId: string, userId: string ,full_name: string}) => {
 
-     const remoteUsersTemp= Array.from(new Set(existingUsers.filter((id)=> id != socket.id)));
-    console.log("remoteUsersTemp",remoteUsersTemp)
-    if(remoteUsersTemp.length==0){
-      setviewingSelf(false)
-    }
-    remoteUsersTemp.map((item)=>{
-    existingUserDetails[item].muted=false;
-    existingUserDetails[item].video_paused=false;
-   })
-
-    setUserInforDetails(existingUserDetails);
-
-    existingUsers.forEach(id => {
-      if (!remoteVideoRefs.current[id]) {
-        remoteVideoRefs.current[id] = React.createRef<HTMLVideoElement>();
-      }
-    });
-    
-    const usersExceptMe = existingUsers.filter(id => id !== socket.id);
-
-
-    
-    setRemoteUserIds(Array.from(new Set(usersExceptMe)));
-    const temp=usersExceptMe
-    console.log("viewing",temp[0])
-    setviewingOnbigscreen(temp[0])
-
-
-
-
-    // ✅ Set default main video to first remote user (if available)
-    if (usersExceptMe.length > 0) {
-      setMainVideoRef(remoteVideoRefs.current[usersExceptMe[0]]);
-    }
-
+   console.log("Room info received:", { existingParticipants, socketId, userId, full_name });
 
     startMedia({
       videoRef: localVideoRef,
       remoteVideoRef,
       peerConnectionRef,
       socket,
-      roomId,
-      existingUsers,
+      userId,
+      decrypted_meeting_id,
+      existingParticipants,
       onLocalStream: (stream: MediaStream) => {
         localStreamRef.current = stream;
-        setRerender(!rerender)
+       
       },
       onRemoteStream: (userId: string, stream: MediaStream) => {
-        allStreamsRef.current[userId] = stream;
-          if(remoteUsersTemp.length==0){
-      setviewingSelf(true)
-      setviewingOnbigscreen(userId)
-     
-      
-    }
-      if(!(remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current)){
-         
-
-
-        remoteVideoRefs.current[userId] = React.createRef<HTMLVideoElement>();
-       
-        setTimeout(() => { setnewComer(userId) }, 5000);
-
-
-      }
-     
-       
-          
-      setTimeout(() => {
-     
-        if (remoteVideoRefs.current[userId] && remoteVideoRefs.current[userId].current) {
-          
-          remoteVideoRefs.current[userId].current!.srcObject = stream;
-        }
-        
-      }, 5000);
+        console.log("onRemoteStream called for userId:", userId, "with stream:", stream);
       },
     });
   });
@@ -260,7 +153,7 @@ socket.on("user-disconnected", ({userId,name}:{userId: string,name:string}) => {
   return () => {
     socket.disconnect();
   };
-}, [roomId]);
+}, [decrypted_meeting_id]);
 
 
  const send_note=(note:string,idx:string)=>{
@@ -314,47 +207,11 @@ const resumeRemoteVideo = (userId: string) => {
 };
 
 const muteRemoteAudio = (userId: string) => {
-  const stream = allStreamsRef.current[userId];
-  if (stream) {
-    console.log("given for muting",userId)
-    stream.getAudioTracks().forEach(track => (track.enabled = false));
-  }
-    setUserInforDetails((prev) => ({
-    ...prev,
-    [userId]: {
-      ...prev[userId],   // preserve existing data
-      "muted":true,          // apply updates
-    },
-  }));
-  setbtnRerender(!btnrerender)
-
-     //  notification
- setToastMessage(UserInforDetails[userId]?.name+"'s Audio  is Muted ");
-       settoastType("falure");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+ 
 };
 
 const unmuteRemoteAudio = (userId: string) => {
-  console.log("given for unmuting",userId)
-  const stream = allStreamsRef.current[userId];
-  if (stream) {
-    stream.getAudioTracks().forEach(track => (track.enabled = true));
-  }
-   setUserInforDetails((prev) => ({
-    ...prev,
-    [userId]: {
-      ...prev[userId],   // preserve existing data
-      "muted":false,          // apply updates
-    },
-  }));
-  setbtnRerender(!btnrerender)
-
-     //  notification
- setToastMessage(UserInforDetails[userId]?.name+"'s Audio  is unmuted ");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+ 
 };
 
 
@@ -364,63 +221,22 @@ const unmuteRemoteAudio = (userId: string) => {
 
 // Pause local video track
 const handlePause = () => {
-  console.log("called handle pause")
-  const stream = localStreamRef.current;
-  if (stream) {
-    stream.getVideoTracks().forEach(track => track.enabled = false);
-    setVideoPaused(true);
-  }
-  
-     //  notification
- setToastMessage("Your Camera  is turned Off ");
-       settoastType("failure");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+
 };
 
 
 // Play/resume local video track
 const handlePlay = () => {
-  console.log("called handle play")
-  const stream = localStreamRef.current;
-  if (stream) {
-    stream.getVideoTracks().forEach(track => track.enabled = true);
-    setVideoPaused(false);
-  }
-        //  notification
- setToastMessage("Your Camera  is turned on ");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+
 };
 // Mute local audio track
 const handleMute = () => {
-  const stream = localStreamRef.current;
-  if (stream) {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    setmutedself(true);
-  }
-      //  notification
- setToastMessage("Your mic  is turned off ");
-       settoastType("failure");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
+
 };
 
 // Unmute local audio track
 const handleUnmute = () => {
-  const stream = localStreamRef.current;
-  if (stream) {
-    stream.getAudioTracks().forEach(track => track.enabled = true);
-    setmutedself(false);
-  }
 
-
-      //  notification
- setToastMessage("Your speaker  is turned on ");
-       settoastType("success");
-      setShowToast(true);
-       setTimeout(() => {setShowToast(false);}, 5000); 
 };
 const handlegetOut = () => {
   const stream = localStreamRef.current;
@@ -438,7 +254,7 @@ const handleMsgSend = async() => {
  
   if (NewMessage=="") return; 
   setisloadingmsgSend(true)
-  await call_send_msg_through_socket(NewMessage, roomId);
+  await call_send_msg_through_socket(NewMessage, decrypted_meeting_id);
  setisloadingmsgSend(false)
 
 
@@ -574,14 +390,7 @@ useEffect(() => {
 
 
 {/* Self View Window (small) */}
-            {rerender?<div onClick={()=>{setviewingSelf(!viewingSelf)}}
-              className={`${remoteUserIds.length==0?"hidden":""}  absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
-              title="Click to swap videos"
-            >
-              {/* Small video (always rendered) */}
-              <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
-              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
-            </div>:
+            
             <div onClick={()=>{setviewingSelf(!viewingSelf)}}
               className={`${remoteUserIds.length==0?"hidden":""}  absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
               title="Click to swap videos"
@@ -589,7 +398,7 @@ useEffect(() => {
               {/* Small video (always rendered) */}
               <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
               <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
-            </div>}
+            </div>
           </div>
           {/* Participants */}
        
@@ -619,7 +428,7 @@ useEffect(() => {
         {/* Meeting Task List */}
         
         {/* Document List */}
-        <Video_call_Documets_review setmeetingTopic={setmeetingTopic} roomId= {roomId} send_note= {send_note} myObject={myObject} setMyObject={setMyObject}/>
+        <Video_call_Documets_review setmeetingTopic={setmeetingTopic} decrypted_meeting_id= {decrypted_meeting_id} send_note= {send_note} myObject={myObject} setMyObject={setMyObject}/>
       </aside>:null}
 
 

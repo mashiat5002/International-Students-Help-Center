@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 interface ParticipantsDetails  {
     email: string,
+    id: string,
     name: string,
     motive: string
 }

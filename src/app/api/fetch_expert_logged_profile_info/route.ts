@@ -1,5 +1,6 @@
 
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
+import Expert from "@/app/models/expert";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -25,22 +26,19 @@ export async function POST(request: Request) {
     exp: number;
   };
 
-    // const extracted_details= JSON.parse(details.toString());
-    
-  
 
-    // var result;
+    var result;
 
     
  
-    // result= await Expert.find({email: details.Email},{ 
-    // password:0, 
-    // varification_key: 0,
-    // varify_timeout: 0,
-    // active_status: 0,
-    //  status: 0,
+    result= await Expert.find({email: details.Email},{ 
+    password:0, 
+    varification_key: 0,
+    varify_timeout: 0,
+    active_status: 0,
+     status: 0,
  
-    // });
+    });
     
    
   if(!details){
@@ -48,7 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "No data found" }, { status: 404 });}
   else{
     console.log("Data fetched successfully")
-    return NextResponse.json({ message: "Data fetched successfully", data: details }, { status: 200 });
+    return NextResponse.json({ message: "Data fetched successfully", data: result }, { status: 200 });
   }
 
   }catch (error) {

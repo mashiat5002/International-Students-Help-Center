@@ -1,6 +1,5 @@
 
 import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
-import User from "@/app/models/user";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -15,23 +14,24 @@ export async function POST() {
     }
     const details = (await decrypt(session)) as {
     Email: string;
+    full_name: string;
+    id: string;
+    img: string;
     expires: string;
-    Password: string;
     iat: number;
     exp: number;
   };
    
-
-  var result= await User.find({email: details.Email},{img:1, email: 1, _id:0, full_name: 1 });
+  
+  // var result= await User.find({email: details.Email},{img:1, email: 1, _id:1, full_name: 1 });
    
    
    
-  if(!result){
+  if(!details){
     console.log("No data found")
     return NextResponse.json({ message: "No data found" }, { status: 404 });}
   else{
-    console.log("Data fetched successfully")
-    return NextResponse.json({ message: "Data fetched successfully", data: result }, { status: 200 });
+    return NextResponse.json({ message: "Data fetched successfully", data: details }, { status: 200 });
   }
 
   }catch (error) {

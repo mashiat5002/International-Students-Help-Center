@@ -70,7 +70,7 @@ const NoteModal = ({
   );
 };
 
-export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObject,setmeetingTopic}: { roomId: string, send_note: (note: string, idx: string) => void,setmeetingTopic:React.Dispatch<React.SetStateAction<string>> ,myObject:any,setMyObject:React.Dispatch<React.SetStateAction<{}>>}) => {
+export const Video_call_Documets_review = ({ decrypted_meeting_id ,send_note,myObject,setMyObject,setmeetingTopic}: { decrypted_meeting_id: string, send_note: (note: string, idx: string) => void,setmeetingTopic:React.Dispatch<React.SetStateAction<string>> ,myObject:any,setMyObject:React.Dispatch<React.SetStateAction<{}>>}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [meetingTasks, setMeetingTasks] = useState<MeetingTask[]>([]);
@@ -83,7 +83,9 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
   useEffect(() => {
     const callfun = async () => {
       setloadingdocDetails(true)
-      const res = await call_fetch_specific_doc(roomId);
+      if(!decrypted_meeting_id)
+        return
+      const res = await call_fetch_specific_doc(decrypted_meeting_id);
       setloadingdocDetails(false)
       
       
@@ -116,7 +118,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
       }
     };
     callfun();
-  }, []);
+  }, [decrypted_meeting_id]);
 
   // Function to handle sending the note
   const handleSendNote = () => {
@@ -132,7 +134,7 @@ export const Video_call_Documets_review = ({ roomId ,send_note,myObject,setMyObj
     }
 
 
-    const res= call_push_note_on_journey_step(roomId,noteStepIndex?.toString(), noteInput )
+    const res= call_push_note_on_journey_step(decrypted_meeting_id,noteStepIndex?.toString(), noteInput )
 
 
 

@@ -109,6 +109,7 @@ useEffect(() => {
       const fetchData = async () => {
         try {
           const response = await call_fetch_logged_id_info()
+
           setDetails(response)
          
         } catch (error) {

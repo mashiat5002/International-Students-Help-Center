@@ -7,6 +7,8 @@ import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
 import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
 import { call_fetch_meeting_requests_for_student } from '../(utils)/call_fetch_meeting_requests_for_student/call_fetch_meeting_requests_for_student';
+import { encrypt } from '../(utils)/jwt_encrypt_decrypt';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
 
 // Meeting details type
 type MeetingDetails = {
@@ -82,11 +84,23 @@ const MeetingDetailsPanel = ({
   toggleHeading_Details: boolean;
   settoggleHeading_Details: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const [param,setPeram] = useState<string>("");
+  useEffect(() => {
+    const getEncryptedparam=async()=>{
+      const loggedInfo= await call_fetch_logged_id_info()
+      console.log("meeting._id:", meeting._id)
+      const encryptedParam = await encrypt({meeting_id: meeting._id, id: loggedInfo.id ,full_name:loggedInfo.full_name});
+      
+      setPeram(encryptedParam);
+    }
+    getEncryptedparam()
+  
+  }, [meeting]);
   return (
     <div className="flex flex-col justify-between p-4 h-[calc(100vh-6rem)] overflow-x-hidden overflow-scroll backdrop-blur-md rounded-xl shadow-lg relative">
       
       <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
-        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Meeting With:</h4>
+        <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Meeting Withhh:</h4>
         <div className="flex flex-col sm:flex-row items-center gap-4 bg-white/80 rounded-lg shadow p-4">
           <img
             src={meeting.expert_img}
@@ -126,7 +140,7 @@ const MeetingDetailsPanel = ({
           <div className="flex flex-col items-center justify-center">
             <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Join Meeting</h4>
             <a
-              href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/meeting/${meeting._id}`}
+              href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/meeting/${param}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-lg font-semibold"

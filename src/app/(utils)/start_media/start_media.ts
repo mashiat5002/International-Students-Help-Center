@@ -12,8 +12,9 @@ export async function startMedia({
   remoteVideoRef,
   peerConnectionRef,
   socket,
-  roomId,
-  existingUsers,
+  userId,
+  decrypted_meeting_id,
+  existingParticipants,
   onLocalStream,
   onRemoteStream
 }: {
@@ -21,12 +22,14 @@ export async function startMedia({
   remoteVideoRef: React.RefObject<HTMLVideoElement>;
   peerConnectionRef: React.MutableRefObject<{ [key: string]: RTCPeerConnection }>;
   socket: any;
-  roomId: string;
-  existingUsers: string[];
+  userId: string;
+  decrypted_meeting_id: string;
+  existingParticipants: string[];
   onLocalStream?: (stream: MediaStream) => void;
   onRemoteStream?: (userId: string, stream: MediaStream) => void;
 }) {
 
+  
   const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   if (videoRef.current) videoRef.current.srcObject = localStream;
   if (onLocalStream) onLocalStream(localStream);
@@ -36,73 +39,70 @@ export async function startMedia({
   const pendingCandidates: { [id: string]: RTCIceCandidateInit[] } = {};
 
 
-  function createPeerConnection(userId: string): RTCPeerConnection {
+  function createPeerConnection(Uid: string): RTCPeerConnection {
+    // Finding out own public IP and port using public server of google and storing details connection in peer object.
     const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
 
 
-    // continuing local stream to remote
+    // grabbing local stream and adding tracks to peer connection
     localStream.getTracks().forEach(track => peer.addTrack(track, localStream));
 
 
+    // creating a remote stream object to handle remote stream
     const remoteStream = new MediaStream();
+
+    // assigning remote stream to video element
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
     }
-    if(userId != socket.id){
 
-      if (onRemoteStream) onRemoteStream(userId, remoteStream);
-    }
-
-    
+    // Hook incoming tracks into remoteStream
     peer.ontrack = (event) => {
-           // continuing remote stream to local
-        if (event.streams[0]) {
-          event.streams[0].getTracks().forEach(track => {
-            remoteStream.addTrack(track);
-          
-          });
-        } else {
-          console.warn("No stream received in ontrack from", userId);
-        }
-};
+      event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+      if (onRemoteStream) onRemoteStream(Uid, remoteStream);
+    };
+
 
 
 
     peer.onicecandidate = (event) => {
-      if(userId !=socket.id){
+      if(Uid !=userId){
       if (event.candidate) {
         socket.emit('webrtc-ice-candidate', {
-          to: userId,
-          from: socket.id,
+          to: Uid,
+          from: userId,
           candidate: event.candidate,
         });
       }}
     };
 
-
-    peers[userId] = peer;
+    peers[Uid] = peer;
     return peer;
   }
 
 
   // Store reference
-  peerConnectionRef.current = peers;
+  peerConnectionRef.current = { ...peerConnectionRef.current, ...peers };
+
 
 
   // === Handle offers to existing users ===
-  for (const userId of existingUsers) {
-    const peer = createPeerConnection(userId);
+  for (const Uid of existingParticipants) {
+
+    console.log("Creating peer connection for:", Uid);
+    const peer = createPeerConnection(Uid);
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
-    if(userId!=socket.id){
+    if(Uid!=userId){
 
-      socket.emit('webrtc-offer', { to: userId, from: socket.id, offer });
+      socket.emit('webrtc-offer', { to: Uid, from: userId, offer });
     }
   }
 
 
   // === Incoming offer ===
   socket.on('webrtc-offer', async ({ from, offer }: SignalData) => {
+    console.log("received offer from:", from);
     if (peers[from]) return; // Already handled
 
 
@@ -115,7 +115,7 @@ export async function startMedia({
     // console.log(offer, "completed setting remote description in webrtc-offer");
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
-    socket.emit('webrtc-answer', { to: from, from: socket.id, answer });
+    socket.emit('webrtc-answer', { to: from, from: userId, answer });
 
 
     // Add buffered ICE candidates

@@ -39,6 +39,7 @@ const Profile = ({ details }: { details: any }) => {
       setIsloading(true);
       try {
         const response = await call_fetch_student_profile_info();
+        console.log('Profile data fetched:', response);
         const userData = response.data[0];
         
         console.log('Raw userData from database:', userData);
@@ -96,7 +97,7 @@ const Profile = ({ details }: { details: any }) => {
       const response = await call_push_edited_profile(editedProfile);
       console.log('Profile update response:', response);
       
-      if (response.success) {
+      if (response=="info updated successfully") {
         setProfile(editedProfile);
         setIsEditing(false);
         // You could add a success toast here

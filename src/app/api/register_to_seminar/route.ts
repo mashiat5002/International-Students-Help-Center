@@ -1,12 +1,35 @@
+import { decrypt } from "@/app/(utils)/jwt_encrypt_decrypt";
 import ScheduledSeminars from "@/app/models/scheduled_seminars";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-interface ParticipantsDetails  {
-    email: string,
-    name: string,
-    motive: string
-}
+
 export async function POST(request: Request) {
-    const {participantName,participantEmail,seminarID,purpose} = await request.json();
+    const { seminarID, purpose } = await request.json();
+
+
+              const session = cookies().get("student-session")?.value;
+              if (!session) {
+                console.log("Session not found");
+                return NextResponse.json(
+                  { message: "Session not found" },
+                  { status: 404 }
+                );
+              }
+        
+        
+              // decrypting the session to get user details cannot be done in the server side as it is not secure
+              const details = (await decrypt(session)) as {
+                full_name: string;
+                Email: string;
+                expires: string;
+                Password: string;
+                iat: number;
+                exp: number;
+              };
+
+
+
+    
     if (!purpose) {
         return NextResponse.json({ message: "Must Provide Purpose!!!" }, { status: 404 });}
   try {
@@ -25,7 +48,7 @@ export async function POST(request: Request) {
       _id:seminarID,
       Scheduled_time: { $gt: now },
       registed_participants: { $lt: parseInt(seminar.max_Participants) },
-      "participants.email": { $ne: participantEmail },
+      "participants.email": { $ne: details.Email },
       status: {  $nin: ["cancelled", "ended", "completed"]},
       
 
@@ -33,8 +56,8 @@ export async function POST(request: Request) {
         {
             $push: {
                 participants: {
-                    name: participantName,
-                    email: participantEmail,
+                    name: details.full_name,
+                    email: details.Email,
                     motive: purpose
                 },
             },

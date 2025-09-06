@@ -20,11 +20,12 @@ export  async function POST(request:NextRequest){
     }
     
     const rows= await User.findOne({email:email,password:password})
+
     if (rows) {
         // const expires = new Date(Date.now() + 1 * 60 * 60  * 1000);
         const expires = new Date(Date.now() + 1 * 60 * 60 * 60 * 1000);
        
-        const session= await encrypt({Email:email,expires,full_name:rows.full_name});
+        const session= await encrypt({Email:email,expires,full_name:rows.full_name,id:rows._id,img:rows.img});
         cookies().set('student-session',session,{expires, httpOnly:true})
         
 

@@ -11,9 +11,6 @@ type seminarData={
 export async function call_schedule_seminar(seminarData:seminarData) {
    
     try{
-        const expertDetails= await call_fetch_expert_logged_id_info()
-      console.log("seminarData")
-      console.log(seminarData)
 
         const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/schedule_seminar`,{
             method:"POST",
@@ -26,8 +23,6 @@ export async function call_schedule_seminar(seminarData:seminarData) {
                 "date_time":seminarData.dateTime,
                 "seminarDuration":seminarData.duration,
                 "maxParticipants":seminarData.maxParticipants,
-                "expert_id":expertDetails._id,
-                "expert_name":expertDetails.full_name,
                 "topics":seminarData.topics
             }),
             

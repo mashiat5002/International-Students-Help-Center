@@ -1,9 +1,9 @@
 
 
 
-export async function call_fetch_expert_logged_id_info() {
+export async function call_fetch_expert_logged_profile_info() {
     
-    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/fetch_expert_logged_id_info`,{
+    const res= await fetch(`${process.env.NEXT_PUBLIC_Base_Url}/api/fetch_expert_logged_profile_info`,{
         method:"POST",
         headers:{
             "Content-Type": "application/json",
@@ -15,6 +15,6 @@ export async function call_fetch_expert_logged_id_info() {
     })
     const final_res= await res.json()
    
-    return final_res.data;
+    return final_res.data[0];
    
 }

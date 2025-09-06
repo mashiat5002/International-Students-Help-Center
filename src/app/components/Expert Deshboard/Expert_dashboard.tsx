@@ -14,6 +14,7 @@ import UpcomingSeminars from './UpcomingSeminars';
 import HeroSection from './HeroSection';
 import { call_logout_expert } from '@/app/(utils)/call_logout_expert/call_logout';
 import { useRouter } from 'next/navigation';
+import { call_fetch_expert_logged_profile_info } from '@/app/(utils)/call_fetch_expert_logged_profile_info/call_fetch_expert_logged_profile_info';
 
 
 const Expert_dashboard=()=> {
@@ -31,7 +32,7 @@ const Expert_dashboard=()=> {
         const fetchData = async () => {
           try {
             setLoadingProfileInfo(true);
-            const response = await call_fetch_expert_logged_id_info()
+            const response = await call_fetch_expert_logged_profile_info()
             setDetails(response)
             setLoadingProfileInfo(false);
             console.log("response");

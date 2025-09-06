@@ -14,7 +14,7 @@ export async function call_fetch_logged_id_info() {
         
     })
     const final_res= await res.json()
-   
-    return final_res.data[0];
+
+    return final_res.data;
    
 }

@@ -7,6 +7,9 @@ import Seminar_Registration_Modal from './Seminar_Registration_Modal';
 import LoadingSpinner from './common/LoadingSpinner';
 import Toast from './common/Toast';
 import timeFormatConverter from '../(utils)/time_format_converter/time_format_converter';
+import { FaVideo } from 'react-icons/fa';
+import { call_fetch_logged_id_info } from '../(utils)/call_fetch_logged_id_info/call_fetch_logged_id_info';
+import { encrypt } from '../(utils)/jwt_encrypt_decrypt';
 
 // New seminar details type
 type seminarDetails = {
@@ -109,6 +112,21 @@ const SeminarDetails = ({
   const registeredParticipants = parseInt(seminar.registed_participants);
   const availableSlots = maxParticipants - registeredParticipants;
   const progressPercentage = (registeredParticipants / maxParticipants) * 100;
+
+
+
+    const [param,setPeram] = useState<string>("");
+    useEffect(() => {
+      const getEncryptedparam=async()=>{
+        const loggedInfo= await call_fetch_logged_id_info()
+        console.log("seminar._id:", seminar._id)
+        const encryptedParam = await encrypt({meeting_id: seminar._id, id: loggedInfo.id ,full_name:loggedInfo.full_name});
+
+        setPeram(encryptedParam);
+      }
+      getEncryptedparam()
+    
+    }, [seminar]);
  
   return (
     <div className="flex flex-col justify-between  p-4    h-[calc(100vh-6rem)]  overflow-x-hidden overflow-scroll backdrop-blur-md rounded-xl shadow-lg ">
@@ -178,7 +196,23 @@ const SeminarDetails = ({
               />
             </div>
           </div>
-          <button
+          {seminar.status=="ongoing"?
+          
+      <div className="bg-blue-50/50 p-3 sm:p-4 rounded-xl mb-2">
+          <div className="flex flex-col items-center justify-center">
+            <h4 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">Join Meeting</h4>
+              <a
+              href={`${process.env.NEXT_PUBLIC_Base_Url}/homepage/seminar/${param}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors text-lg font-semibold"
+            >
+              <FaVideo className="text-2xl" />
+              <span>Join Now</span>
+            </a>
+          </div>
+      </div>
+     :<button
             onClick={() => onRegister(seminar)}
             disabled={availableSlots <= 0 || seminar.isregistered || seminar.status=="cancelled" || seminar.status=="ended" }
             className={`${seminar.status=="ended" || seminar.status=="cancelled"?"bg-red-400 cursor-default":seminar.isregistered?"bg-green-400 ":seminar.max_Participants<=seminar.registed_participants?"bg-red-400":""} w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r text-blue-900 font-semibold rounded-2xl shadow-md transition duration-300 ease-in-out text-sm sm:text-base
@@ -187,7 +221,7 @@ const SeminarDetails = ({
                 : 'bg-green-400 text-blue-600 cursor-default '}`}
           > 
             {seminar.status=="cancelled"?"cancelled":seminar.status=="ended"?"Ended":seminar.isregistered?"You Are Registered":availableSlots > 0 ? 'Register Now' : 'Fully Booked'}
-          </button>
+          </button>}
         </div>
       </div>
 

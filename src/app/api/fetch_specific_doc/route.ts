@@ -7,7 +7,6 @@ export async function POST(request:NextRequest) {
   try{
      
 
-
   const resp= await MeetingRequests.find({_id: body.roomId,},{journey_id:1,Institution:1,fieldOfStudy:1,ApplyingOn:1,meeting_topic:1,Scheduled_time:1});
   const res= await Journey.find({_id: resp[0].journey_id},{steps:1});
   if(!res){
