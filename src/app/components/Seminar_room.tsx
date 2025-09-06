@@ -104,7 +104,7 @@ const Seminar_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:strin
 
 useEffect(() => {
   
-  const socket = io("https://ishc-socketio-server-production.up.railway.app");
+  const socket = io("https://ishc-socket-io-server-1.onrender.com");
   socketRef.current = socket;
   
   socket.on("connect", () => {
