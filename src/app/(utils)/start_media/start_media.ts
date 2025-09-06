@@ -103,7 +103,7 @@ export async function startMedia({
   // === Incoming offer ===
   socket.on('webrtc-offer', async ({ from, offer }: SignalData) => {
     console.log("received offer from:", from);
-    if (peers[from]) return; // Already handled
+    // if (peers[from]) return; // Already handled
     console.log("not already handled");
 
 
