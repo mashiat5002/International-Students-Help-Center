@@ -104,6 +104,7 @@ export async function startMedia({
   socket.on('webrtc-offer', async ({ from, offer }: SignalData) => {
     console.log("received offer from:", from);
     if (peers[from]) return; // Already handled
+    console.log("not already handled");
 
 
     const peer = createPeerConnection(from);
