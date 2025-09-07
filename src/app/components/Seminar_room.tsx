@@ -19,6 +19,7 @@ import { call_join_room_to_socket_student } from '../../../lib/auth/join_room_to
 import { call_join_room_to_socket_expert } from '../../../lib/auth/call_join_room_to_socket_expert';
 import { call_fetch_expert_logged_id_info } from '../(utils)/call_fetch_expert_logged_id_info/call_fetch_expert_logged_id_info';
 import { decrypt } from '../(utils)/jwt_encrypt_decrypt';
+import { Stream } from 'nodemailer/lib/xoauth2';
 
 // Add fetch utility for seminar by ID
 
@@ -53,15 +54,18 @@ type seminarDetails={
     duration: string;
     topics: string[];
 }
-
+type userDetails={
+    roomId: string, 
+    socketId: string,
+    fullName: string, 
+    isMute: boolean, 
+    isVideoOn: boolean,
+    stream?: MediaStream
+}
 const Seminar_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:string|null}) => {
 
-    const [newComer,setnewComer]= useState("")
     const [rerender,setRerender] = useState<boolean>(true)
-    const [btnrerender,setbtnRerender] = useState<boolean>(true)
     const [viewingSelf,setviewingSelf] = useState<boolean>(true)
-    const [vdoPausedself,setvdoPausedself] = useState<boolean>(false)
-    const [mutedself,setmutedself] = useState<boolean>(false)
     const [viewingOnbigscreen,setviewingOnbigscreen] = useState<string>('')
     const [mysocketId,setmysocketId] = useState<string>('')
     const [NewMessage,setNewMessage] = useState<string>('')
@@ -70,14 +74,15 @@ const Seminar_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:strin
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const peerConnectionRef = useRef<{ [userId: string]: RTCPeerConnection }>({});
     const localStreamRef = useRef<MediaStream | null>(null);
-    const [videoPaused, setVideoPaused] = useState(false);
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const [remoteUserIds, setRemoteUserIds] = useState<string[]>([]);
-    const remoteVideoRefs = useRef<{ [id: string]: React.RefObject<HTMLVideoElement> }>({});
-    const [mainVideoRef, setMainVideoRef] = useState<React.RefObject<HTMLVideoElement>>(localVideoRef);
     const [UserInforDetails , setUserInforDetails] = useState<UsersMap >({});
     const allStreamsRef = useRef<{ [userId: string]: MediaStream }>({});
     const [isloadingmsgSend, setisloadingmsgSend] = useState(false);
+    const [ParticipantsOrder, setParticipantsOrder] = useState<string[]>([]); // keeps order for big screen/thumbnails
+    const [ParticipantsInfoMap, setParticipantsInfoMap] = useState<{ [id: string]: userDetails }>({}); // fast lookup by id
+    const [myUserId, setMyUserId] = useState<string>("");
+
     const router = useRouter();
     
     // Seminar details state
@@ -146,6 +151,21 @@ socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
 
    console.log("Room info received:", { existingParticipants, socketId, userId, full_name });
 
+    // Initialize self as a participant and set ordering with self in front
+    setMyUserId(userId);
+    setParticipantsInfoMap(prev => ({
+      ...prev,
+      [userId]: {
+        roomId: encodedTxt,
+        socketId: userId,
+        fullName: full_name || `You`,
+        isMute: false,
+        isVideoOn: true,
+        stream: prev[userId]?.stream,
+      }
+    }));
+    setParticipantsOrder(prev => (prev.length === 0 ? [userId] : prev));
+
     startMedia({
       videoRef: localVideoRef,
       remoteVideoRef,
@@ -156,11 +176,32 @@ socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
       existingParticipants,
       onLocalStream: (stream: MediaStream) => {
         localStreamRef.current = stream;
-       
+        // Register/update local stream and ensure self is first in order
+        setParticipantsInfoMap(prev => ({
+          ...prev,
+          [userId]: {
+            roomId: encodedTxt,
+            socketId: userId,
+            fullName: full_name || `You`,
+            isMute: false,
+            isVideoOn: true,
+            stream,
+          }
+        }));
+        setParticipantsOrder(prev => {
+          const withoutSelf = prev.filter(id => id !== userId);
+          return [userId, ...withoutSelf];
+        });
       },
       onRemoteStream: (userId: string, stream: MediaStream) => {
         console.log("onRemoteStream called for userId:", userId, "with stream:", stream);
-      },
+        handleRemoteStream(userId, stream);
+
+        stream.getTracks().forEach(track => {
+          track.addEventListener("ended", () => handleTrackEnded(userId));
+        });
+
+      }
     });
   });
 
@@ -189,7 +230,50 @@ useEffect(() => {
 }, [decrypted_meeting_id]);
 
 
- 
+function handleRemoteStream(userId: string, stream: MediaStream) {
+  setParticipantsInfoMap(prev => ({
+    ...prev,
+    [userId]: {
+      ...prev[userId],
+      stream, // add/update stream
+    }
+  }));
+
+  setParticipantsOrder(prev => prev.includes(userId) ? prev : [...prev, userId]);
+}
+
+
+function handleTrackEnded(userId: string) {
+  setParticipantsInfoMap(prev => ({
+    ...prev,
+    [userId]: {
+   ...prev[userId],
+      stream: undefined, // remove stream
+    }
+  }));
+}
+
+function handleUserLeft(userId: string) {
+  setParticipantsOrder(prev => prev.filter(id => id !== userId));
+  setParticipantsInfoMap(prev => {
+    const newMap = { ...prev };
+    delete newMap[userId];
+    return newMap;
+  });
+}
+
+function bringUserToFront(userId: string) {
+  setParticipantsOrder(prev => {
+    const index = prev.indexOf(userId);
+    if (index === -1) return prev;
+    const newOrder = [...prev];
+    newOrder.splice(index, 1);
+    newOrder.unshift(userId);
+    return newOrder;
+  });
+}
+
+
 
 
 const pauseRemoteVideo = (userId: string) => {
@@ -326,7 +410,7 @@ useEffect(() => {
           <div className="flex items-center ">
             
             <span className="ml-2 font-semibold text-base sm:text-lg mr-5">{seminarDetails?.meeting_topic}</span>
-            <span className="ml-2 text-gray-500 text-xs sm:text-sm md:mt-2">{remoteUserIds.length+1} Joined</span>
+            <span className="ml-2 text-gray-500 text-xs sm:text-sm md:mt-2">{ParticipantsOrder.length} Joined</span>
           </div>
           {pathname?.includes("expert-dashboard")?<button onClick={()=>handlegetOut()} className="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-base">End Meeting</button>:null}
         </div>
@@ -343,12 +427,12 @@ useEffect(() => {
             <div
               className={`w-full ${(isFullscreen || !showSidePanels) ? 'h-full' : 'h-80 sm:h-[26rem]'} object-cover rounded-xl relative`}
             >
-              {/* Local video in main area */}
-              <p className='absolute m-4 bg-transparent font-bold text-white'>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
+              {/* Big video shows the first participant in order */}
+              <p className='absolute m-4 bg-transparent font-bold text-white'>{ParticipantsInfoMap[ParticipantsOrder[0]]?.fullName || (ParticipantsOrder[0] ? `User ${ParticipantsOrder[0].slice(0,5)}` : '')}</p>
              
              
          
-            <VideoBoxBig stream={!viewingSelf?localStreamRef.current:allStreamsRef.current[remoteUserIds[0]] }   rerender={rerender}   />
+            <VideoBoxBig stream={ParticipantsInfoMap[ParticipantsOrder[0]]?.stream || null}   rerender={rerender}   />
         
             </div>
             
@@ -374,14 +458,20 @@ useEffect(() => {
 
             {/* Self View Window (small) */}
           
-            <div onClick={()=>{setviewingSelf(!viewingSelf)}}
-              className={`${remoteUserIds.length==0?"hidden":""}  absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
-              title="Click to swap videos"
-            >
-              {/* Small video (always rendered) */}
-              <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
-              <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
-            </div>
+            {myUserId && ParticipantsOrder[0] && myUserId !== ParticipantsOrder[0] ? (
+              <div onClick={() => bringUserToFront(myUserId)}
+                className={`absolute bottom-4 right-4 w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl shadow-lg flex flex-col items-center justify-end overflow-hidden border-2 border-white cursor-pointer`}
+                title="Click to make you big"
+              >
+                <VideoBoxSmall
+                  key={myUserId}
+                  stream={ParticipantsInfoMap[myUserId]?.stream}
+                  name={ParticipantsInfoMap[myUserId]?.fullName || `You`}
+                  isMuted={!ParticipantsInfoMap[myUserId]?.stream || !!ParticipantsInfoMap[myUserId]?.isMute}
+                />
+                <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{ParticipantsInfoMap[myUserId]?.fullName || 'You'}</span> 
+              </div>
+            ) : null}
           </div>
           {/* Participants */}
        
@@ -406,30 +496,24 @@ useEffect(() => {
       </main>
 
       {/* Participants Sidebar */}
-      {showSidePanels && remoteUserIds.slice(1).length > 0 ? (
+      {showSidePanels && ParticipantsOrder.slice(1).length > 0 ? (
         <aside className="flex flex-col gap-3 overflow-y-auto max-h-[80vh] w-28 sm:w-36 p-2 bg-white rounded-xl shadow-md">
           {/* Remote videos */}
-          {remoteUserIds.slice(1).map(id => (
+          {ParticipantsOrder.slice(1).map(id => (
             <div
               key={id}
-              onClick={() => {
-                const temp = [...remoteUserIds];
-                const targetIdx = temp.indexOf(id);
-                const prevOntarget = temp[0];
-                temp[0] = id; 
-                temp[targetIdx] = prevOntarget;
-                setRemoteUserIds(temp);
-                setRerender(!rerender);
-                setviewingSelf(true);
-                setviewingOnbigscreen(id)
-              
-              }}
+              onClick={() => bringUserToFront(id)}
               className="relative rounded-lg border-2 border-gray-300 bg-gray-100 cursor-pointer"
               style={{ aspectRatio: '1/1' }}
             >
-              <VideoBoxSmall stream={allStreamsRef.current[id]} rerender={rerender} />
+              <VideoBoxSmall
+                key={id}
+                stream={ParticipantsInfoMap[id]?.stream}
+                name={ParticipantsInfoMap[id]?.fullName || `User ${id.slice(0,5)}`}
+                isMuted={!ParticipantsInfoMap[id]?.stream || !!ParticipantsInfoMap[id]?.isMute}
+              />
               <span className="absolute bottom-1 left-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded text-center truncate">
-                {UserInforDetails ? UserInforDetails[id]?.name : `User ${id.substring(0, 5)}`}
+                {ParticipantsInfoMap[id]?.fullName || `User ${id.substring(0, 5)}`}
               </span>
             </div>
           ))}
