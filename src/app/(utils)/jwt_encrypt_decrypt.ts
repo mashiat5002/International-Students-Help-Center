@@ -12,6 +12,7 @@ export const encrypt= (payload:Record<string, any>)=>{
 
 
 export async function decrypt(input:string){
+
     const  {payload} = await jwtVerify(input, secret_key, {
         algorithms:['HS256']
     })

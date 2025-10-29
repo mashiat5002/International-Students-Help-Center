@@ -38,6 +38,13 @@ type UserInfo = {
   muted: boolean;
   video_paused: boolean;
 };
+export type UserInformationWithId = {
+  id: string;
+  fullName: string;
+  roomId: string;
+  muted: boolean;
+  video_paused: boolean;
+};
 
 type UsersMap = {
   [socketId: string]: UserInfo;
@@ -100,6 +107,7 @@ const Seminar_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:strin
 
   useEffect(() => {
     const call_fun=async () => {
+
       const str=  await decrypt(encodedTxt) as { id: string, meeting_id: string };
       setDecrypted_id(str.id);
       setDecrypted_meeting_id(str.meeting_id);
@@ -109,7 +117,7 @@ const Seminar_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:strin
 
 useEffect(() => {
   
-  const socket = io("https://ishc-socket-io-server-1.onrender.com");
+  const socket = io("http://localhost:3001");
   socketRef.current = socket;
   
   socket.on("connect", () => {
@@ -117,28 +125,28 @@ useEffect(() => {
 });
  
 
-  socket.on("receive-notes",({msg}: {msg: any}) => {
-    // console.log('received note:', msg);
-    setMyObject(prev => ({
-  ...prev,         // keep all existing keys
-  [msg.idx]: msg.note  // add a new key "country"
-}));
+//   socket.on("receive-notes",({msg}: {msg: any}) => {
+//     // console.log('received note:', msg);
+//     setMyObject(prev => ({
+//   ...prev,         // keep all existing keys
+//   [msg.idx]: msg.note  // add a new key "country"
+// }));
 
    
-  });
-  socket.on("add-new-userDetails",({updatedUserDetails,existingUsers ,new_userId}: {updatedUserDetails: UsersMap,existingUsers: string[],new_userId:string}) => {
+//   });
+//   socket.on("add-new-userDetails",({updatedUserDetails,existingUsers ,new_userId}: {updatedUserDetails: UsersMap,existingUsers: string[],new_userId:string}) => {
     
-  });
+//   });
 
 
-  socket.on("send-previous-chats",({msg}: {msg: ChatMessage[]}) => {
-    // console.log('[VideoMeeting] Received chat messages:', msg);
-    setchatMessages(prevMessages => [...prevMessages, ...msg]);
-  });
-  socket.on("receive-chat",({msg}: {msg: ChatMessage}) => {
-    // console.log('[VideoMeeting] Received chat message:', msg);
-    setchatMessages(prevMessages => [...prevMessages, msg]);
-  });
+  // socket.on("send-previous-chats",({msg}: {msg: ChatMessage[]}) => {
+  //   // console.log('[VideoMeeting] Received chat messages:', msg);
+  //   setchatMessages(prevMessages => [...prevMessages, ...msg]);
+  // });
+  // socket.on("receive-chat",({msg}: {msg: ChatMessage}) => {
+  //   // console.log('[VideoMeeting] Received chat message:', msg);
+  //   setchatMessages(prevMessages => [...prevMessages, msg]);
+  // });
 
 socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
   console.log("User disconnecting:", userId, name);
@@ -147,9 +155,23 @@ socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
 
 
 
-  socket.on('room-info', ({ existingParticipants, socketId ,userId,full_name}: { existingParticipants: string[], socketId: string, userId: string ,full_name: string}) => {
+  socket.on('room-info', ({ existingParticipants, socketId ,userId,full_name}: { existingParticipants: UserInformationWithId[], socketId: string, userId: string ,full_name: string}) => {
 
-   console.log("Room info received:", { existingParticipants, socketId, userId, full_name });
+   console.log("  received:", { existingParticipants, socketId, userId, full_name });
+
+   existingParticipants.map((user)=>{
+        setParticipantsInfoMap(prev => ({
+      ...prev,
+      [user.id]: {
+        roomId: encodedTxt,
+        socketId: user.id,
+        fullName: user.fullName,
+        isMute: false,
+        isVideoOn: true,
+        stream: prev[user.id]?.stream,
+      }
+    }));
+   })
 
     // Initialize self as a participant and set ordering with self in front
     setMyUserId(userId);
@@ -345,6 +367,18 @@ useEffect(() => {
   (window as any).viewingOnbigscreen = viewingOnbigscreen;
   // (window as any).mysocketId = mysocketId;
 }, [viewingOnbigscreen]);
+
+
+useEffect(() => {
+  // (window as any).remoteUserIds = remoteUserIds;
+  (window as any).ParticipantsOrder = ParticipantsOrder;
+  // (window as any).mysocketId = mysocketId;
+}, [ParticipantsOrder]);
+useEffect(() => {
+  // (window as any).remoteUserIds = remoteUserIds;
+  (window as any).ParticipantsInfoMap = ParticipantsInfoMap;
+  // (window as any).mysocketId = mysocketId;
+}, [ParticipantsInfoMap]);
 
   // Fullscreen effect for video area
   useEffect(() => {

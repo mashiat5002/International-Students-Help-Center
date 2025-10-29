@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
 export interface IMeetingRequests extends Document {
     expert_id: string;
+    student_email: string;
+    student_full_name: string;
     expert_full_name: string;
+    ApplyingOn: string;
     journey_id: string;
     Institution: string;
     fieldOfStudy: string;
-    ApplyingOn: string;
     meeting_topic: string;
-    student_email: string;
-    student_full_name: string;
     Request_time: {type:Date };
     Scheduled_time: string;
 

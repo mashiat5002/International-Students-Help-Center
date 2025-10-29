@@ -89,7 +89,7 @@ const Meeting_room = ({ encodedTxt,pathname }: {encodedTxt:string,pathname:strin
 
 useEffect(() => {
   
-  const socket = io("https://ishc-socket-io-server-1.onrender.com");
+  const socket = io("http://localhost:3001");
   socketRef.current = socket;
   
   socket.on("connect", () => {

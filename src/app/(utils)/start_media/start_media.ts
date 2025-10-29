@@ -1,3 +1,5 @@
+import { UserInformationWithId } from "@/app/components/Seminar_room";
+
 type SignalData = {
   from: string;
   to: string;
@@ -24,7 +26,7 @@ export async function startMedia({
   socket: any;
   userId: string;
   decrypted_meeting_id: string;
-  existingParticipants: string[];
+  existingParticipants: UserInformationWithId[];
   onLocalStream?: (stream: MediaStream) => void;
   onRemoteStream?: (userId: string, stream: MediaStream) => void;
 }) {
@@ -88,14 +90,16 @@ export async function startMedia({
 
   // === Handle offers to existing users ===
   for (const Uid of existingParticipants) {
+    console.log("- offering to"+Uid.id+"from"+userId)
 
-    console.log("Creating peer connection for:", Uid);
-    const peer = createPeerConnection(Uid);
+    // console.log("Creating peer connection for:", Uid);
+    const peer = createPeerConnection(Uid.id);
+    // console.log("Creating peer connection for:", peer);
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
-    if(Uid!=userId){
-
-      socket.emit('webrtc-offer', { to: Uid, from: userId, offer });
+    if(Uid.id!=userId){
+      console.log("offering to"+Uid.id+"from"+userId)
+      socket.emit('webrtc-offer', { to: Uid.id, from: userId, offer });
     }
   }
 
