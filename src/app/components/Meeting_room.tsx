@@ -131,6 +131,15 @@ socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
 
    console.log("Room info received:", { existingParticipants, socketId, userId, full_name });
 
+    // Map string IDs to UserInformationWithId objects expected by startMedia
+    const existingParticipantsDetailed = existingParticipants.map(id => ({
+      id,
+      fullName: `User ${id.substring(0, 5)}`,
+      roomId: decrypted_meeting_id,
+      muted: false,
+      video_paused: false,
+    }));
+
     startMedia({
       videoRef: localVideoRef,
       remoteVideoRef,
@@ -138,7 +147,7 @@ socket.on("disconnecting", ({userId,name}:{userId: string,name:string}) => {
       socket,
       userId,
       decrypted_meeting_id,
-      existingParticipants,
+      existingParticipants: existingParticipantsDetailed,
       onLocalStream: (stream: MediaStream) => {
         localStreamRef.current = stream;
        
@@ -354,7 +363,7 @@ useEffect(() => {
               <p className='absolute m-4 bg-transparent font-bold '>{UserInforDetails ? UserInforDetails[!viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${remoteUserIds[0].substring(0, 5)}`}</p>
              
          
-            <VideoBoxBig stream={!viewingSelf?localStreamRef.current:allStreamsRef.current[remoteUserIds[0]] }   rerender={rerender}   />
+            <VideoBoxBig stream={!viewingSelf ? localStreamRef.current : (allStreamsRef.current[remoteUserIds[0]] || null)}   rerender={rerender}   />
               
               
              
@@ -396,7 +405,11 @@ useEffect(() => {
               title="Click to swap videos"
             >
               {/* Small video (always rendered) */}
-              <VideoBoxSmall rerender={rerender} stream={viewingSelf?localStreamRef.current  : allStreamsRef.current[remoteUserIds[0]]}/>
+              <VideoBoxSmall
+                stream={viewingSelf ? (localStreamRef.current || undefined) : allStreamsRef.current[remoteUserIds[0]]}
+                name={UserInforDetails ? (UserInforDetails[viewingSelf ? mysocketId : remoteUserIds[0]]?.name || `User ${(viewingSelf ? mysocketId : remoteUserIds[0])?.substring(0, 5)}`) : `User ${(viewingSelf ? mysocketId : remoteUserIds[0])?.substring(0, 5)}`}
+                isMuted={!(viewingSelf ? localStreamRef.current : allStreamsRef.current[remoteUserIds[0]])}
+              />
               <span className="bg-black bg-opacity-60 text-white text-xs px-2 py-1 w-full text-center absolute bottom-0 left-0">{UserInforDetails ? UserInforDetails[viewingSelf?mysocketId:remoteUserIds[0]]?.name : `User ${mysocketId.substring(0, 5)}`} </span> 
             </div>
           </div>
