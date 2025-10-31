@@ -106,9 +106,6 @@ Student clicking to open request form:
 <div align="center"><img src="/public/student-clicking-to-open-request-form.png" alt="Student Clicking Request" width="500" /></div>
 *Visual showing a student initiating the process to connect with an expert by opening the meeting request form.*
 
-Meeting requests list:
-<div align="center"><img src="/public/meeting-requests-list.png" alt="Meeting Requests List" width="500" /></div>
-*List view of all meeting requests, allowing students to track the status of their expert consultations.*
 
 Seminar scheduling form:
 <div align="center"><img src="/public/seminar-scheduing-form.png" alt="Seminar Scheduling" width="500" /></div>
